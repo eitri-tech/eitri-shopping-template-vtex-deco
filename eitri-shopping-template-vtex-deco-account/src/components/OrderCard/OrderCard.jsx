@@ -1,6 +1,6 @@
 import Eitri from 'eitri-bifrost'
 import { useState, useEffect } from 'react'
-import { GenericBox, CopyIcon } from 'eitri-shopping-monte-carlo-shared'
+import { GenericBox, CopyIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import OrderStatusBadge from '../OrderStatusBadge/OrderStatusBadge'
 import { formatDateDaysMonthYear, formatPriceInCents } from '../../utils/utils'
 import { getOrderById } from '../../services/CustomerService'

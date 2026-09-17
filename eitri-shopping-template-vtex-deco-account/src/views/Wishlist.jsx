@@ -11,7 +11,7 @@ import {
 	CustomButton,
 	WishlistIcon,
 	useRetractableBottomBar
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import { sendScreenView } from '../services/TrackingService'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { EventBusChannels, EventBus } from 'eitri-shopping-vtex-shared'

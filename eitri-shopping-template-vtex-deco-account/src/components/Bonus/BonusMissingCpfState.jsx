@@ -1,5 +1,5 @@
 import { View, Text } from 'eitri-luminus'
-import { CustomButton, UserIcon } from 'eitri-shopping-monte-carlo-shared'
+import { CustomButton, UserIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 import BonusHelpSection from './BonusHelpSection'
 

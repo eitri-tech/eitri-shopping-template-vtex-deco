@@ -10,6 +10,10 @@ module.exports = {
   'organizationId': '36c61ecd-383b-41a5-8be4-3e4aa4dafe3c',
   'organization': {},
   "eitri-app-dependencies": {
+    "eitri-shopping-template-vtex-deco-shared": {
+      "isEitriAppShared": true,
+      "version": "0.1.0"
+    },
     "eitri-shopping-vtex-shared": {
       "isEitriAppShared": true,
       "version": "1.18.0"

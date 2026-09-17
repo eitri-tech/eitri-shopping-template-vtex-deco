@@ -6,7 +6,7 @@ import {
 	BottomInset,
 	GenericBox,
 	useRetractableBottomBar
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import NoItem from '../components/NoItem/NoItem'
 import { sendScreenView } from '../services/TrackingService'
 import { useTranslation } from 'eitri-i18n'

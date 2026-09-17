@@ -4,7 +4,7 @@ import {
 	HeaderText,
 	CustomButton,
 	CustomInput
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import { sendScreenView } from '../services/TrackingService'

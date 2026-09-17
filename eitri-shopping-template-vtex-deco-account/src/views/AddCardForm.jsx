@@ -9,7 +9,7 @@ import {
 	CustomButton,
 	CustomInput,
 	CheckIcon
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import Alert from '../components/Alert/Alert'
 import Recaptcha from '../services/Recaptcha'
 import { addNewCard } from '../services/CustomerService'

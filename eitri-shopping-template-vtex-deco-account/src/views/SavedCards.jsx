@@ -8,7 +8,7 @@ import {
 	CustomButton,
 	CreditCardIcon,
 	TrashIcon
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import ProtectedView from '../components/ProtectedView/ProtectedView'
 import ModalConfirm from '../components/ModalConfirm/ModalConfirm'
 import { getSavedCards, deleteSavedCard } from '../services/CustomerService'

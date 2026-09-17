@@ -1,6 +1,6 @@
 import Eitri from 'eitri-bifrost'
 import { isLoggedIn } from '../../services/CustomerService'
-import { Loading } from 'eitri-shopping-monte-carlo-shared'
+import { Loading } from 'eitri-shopping-template-vtex-deco-shared'
 
 export default function ProtectedView(props) {
 	const { afterLoginRedirectTo, redirectState } = props

@@ -1,6 +1,6 @@
 import Eitri from 'eitri-bifrost'
 import { View, Text } from 'eitri-luminus'
-import { CustomButton, AlertIcon } from 'eitri-shopping-monte-carlo-shared'
+import { CustomButton, AlertIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 
 /**

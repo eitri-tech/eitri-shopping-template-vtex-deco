@@ -1,5 +1,5 @@
 import { Page, View, Text } from 'eitri-luminus'
-import { HeaderContentWrapper, HeaderReturn, BottomInset, Loading } from 'eitri-shopping-monte-carlo-shared'
+import { HeaderContentWrapper, HeaderReturn, BottomInset, Loading } from 'eitri-shopping-template-vtex-deco-shared'
 import { EventBus, EventBusChannels } from 'eitri-shopping-vtex-shared'
 import { useTranslation } from 'eitri-i18n'
 import { sendScreenView } from '../services/TrackingService'

@@ -1,4 +1,4 @@
-import { GenericBox } from 'eitri-shopping-monte-carlo-shared'
+import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 
 export default function InfoCard(props) {
 	const { customerData } = props

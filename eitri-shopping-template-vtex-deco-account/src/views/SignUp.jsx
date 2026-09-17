@@ -6,10 +6,10 @@ import {
 	HeaderContentWrapper,
 	HeaderReturn,
 	Loading
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import userIcon from '../assets/icons/user.svg'
 import { sendScreenView } from '../services/TrackingService'
-import { TrackingService } from 'eitri-shopping-monte-carlo-shared'
+import { TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
 import { getSavedUser, loginWithEmailAndKey, sendAccessKeyByEmail } from '../services/CustomerService'
 import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'

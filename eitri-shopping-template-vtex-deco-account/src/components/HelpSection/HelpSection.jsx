@@ -1,5 +1,5 @@
 import Eitri from 'eitri-bifrost'
-import { Divisor, WhatsappIcon, InfoCircleIcon, ArrowRightIcon } from 'eitri-shopping-monte-carlo-shared'
+import { Divisor, WhatsappIcon, InfoCircleIcon, ArrowRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { RemoteConfig } from 'eitri-shopping-vtex-shared'
 import { useTranslation } from 'eitri-i18n'
 

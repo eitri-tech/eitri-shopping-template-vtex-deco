@@ -6,7 +6,7 @@ import {
 	CustomInput,
 	HeaderReturn,
 	GenericBox
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import Alert from '../components/Alert/Alert'
 import { sendPasswordResetCode } from '../services/CustomerService'
 import { sendScreenView } from '../services/TrackingService'

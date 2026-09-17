@@ -1,4 +1,3 @@
-// /Users/calindra/Workspace/Eitri/eitri-shopping-template/shopping-vtex-template-account/src/views/PasswordResetNewPass.jsx
 import {
 	Loading,
 	HeaderContentWrapper,
@@ -6,7 +5,7 @@ import {
 	HeaderText,
 	CustomButton,
 	CustomInput
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import Alert from '../components/Alert/Alert'
 import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'

@@ -9,7 +9,7 @@ import {
 	CustomButton,
 	Loading,
 	GenericBox
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { sendScreenView } from '../services/TrackingService'
 import { createAddress, resolvePostalCode, updateAddress } from '../services/AddressService'

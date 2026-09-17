@@ -9,7 +9,7 @@ import {
 	Loading,
 	HeaderReturn,
 	BottomInset
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 import formatDateMMDDYYYY, { formatDate } from '../utils/utils'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'

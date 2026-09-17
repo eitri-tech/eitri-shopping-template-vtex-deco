@@ -1,6 +1,6 @@
 import Eitri from 'eitri-bifrost'
 import { Vtex } from 'eitri-shopping-vtex-shared'
-import { Datadog, TrackingService } from 'eitri-shopping-monte-carlo-shared'
+import { Datadog, TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
 
 /**
  * Real "Meu Bônus" extract (wallets / orders / incentives) — Monte Carlo's own

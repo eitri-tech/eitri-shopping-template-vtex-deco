@@ -1,5 +1,5 @@
 import Eitri from 'eitri-bifrost'
-import { getCartTabBadgeIndex } from 'eitri-shopping-monte-carlo-shared'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
 import { getCart, addItemToCart, removeCartItem, updateItemOnCart } from '../services/CartService'
 const LocalCart = createContext({})
 export default function CartProvider({ children }) {

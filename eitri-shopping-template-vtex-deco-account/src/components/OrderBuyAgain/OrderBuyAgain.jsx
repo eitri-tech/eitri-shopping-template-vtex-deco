@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Eitri from 'eitri-bifrost'
-import { CustomButton } from 'eitri-shopping-monte-carlo-shared'
+import { CustomButton } from 'eitri-shopping-template-vtex-deco-shared'
 import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { useTranslation } from 'eitri-i18n'
 

@@ -1,5 +1,5 @@
 import { View } from 'eitri-luminus'
-import { TrashIcon, CheckIcon, CloseIcon } from 'eitri-shopping-monte-carlo-shared'
+import { TrashIcon, CheckIcon, CloseIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 const SnackBar = createContext({})
 

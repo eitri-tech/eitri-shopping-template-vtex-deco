@@ -15,7 +15,7 @@ import {
 	TruckIcon,
 	CopyIcon,
 	useRetractableBottomBar
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import { formatDateDaysMonthYear, formatPriceInCents } from '../utils/utils'
 import OrderStatusBadge from '../components/OrderStatusBadge/OrderStatusBadge'
 import ProtectedView from '../components/ProtectedView/ProtectedView'

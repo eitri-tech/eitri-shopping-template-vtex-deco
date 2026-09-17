@@ -3,7 +3,7 @@ import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { openCart, openProduct } from '../../services/NavigationService'
 import { formatPrice } from '../../utils/utils'
 import { App, EventBus } from 'eitri-shopping-vtex-shared'
-import { ProductCardFullImage, TrackingService, getBadgesForProducts } from 'eitri-shopping-monte-carlo-shared'
+import { ProductCardFullImage, TrackingService, getBadgesForProducts } from 'eitri-shopping-template-vtex-deco-shared'
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import { useTranslation } from 'eitri-i18n'
 

@@ -1,4 +1,4 @@
-import { BottomInset, PackageIcon } from 'eitri-shopping-monte-carlo-shared'
+import { BottomInset, PackageIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 export default function NoItem(props) {
 	const { title, subtitle } = props

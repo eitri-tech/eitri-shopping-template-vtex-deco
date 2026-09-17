@@ -1,4 +1,3 @@
-// /Users/calindra/Workspace/Eitri/eitri-shopping-template/shopping-vtex-template-account/src/components/Alert/Alert.jsx
 export default function Alert(props) {
 	const { message, type = 'negative', duration = 5, onDismiss, show } = props
 

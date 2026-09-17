@@ -1,4 +1,4 @@
-import { CustomButton } from 'eitri-shopping-monte-carlo-shared'
+import { CustomButton } from 'eitri-shopping-template-vtex-deco-shared'
 import { View, Text } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
 

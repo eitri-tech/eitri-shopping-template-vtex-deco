@@ -4,6 +4,11 @@ eitri-apps:
   alias: home
   focus: true
   shared: false
+- path: ./eitri-shopping-template-vtex-deco-account
+  workspace: eitri-shopping-template-vtex-deco-account
+  alias: account
+  focus: false
+  shared: false
 - path: ./eitri-shopping-template-vtex-deco-checkout
   workspace: eitri-shopping-template-vtex-deco-checkout
   alias: checkout
@@ -41,6 +46,11 @@ bottom-tab-view-simulation:
     initialization-params:
       type: string
       value: tabIndex=2
+  - slug: eitri-shopping-template-vtex-deco-account
+    title: Perfil
+    initialization-params:
+      type: string
+      value: tabIndex=3
 
 
 #Monte Carlo

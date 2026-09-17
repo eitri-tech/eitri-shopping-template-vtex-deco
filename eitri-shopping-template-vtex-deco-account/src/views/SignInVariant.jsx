@@ -11,7 +11,7 @@ import {
 	TrackingService,
 	MailIcon,
 	Datadog
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import {
 	isLoggedIn,
 	loginWithGoogle,

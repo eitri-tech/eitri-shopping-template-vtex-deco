@@ -16,7 +16,7 @@ import {
 	MapPinIcon,
 	ArrowRightIcon,
 	resetBiometricLoginAttempt
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import { doLogout, getCustomerData, isLoggedIn, removeClientData } from '../services/CustomerService'
 import { navigate, PAGES } from '../services/NavigationService'
 import { sendScreenView } from '../services/TrackingService'

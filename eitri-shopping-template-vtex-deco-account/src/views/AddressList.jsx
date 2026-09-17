@@ -8,7 +8,7 @@ import {
 	BottomInset,
 	GenericBox,
 	CustomButton
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import { sendScreenView } from '../services/TrackingService'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { deleteAddress, getAddresses } from '../services/AddressService'

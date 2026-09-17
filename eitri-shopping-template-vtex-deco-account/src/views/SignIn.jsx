@@ -12,7 +12,7 @@ import {
 	BiometricService,
 	useBiometricLogin,
 	BiometricReauthModal
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import {
 	doLogin,
 	isLoggedIn,

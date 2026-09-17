@@ -7,7 +7,7 @@ import {
 	CustomInput,
 	GenericBox,
 	BiometricService
-} from 'eitri-shopping-monte-carlo-shared'
+} from 'eitri-shopping-template-vtex-deco-shared'
 import Alert from '../components/Alert/Alert'
 import { sendPasswordResetCode, setPassword, changePassword } from '../services/CustomerService'
 import { navigate, PAGES } from '../services/NavigationService'

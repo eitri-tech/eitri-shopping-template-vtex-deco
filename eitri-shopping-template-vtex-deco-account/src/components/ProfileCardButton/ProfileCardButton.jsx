@@ -1,4 +1,4 @@
-import { ArrowRightIcon } from 'eitri-shopping-monte-carlo-shared'
+import { ArrowRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 export default function ProfileCardButton(props) {
 	const { icon, label, onClick } = props
