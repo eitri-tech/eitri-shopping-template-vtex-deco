@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { Page, View } from 'eitri-luminus'
 import { getWishlist, removeFromWishlist } from '../services/CustomerService'
 import WishlistItem from '../components/WishlistItem/WishlistItem'
 import { HeaderContentWrapper, HeaderReturn, HeaderText, Loading, BottomInset } from 'eitri-shopping-template-vtex-deco-shared'
@@ -6,10 +8,21 @@ import { sendScreenView } from '../services/TrackingService'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { EventBusChannels, EventBus } from 'eitri-shopping-vtex-shared'
 import { useTranslation } from 'eitri-i18n'
+import type { RouteProps } from '../types/route'
 
-export default function Wishlist(props) {
+interface WishlistEntry {
+	id?: string
+	productId?: string
+	[key: string]: unknown
+}
+
+interface WishlistState {
+	tabIndex?: number
+}
+
+export default function Wishlist(props: RouteProps<WishlistState>) {
 	const { t } = useTranslation()
-	const [wishlistItems, setWishlistItems] = useState([])
+	const [wishlistItems, setWishlistItems] = useState<WishlistEntry[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 
 	const openWithBottomBart = !!props?.location?.state?.tabIndex
@@ -21,28 +34,28 @@ export default function Wishlist(props) {
 		EventBus.subscribe({
 			channel: EventBusChannels.USER_LOGGED_IN,
 			broadcast: true,
-			callback: data => {
+			callback: () => {
 				start()
 			}
 		})
 		EventBus.subscribe({
 			channel: EventBusChannels.USER_LOGGED_OUT,
 			broadcast: true,
-			callback: data => {
+			callback: () => {
 				setWishlistItems([])
 			}
 		})
 		EventBus.subscribe({
 			channel: 'addToWishlist',
 			broadcast: true,
-			callback: data => {
+			callback: () => {
 				start()
 			}
 		})
 		EventBus.subscribe({
 			channel: 'removeFromWishlist',
 			broadcast: true,
-			callback: data => {
+			callback: () => {
 				start()
 			}
 		})
@@ -51,7 +64,7 @@ export default function Wishlist(props) {
 	const start = async () => {
 		try {
 			setIsLoading(true)
-			const result = await getWishlist()
+			const result = (await getWishlist()) as WishlistEntry[]
 			setWishlistItems(result)
 			setIsLoading(false)
 		} catch (e) {
@@ -60,7 +73,8 @@ export default function Wishlist(props) {
 		}
 	}
 
-	const onRemoveFromWishList = async id => {
+	const onRemoveFromWishList = async (id?: string) => {
+		if (!id) return
 		setIsLoading(true)
 		try {
 			await removeFromWishlist(id)

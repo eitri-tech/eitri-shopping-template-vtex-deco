@@ -1,20 +1,21 @@
-// /Users/calindra/Workspace/Eitri/eitri-shopping-template/shopping-vtex-template-account/src/views/PasswordResetNewPass.jsx
-import {
-	Loading,
-	HeaderContentWrapper,
-	HeaderReturn,
-	HeaderText,
-	CustomButton,
-	CustomInput
-} from 'eitri-shopping-template-vtex-deco-shared'
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
+import { Page, View, Text } from 'eitri-luminus'
+import { Loading, HeaderContentWrapper, HeaderReturn, HeaderText, CustomButton, CustomInput } from 'eitri-shopping-template-vtex-deco-shared'
 import Alert from '../components/Alert/Alert'
 import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import { setPassword } from '../services/CustomerService'
 import { sendScreenView } from '../services/TrackingService'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
+import type { RouteProps } from '../types/route'
 
-export default function PasswordResetNewPass(props) {
+interface PasswordResetNewPassState {
+	email?: string
+	recoveryCode?: string
+}
+
+export default function PasswordResetNewPass(props: RouteProps<PasswordResetNewPassState>) {
 	const PAGE = 'Reset de senha - nova senha'
 	const email = props?.location?.state?.email
 	const recoveryCode = props?.location?.state?.recoveryCode
@@ -61,7 +62,6 @@ export default function PasswordResetNewPass(props) {
 			setLoading(false)
 		} catch (e) {
 			console.error(e)
-			// logError(PAGE, 'Erro ao redefinir senha', e) // logError não está definido no escopo
 			setShowErrorAlert(true)
 			setLoading(false)
 		}
@@ -93,13 +93,13 @@ export default function PasswordResetNewPass(props) {
 						type='password'
 						label={t('passwordResetNewPass.newPass')}
 						value={newPassword}
-						onChange={e => setNewPassword(e.target.value)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
 					/>
 					<CustomInput
 						type='password'
 						label={t('passwordResetNewPass.confirmPass')}
 						value={confirmPassword}
-						onChange={e => setConfirmPassword(e.target.value)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
 					/>
 				</View>
 

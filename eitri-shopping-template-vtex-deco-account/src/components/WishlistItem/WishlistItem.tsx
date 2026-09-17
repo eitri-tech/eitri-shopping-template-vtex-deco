@@ -5,6 +5,8 @@ import type { VtexProduct } from '../../types/vtex'
 
 interface WishlistItemProps {
 	productId?: string
+	// Accepted by callers (Wishlist.jsx) but never wired up here — pre-existing, kept as a no-op.
+	onRemoveFromWishlist?: () => void
 }
 
 export default function WishlistItem(props: WishlistItemProps) {

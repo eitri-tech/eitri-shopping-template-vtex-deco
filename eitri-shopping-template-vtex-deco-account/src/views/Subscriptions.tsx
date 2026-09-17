@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+import { Page, View, Text } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import { HeaderContentWrapper, HeaderText, HeaderReturn, BottomInset, Loading } from 'eitri-shopping-template-vtex-deco-shared'
 import ProtectedView from '../components/ProtectedView/ProtectedView'
@@ -11,17 +13,22 @@ import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { STATUS_OPTIONS } from '../utils/subscription'
 import { useSnackBar } from '../providers/SnackBar'
 import { useTranslation } from 'eitri-i18n'
-import { useState, useEffect } from 'react'
+import type { VtexSubscription } from '../types/vtex'
 
-export default function Subscriptions(props) {
+interface SubscriptionProductEntry {
+	name?: string
+	imageUrl?: string
+}
+
+export default function Subscriptions() {
 	const { t } = useTranslation()
 	const { showSnackBar } = useSnackBar()
 
 	const [status, setStatus] = useState('ACTIVE')
-	const [subscriptions, setSubscriptions] = useState([])
-	const [products, setProducts] = useState({})
+	const [subscriptions, setSubscriptions] = useState<VtexSubscription[]>([])
+	const [products, setProducts] = useState<Record<string, SubscriptionProductEntry | null>>({})
 	const [isLoading, setIsLoading] = useState(true)
-	const [renaming, setRenaming] = useState(null)
+	const [renaming, setRenaming] = useState<VtexSubscription | null>(null)
 	const [isSaving, setIsSaving] = useState(false)
 
 	useEffect(() => {
@@ -34,14 +41,14 @@ export default function Subscriptions(props) {
 		load(status)
 	}, [status])
 
-	const load = async currentStatus => {
+	const load = async (currentStatus: string) => {
 		setIsLoading(true)
 		try {
-			const result = await listSubscriptions(currentStatus)
+			const result = (await listSubscriptions(currentStatus)) as VtexSubscription[] | undefined
 			const list = result || []
 			setSubscriptions(list)
-			const skuIds = list.flatMap(subscription => subscription.items.map(item => item.skuId))
-			const missing = skuIds.filter(skuId => !products[skuId])
+			const skuIds = list.flatMap(subscription => (subscription.items ?? []).map(item => item.skuId ?? ''))
+			const missing = skuIds.filter(skuId => skuId && !products[skuId])
 			if (missing.length) {
 				const loaded = await loadSkuProducts(missing)
 				setProducts(prev => ({ ...prev, ...loaded }))
@@ -54,7 +61,8 @@ export default function Subscriptions(props) {
 		}
 	}
 
-	const saveTitle = async title => {
+	const saveTitle = async (title: string) => {
+		if (!renaming?.id) return
 		setIsSaving(true)
 		try {
 			await updateSubscription(renaming.id, { title })
@@ -110,7 +118,7 @@ export default function Subscriptions(props) {
 								<SubscriptionCard
 									key={subscription.id}
 									subscription={subscription}
-									products={products}
+									products={products as Record<string, { imageUrl?: string; name?: string }>}
 									onRename={() => setRenaming(subscription)}
 								/>
 							))}

@@ -1,21 +1,21 @@
+import { useEffect, useRef, useState } from 'react'
+import { Page, View, Text } from 'eitri-luminus'
 import { FiCreditCard, FiTrash2 } from 'react-icons/fi'
-import {
-	HeaderContentWrapper,
-	HeaderReturn,
-	HeaderText,
-	Loading,
-	BottomInset,
-	GenericBox,
-	CustomButton
-} from 'eitri-shopping-template-vtex-deco-shared'
+import { HeaderContentWrapper, HeaderReturn, HeaderText, Loading, BottomInset, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import ProtectedView from '../components/ProtectedView/ProtectedView'
 import ModalConfirm from '../components/ModalConfirm/ModalConfirm'
 import { getSavedCards, deleteSavedCard } from '../services/CustomerService'
-import { navigate, PAGES } from '../services/NavigationService'
 import { sendScreenView } from '../services/TrackingService'
 import { useTranslation } from 'eitri-i18n'
+import type { VtexSavedCard } from '../types/vtex'
 
-const CardItem = ({ card, onDelete }) => {
+interface CardItemProps {
+	card: VtexSavedCard
+	onDelete: (card: VtexSavedCard) => void
+}
+
+const CardItem = (props: CardItemProps) => {
+	const { card, onDelete } = props
 	const { t } = useTranslation()
 	return (
 		<GenericBox className='p-4 mb-3'>
@@ -26,10 +26,10 @@ const CardItem = ({ card, onDelete }) => {
 						className='text-gray-500'
 					/>
 					<View className='flex flex-col gap-0.5'>
-						<Text className='font-semibold text-sm'>{card.paymentSystemName}</Text>
+						<Text className='font-semibold text-sm'>{card.paymentSystemName as string}</Text>
 						<Text className='text-gray-500 text-xs'>{card.cardNumber}</Text>
 						<Text className={`text-xs ${card.isExpired ? 'text-red-500' : 'text-gray-400'}`}>
-							{t('savedCards.expires')} {card.expirationDate}
+							{t('savedCards.expires')} {card.expirationDate as string}
 							{card.isExpired ? ` • ${t('savedCards.expired')}` : ''}
 						</Text>
 					</View>
@@ -45,12 +45,12 @@ const CardItem = ({ card, onDelete }) => {
 	)
 }
 
-export default function SavedCards(props) {
+export default function SavedCards() {
 	const { t } = useTranslation()
-	const [cards, setCards] = useState([])
+	const [cards, setCards] = useState<VtexSavedCard[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 	const [showDeleteModal, setShowDeleteModal] = useState(false)
-	const deletingCard = useRef(null)
+	const deletingCard = useRef<VtexSavedCard | null>(null)
 
 	useEffect(() => {
 		sendScreenView('Cartões salvos', 'SavedCards')
@@ -68,7 +68,7 @@ export default function SavedCards(props) {
 		setIsLoading(false)
 	}
 
-	const handleDelete = card => {
+	const handleDelete = (card: VtexSavedCard) => {
 		deletingCard.current = card
 		setShowDeleteModal(true)
 	}
@@ -80,7 +80,7 @@ export default function SavedCards(props) {
 		setCards(prev => prev.filter(c => c.id !== id))
 		deletingCard.current = null
 		try {
-			await deleteSavedCard(id)
+			if (id) await deleteSavedCard(id)
 		} catch (e) {
 			console.error('SavedCards: failed to delete', e)
 			loadCards()
@@ -89,7 +89,9 @@ export default function SavedCards(props) {
 
 	return (
 		<ProtectedView afterLoginRedirectTo='SavedCards'>
-			<Page title='Cartões salvos' topInset>
+			<Page
+				title='Cartões salvos'
+				topInset>
 				<HeaderContentWrapper>
 					<HeaderReturn />
 					<HeaderText text={t('savedCards.title')} />
@@ -119,11 +121,6 @@ export default function SavedCards(props) {
 								/>
 							))
 						)}
-
-						{/*<CustomButton*/}
-						{/*	label={t('savedCards.addCard')}*/}
-						{/*	onClick={() => navigate(PAGES.ADD_CARD_FORM)}*/}
-						{/*/>*/}
 					</View>
 				)}
 

@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react'
+import type { ChangeEvent } from 'react'
+import { Page, View, Text } from 'eitri-luminus'
 import {
 	Loading,
 	HeaderContentWrapper,
@@ -13,43 +16,57 @@ import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import { sendScreenView } from '../services/TrackingService'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
+import type { RouteProps } from '../types/route'
 
 const RECOVERY_CODE_LENGTH = 6
 
-const RequirementItem = ({ valid, text }) => (
-	<View className={`flex items-center gap-2 ${valid ? 'text-green-600' : 'text-red-600'}`}>
-		{valid ? (
-			<svg
-				xmlns='http://www.w3.org/2000/svg'
-				className='h-4 w-4 stroke-current'
-				fill='none'
-				viewBox='0 0 24 24'>
-				<path
-					strokeLinecap='round'
-					strokeLinejoin='round'
-					strokeWidth='2'
-					d='M5 13l4 4L19 7'
-				/>
-			</svg>
-		) : (
-			<svg
-				xmlns='http://www.w3.org/2000/svg'
-				className='h-4 w-4 stroke-current'
-				fill='none'
-				viewBox='0 0 24 24'>
-				<path
-					strokeLinecap='round'
-					strokeLinejoin='round'
-					strokeWidth='2'
-					d='M6 18L18 6M6 6l12 12'
-				/>
-			</svg>
-		)}
-		<Text className='text-sm'>{text}</Text>
-	</View>
-)
+interface RequirementItemProps {
+	valid: boolean
+	text: string
+}
 
-export default function ChangePassword(props) {
+const RequirementItem = (props: RequirementItemProps) => {
+	const { valid, text } = props
+	return (
+		<View className={`flex items-center gap-2 ${valid ? 'text-green-600' : 'text-red-600'}`}>
+			{valid ? (
+				<svg
+					xmlns='http://www.w3.org/2000/svg'
+					className='h-4 w-4 stroke-current'
+					fill='none'
+					viewBox='0 0 24 24'>
+					<path
+						strokeLinecap='round'
+						strokeLinejoin='round'
+						strokeWidth='2'
+						d='M5 13l4 4L19 7'
+					/>
+				</svg>
+			) : (
+				<svg
+					xmlns='http://www.w3.org/2000/svg'
+					className='h-4 w-4 stroke-current'
+					fill='none'
+					viewBox='0 0 24 24'>
+					<path
+						strokeLinecap='round'
+						strokeLinejoin='round'
+						strokeWidth='2'
+						d='M6 18L18 6M6 6l12 12'
+					/>
+				</svg>
+			)}
+			<Text className='text-sm'>{text}</Text>
+		</View>
+	)
+}
+
+interface ChangePasswordState {
+	email?: string
+	passwordLastUpdate?: string | null
+}
+
+export default function ChangePassword(props: RouteProps<ChangePasswordState>) {
 	const email = props?.location?.state?.email
 	const passwordLastUpdate = props?.location?.state?.passwordLastUpdate
 	const isFirstPassword = passwordLastUpdate === null
@@ -94,7 +111,7 @@ export default function ChangePassword(props) {
 
 	const sendCode = async () => {
 		try {
-			await sendPasswordResetCode(email)
+			if (email) await sendPasswordResetCode(email)
 		} catch (e) {
 			setErrorMessage(t('changePassword.errorSendCode'))
 			setShowErrorAlert(true)
@@ -102,6 +119,7 @@ export default function ChangePassword(props) {
 	}
 
 	const handleSubmit = async () => {
+		if (!email) return
 		setLoading(true)
 		try {
 			if (isFirstPassword) {
@@ -125,7 +143,9 @@ export default function ChangePassword(props) {
 	const canSubmit = firstInputValid && allRequirementsMet && passwordsMatch && !loading
 
 	return (
-		<Page title='Alterar senha' topInset>
+		<Page
+			title='Alterar senha'
+			topInset>
 			<Loading
 				isLoading={loading}
 				fullScreen={true}
@@ -156,7 +176,7 @@ export default function ChangePassword(props) {
 								inputMode='numeric'
 								className='text-center tracking-widest'
 								value={code}
-								onChange={e => setCode(e.target.value)}
+								onChange={(e: ChangeEvent<HTMLInputElement>) => setCode(e.target.value)}
 							/>
 							<View
 								className='flex justify-end'
@@ -170,7 +190,7 @@ export default function ChangePassword(props) {
 							type='password'
 							label={t('changePassword.labelCurrentPassword')}
 							value={currentPassword}
-							onChange={e => setCurrentPassword(e.target.value)}
+							onChange={(e: ChangeEvent<HTMLInputElement>) => setCurrentPassword(e.target.value)}
 						/>
 					)}
 
@@ -178,14 +198,14 @@ export default function ChangePassword(props) {
 						type='password'
 						label={t('changePassword.labelNewPassword')}
 						value={newPassword}
-						onChange={e => setNewPassword(e.target.value)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
 					/>
 
 					<CustomInput
 						type='password'
 						label={t('changePassword.labelConfirmPassword')}
 						value={confirmPassword}
-						onChange={e => setConfirmPassword(e.target.value)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
 					/>
 
 					<View className='flex flex-col gap-1'>
