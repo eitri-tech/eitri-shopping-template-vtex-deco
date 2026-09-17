@@ -42,17 +42,19 @@ export default function ImageCarousel(props: ImageCarouselProps) {
 					{currentSku?.images?.map((item, index) => {
 						return (
 							<View
-								key={item.imageUrl}
+								key={item.imageUrl ?? index}
 								id={`keen-slider__slide-${index}`}
 								className={`flex justify-center items-center keen-slider__slide`}>
-								<Image
-									pinchZoom
-									zoomMaxScale={8}
-									fadeIn={IMAGE_FADE_TIME}
-									onLoad={index === 0 ? imageLoaded : undefined}
-									src={item.imageUrl}
-									width='100vw'
-								/>
+								{item.imageUrl && (
+									<Image
+										pinchZoom
+										zoomMaxScale={8}
+										fadeIn={IMAGE_FADE_TIME}
+										onLoad={index === 0 ? imageLoaded : undefined}
+										src={item.imageUrl}
+										width='100vw'
+									/>
+								)}
 							</View>
 						)
 					})}

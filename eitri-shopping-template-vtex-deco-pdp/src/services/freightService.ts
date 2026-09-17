@@ -34,7 +34,7 @@ export default async function fetchFreight(zipCode: string, currentSku?: VtexSku
 		// store's actual one, which can silently skew pricing/availability in the freight quote.
 		result = await Vtex.cart.simulateCart(cartSimulationPayload, Vtex.configs?.salesChannel)
 
-		const cannotBeDelivered = result?.messages?.find(item => item.code === 'cannotBeDelivered')
+		const cannotBeDelivered = result?.messages?.find((item: { code?: string }) => item.code === 'cannotBeDelivered')
 
 		if (cannotBeDelivered) {
 			return []
