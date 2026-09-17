@@ -142,7 +142,7 @@ export default function AddCardForm(props) {
 				/>
 			</View>
 
-			<View className='m-4 border bg-white p-4 rounded'>
+			<View className='m-4 border bg-white p-4'>
 				<View className='flex flex-col gap-2'>
 					<View className='relative'>
 						<CustomInput

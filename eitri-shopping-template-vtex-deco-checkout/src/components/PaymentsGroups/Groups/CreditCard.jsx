@@ -201,7 +201,7 @@ export default function CreditCard(props) {
 					}}>
 					<View
 						onClick={e => e.stopPropagation()}
-						className='bg-white !rounded-t-sm max-w-[80%] max-h-[70vh] overflow-y-auto pointer-events-auto p-4'>
+						className='bg-white max-w-[80%] max-h-[70vh] overflow-y-auto pointer-events-auto p-4'>
 						<Text className='text-lg font-semibold'>
 							{`Deseja remover o cartão final ${accountToRemove?.cardNumber?.replaceAll('*', '')}`}
 						</Text>

@@ -8,6 +8,10 @@ const baseOrder = {
 	EG: 7
 }
 
+/**
+ * @param {string} size
+ * @returns {number}
+ */
 function getOrder(size) {
 	const s = size.toString().trim().toUpperCase()
 
@@ -38,6 +42,10 @@ function getOrder(size) {
 	return 9999 + s.charCodeAt(0)
 }
 
+/**
+ * Ordena os SKUs de acordo com a ordem definida em getOrder.
+ * @param {string[]} values
+ */
 export const sortSku = values => {
 	try {
 		return values?.sort((a, b) => getOrder(a) - getOrder(b))

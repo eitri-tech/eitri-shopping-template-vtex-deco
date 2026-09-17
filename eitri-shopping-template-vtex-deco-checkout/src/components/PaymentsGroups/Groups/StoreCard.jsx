@@ -1,6 +1,6 @@
 import { useLocalShoppingCart } from '../../../providers/LocalCart'
 import GroupsWrapper from './GroupsWrapper'
-import Card from '../../../components/Icons/MethodIcons/Card'
+import Card from '../../Icons/MethodIcons/Card'
 import { navigate } from '../../../services/navigationService'
 
 export default function StoreCard(props) {

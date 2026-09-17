@@ -1,3 +1,4 @@
+import { Image, Text } from 'eitri-luminus'
 import GroupsWrapper from './GroupsWrapper'
 import { useLocalShoppingCart } from '../../../providers/LocalCart'
 import { navigate } from '../../../services/navigationService'
@@ -29,12 +30,14 @@ export default function ExternalPayment(props) {
 	return (
 		<GroupsWrapper
 			title={externalPaymentRc.name}
+			
 			icon={
 				<Image
 					src={externalPaymentRc.imageUrl}
 					className='w-[20px]'
 				/>
 			}
+			
 			onPress={onSelectThisGroup}>
 			{externalPaymentRc.description && <Text fontSize='nano'>{externalPaymentRc.description}</Text>}
 		</GroupsWrapper>

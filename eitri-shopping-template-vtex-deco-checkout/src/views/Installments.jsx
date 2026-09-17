@@ -81,7 +81,7 @@ export default function Installments(props) {
 					isLoading={isLoading}
 				/>
 
-				<View className='bg-white rounded shadow-sm border border-gray-200 p-4 mb-6 flex flex-row items-center gap-3'>
+				<View className='bg-white shadow-sm border border-gray-200 p-4 mb-6 flex flex-row items-center gap-3'>
 					<View className='flex justify-center items-center w-[40px]'>
 						<CardIcon
 							width={'100%'}
@@ -103,7 +103,7 @@ export default function Installments(props) {
 							<View
 								key={index}
 								onClick={() => !isLoading && handleInstallmentSelect(installment)}
-								className={`border bg-white p-4 rounded flex flex-row items-center justify-between`}>
+								className={`border bg-white p-4 flex flex-row items-center justify-between`}>
 								<View className='flex flex-col'>
 									<Text className='text-lg font-bold text-neutral-900'>
 										{`${installment.count}x ${formatAmountInCents(installment.value)}`}

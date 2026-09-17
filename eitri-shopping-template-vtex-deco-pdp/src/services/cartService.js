@@ -17,6 +17,15 @@ export const addItemToCart = async item => {
 	}
 }
 
+export const addMultipleItemsToCart = async items => {
+	try {
+		return await Vtex.cart.addItems(items)
+	} catch (error) {
+		console.error('Erro ao adicionar itens ao carrinho', error)
+		throw error
+	}
+}
+
 export const removeCartItem = async index => {
 	try {
 		return await Vtex.cart.removeItem(index)

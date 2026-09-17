@@ -1,0 +1,47 @@
+appId: tech.eitri.play
+tags:
+  - pdp
+  - cart
+env:
+  # Entramos pelo `home` (não pela `pdp` direto) para pegar um card de produto
+  # real, com os params de navegação cross-app verdadeiros (productId/slug) —
+  # igual ao caminho de um usuário.
+  APP_SLUG: eitri-shopping-template-vtex-deco-home
+---
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+- extendedWaitUntil:
+    visible: "Categorias"
+    timeout: 90000
+
+# Pré-condição explícita: o orderForm do VTEX persiste entre execuções
+# (`clearState: false` não limpa nada no servidor), então sem isto o flow
+# herdaria o carrinho sujo das rodadas anteriores — medido no device, chegou a
+# 4 itens acumulados — e nenhuma asserção sobre quantidade valeria nada.
+- runFlow:
+    file: ../subflows/clear-cart.yml
+- runFlow:
+    file: ../subflows/add-one-item.yml
+
+# Com a sacola comprovadamente vazia antes e exatamente um item adicionado, o
+# badge do header tem de valer exatamente "1" (shared/HeaderCart.jsx:36 só
+# renderiza o badge com quantidade > 0). Sob match de string inteira, "1" não
+# colide com preços nem parcelas.
+- assertVisible: "1"
+
+# Ícone da sacola no header. Medido no device: bounds [951,151][1023,222] ->
+# centro (91%, 8%). Funciona porque add-one-item termina SEM ter rolado a PDP:
+# o header da PDP não é fixo e sai de vista com scroll (verificado — o tap
+# passa a acertar a galeria de imagens).
+- tapOn:
+    point: "91%,8%"
+
+# "Finalizar Compra" (cart ActionButton.jsx:32, cartSummary.labelFinish) só
+# renderiza com a sacola tendo itens, então serve de prova indireta de que a
+# adição chegou ao carrinho. Atenção: ele é renderizado mesmo quando
+# desabilitado, então não use isto como prova de que o checkout está liberado.
+- extendedWaitUntil:
+    visible: "Finalizar Compra"
+    timeout: 60000

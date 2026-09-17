@@ -15,9 +15,11 @@ export default function ExternalProviderOrder(props) {
 		if (props.location?.state?.paymentResult) {
 			const paymentResult = props.location?.state?.paymentResult
 
-			const paymentAuthorizationApp = paymentResult.paymentAuthorizationAppCollection[0]
-			const url = paymentAuthorizationApp.appPayload
+			const paymentAuthorizationApp = paymentResult.paymentAuthorizationAppCollection?.[0]
+			const redirectResponse = paymentResult.RedirectResponseCollection?.[0]
+			const url = paymentAuthorizationApp?.appPayload || redirectResponse?.redirectUrl
 
+			if (!url) return
 			openProvider(url)
 
 			Eitri.navigation.setOnResumeListener(() => checkOrderStatus())
@@ -48,7 +50,7 @@ export default function ExternalProviderOrder(props) {
 			} else {
 				clearCart()
 				navigate('OrderCompleted', {
-					orderValue: cart.value,
+					orderValue: cart?.value,
 					orderId: props.location?.state?.paymentResult?.orderId
 				})
 			}

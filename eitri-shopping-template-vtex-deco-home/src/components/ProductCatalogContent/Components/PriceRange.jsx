@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { View, Text, TextInput } from 'eitri-luminus'
+import { View } from 'eitri-luminus'
 import { CustomInput } from 'eitri-shopping-template-vtex-deco-shared'
 import { formatPrice } from '../../../utils/utils'
 import { useTranslation } from 'eitri-i18n'
@@ -16,6 +16,9 @@ export default function PriceRange({
 	const [minValue, setMinValue] = useState(initialMin)
 	const [maxValue, setMaxValue] = useState(initialMax)
 	const [isDragging, setIsDragging] = useState(null)
+	const [focusedField, setFocusedField] = useState(null)
+	const [minText, setMinText] = useState(String(initialMin))
+	const [maxText, setMaxText] = useState(String(initialMax))
 
 	const sliderRef = useRef(null)
 	const minThumbRef = useRef(null)
@@ -33,6 +36,37 @@ export default function PriceRange({
 			onChange(`${minValue}:${maxValue}`)
 		}
 	}, [minValue, maxValue, onChange])
+
+	// Keep the input buffers synced with the slider while not being edited
+	useEffect(() => {
+		if (focusedField !== 'min') setMinText(String(minValue))
+	}, [minValue, focusedField])
+
+	useEffect(() => {
+		if (focusedField !== 'max') setMaxText(String(maxValue))
+	}, [maxValue, focusedField])
+
+	const sanitizeDigits = raw => (raw || '').replace(/\D/g, '')
+
+	const commitMin = () => {
+		setFocusedField(null)
+		const parsed = parseInt(sanitizeDigits(minText), 10)
+		if (Number.isNaN(parsed)) {
+			setMinText(String(minValue))
+			return
+		}
+		setMinValue(Math.max(rangeMin, Math.min(parsed, maxValue - step)))
+	}
+
+	const commitMax = () => {
+		setFocusedField(null)
+		const parsed = parseInt(sanitizeDigits(maxText), 10)
+		if (Number.isNaN(parsed)) {
+			setMaxText(String(maxValue))
+			return
+		}
+		setMaxValue(Math.min(rangeMax, Math.max(parsed, minValue + step)))
+	}
 
 	const getValueFromPosition = useCallback(
 		clientX => {
@@ -153,14 +187,32 @@ export default function PriceRange({
 			</View>
 
 			{/* Input fields */}
-			<View className='flex justify-between w-full'>
-				<View>
-					<Text className='block text-sm font-medium text-gray-700 mb-1'>{t('priceRange.min')}</Text>
-					<Text className='block text-sm font-medium text-gray-700'>{formatPrice(minValue)}</Text>
+			<View className='flex justify-between w-full gap-4'>
+				<View className='flex-1'>
+					<CustomInput
+						label={t('priceRange.min')}
+						value={focusedField === 'min' ? minText : formatPrice(minValue)}
+						onChange={e => setMinText(sanitizeDigits(e.target.value))}
+						onFocus={() => {
+							setFocusedField('min')
+							setMinText(String(minValue))
+						}}
+						onBlur={commitMin}
+						inputMode='numeric'
+					/>
 				</View>
-				<View>
-					<Text className='block text-sm font-medium text-gray-700 mb-1'>{t('priceRange.max')}</Text>
-					<Text className='block text-sm font-medium text-gray-700'>{formatPrice(maxValue)}</Text>
+				<View className='flex-1'>
+					<CustomInput
+						label={t('priceRange.max')}
+						value={focusedField === 'max' ? maxText : formatPrice(maxValue)}
+						onChange={e => setMaxText(sanitizeDigits(e.target.value))}
+						onFocus={() => {
+							setFocusedField('max')
+							setMaxText(String(maxValue))
+						}}
+						onBlur={commitMax}
+						inputMode='numeric'
+					/>
 				</View>
 			</View>
 		</View>

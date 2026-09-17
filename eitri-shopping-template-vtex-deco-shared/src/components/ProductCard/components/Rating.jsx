@@ -1,4 +1,5 @@
 import { FaStar } from 'react-icons/fa'
+import { View, Text } from 'eitri-luminus'
 
 export default function Rating(props) {
 	const { ratingValue, ratingsCount } = props

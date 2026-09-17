@@ -1,0 +1,82 @@
+# Adiciona exatamente UM item à sacola, partindo da Home do app `home`.
+#
+# Pré-condição: app `home` aberto na view Home. Combine com
+# subflows/clear-cart.yml antes — só assim o badge do header valendo "1" no
+# fim prova que a adição funcionou.
+#
+# Pós-condição: continua na PDP, SEM ter rolado a página, de modo que o header
+# (e o ícone da sacola) seguem acessíveis para quem chamou.
+#
+# Caminho escolhido: busca em vez de tocar um card da Home. A Home é montada
+# por CMS, então a posição de um card não é conhecível estaticamente e um tap
+# TODO: replace the search term "anel" below with a term that returns products
+# in your catalog. The original was verified to return 25/25 multi-SKU results.
+# às cegas pode cair num tile de categoria. A busca pelo termo escolhido é
+# determinística e o caminho foi verificado no device.
+#
+# Este subflow NÃO escolhe tamanho de propósito: o app pré-seleciona o
+# primeiro SKU disponível (pdp Home.jsx:82-87, findAvailableSKU), então a
+# adição funciona sem tocar nos chips — e tocá-los exigiria rolar a página,
+# o que tiraria o header do alcance. A seleção explícita de variação é
+# exercitada por flows/pdp-sku-variations.yml.
+appId: tech.eitri.play
+---
+# Ícone de busca no header (icon-only, sem texto). CORRIGIDO após teste no
+# device: o ícone está em bounds [968,154][1036,222] -> centro (93%, 8%) — o
+# valor antigo (82%, 8%) não correspondia a nenhum elemento tocável do header
+# atual (só existe o ícone de busca nessa área, sem ícone de sacola separado
+# na Home).
+- tapOn:
+    point: "93%,8%"
+# O campo de busca tem autoFocus (SearchInput.jsx:156) e o teclado já abre
+# sozinho, então dá para digitar direto. O placeholder é de um <input> e NÃO é
+# exposto na árvore. CORRIGIDO após teste no device: a espera era pelo título
+# "histórico" (searchHistory.title), mas esse bloco só renderiza quando há
+# busca salva no storage local (SearchHistory.jsx: `if (!history?.length)
+# return null`) — numa sessão nova/anônima ele não aparece e a espera trava.
+# "mais buscados" (topSearches.title) é renderizado incondicionalmente
+# (TopSearches.jsx não tem esse guard), por isso é o sinal confiável de que a
+# tela de busca carregou.
+- extendedWaitUntil:
+    visible: "mais buscados"
+    timeout: 20000
+# TODO: replace "anel" with a search term that returns products in your catalog
+- inputText: "anel"
+# Só o Enter dispara a busca (SearchInput.jsx:107-108) — não há botão de
+# submit.
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: "Filtros"
+    timeout: 30000
+
+# Abre a PDP pelo primeiro card. Tocar a ÁREA DA IMAGEM (não o ícone de sacola
+# no canto do card) sempre chama openProduct -> PDP; o ícone de sacola, em
+# produto de SKU único, adicionaria direto e pularia a PDP
+# (ProductCard.jsx:118-121). Primeiro card da grade de 2 colunas ≈ (25%, 40%).
+#
+# ACHADO no device (não é bug deste flow): a navegação cross-app Home -> PDP
+# abre sempre a versão PUBLICADA da PDP (release.eitri.calindra.com.br), nunca
+# a cópia local do dev server — mesmo com `eitri app start` rodando. No
+# NOTE: During initial testing, the FIRST card in search results triggered a
+# TypeError in the published PDP. The SECOND card worked normally. If you hit
+# a similar issue, it may be a data/render bug for that specific product —
+# report to the team. This is not a selector problem.
+- tapOn:
+    point: "25%,40%"
+# Sinal de "PDP carregou": o botão fixo do rodapé (ActionButton.jsx:53). NÃO
+# use "Sobre o produto" — verificado no device que, com a galeria de imagens
+# já em cache, o acordeão de descrição nasce ABAIXO DA DOBRA e a asserção
+# falha de forma intermitente. O botão é `fixed`, então está sempre visível
+# numa PDP, independente de scroll.
+- extendedWaitUntil:
+    visible: "Adicionar à Sacola"
+    timeout: 40000
+
+# Botão fixo no rodapé (ActionButton.jsx:53, actionButton.labelBuy), sempre
+# visível independente de scroll.
+- tapOn: "Adicionar à Sacola"
+# actionButton.snackAdded. O snackbar some sozinho em 4s (SnackBar.jsx:31-32),
+# então asserte imediatamente após o tap.
+- extendedWaitUntil:
+    visible: "adicionado à sacola com sucesso"
+    timeout: 15000

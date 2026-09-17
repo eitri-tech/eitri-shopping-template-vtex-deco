@@ -1,0 +1,31 @@
+{
+  "__resolveType": "website/pages/Page.tsx",
+  "name": "Login",
+  "path": "/login",
+  "sections": [
+    {
+      "title": "Entrar com email e senha",
+      "subtitle": "Insira seu email e senha abaixo",
+      "accessCodeTitle": "Login com código de acesso",
+      "accessCodeSubtitle": "Insira seu e-mail para receber seu código de acesso.",
+      "formEmail": "Email",
+      "formPass": "Senha",
+      "labelButton": "Entrar",
+      "labelAccessWithCode": "Login com código de acesso",
+      "forgotPass": "Esqueceu a senha?",
+      "noAccountYet": "Ainda não possui conta?",
+      "registerNow": "Cadastre-se agora",
+      "formCodeVerification": "Código de verificação",
+      "textSendCode": "Enviar código",
+      "textResendCode": "Reenviar código",
+      "labelLoginWithPass": "Login com email e senha",
+      "__resolveType": "site/sections/AppPages/Login.tsx"
+    },
+    {
+      "title": "Precisa de ajuda?",
+      "whatsapp": "Fale conosco pelo Whatsapp",
+      "faq": "Perguntas frequentes",
+      "__resolveType": "site/sections/HelpSection.tsx"
+    }
+  ]
+}

@@ -1,5 +1,4 @@
-import { FaChevronRight } from 'react-icons/fa'
-import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
+import { GenericBox, ChevronRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 export default function CardSelector(props) {
 	const { children, mainTitle, mainClickHandler, secondaryActionHandler, secondaryActionTitle } = props
@@ -11,7 +10,7 @@ export default function CardSelector(props) {
 				className='flex flex-col'>
 				<View className='flex flex-row items-center justify-between mb-1 gap-2'>
 					<Text className='font-bold text-lg block'>{mainTitle}</Text>
-					<FaChevronRight className='text-primary w-[24px]' />
+					<ChevronRightIcon className='text-primary w-[24px]' />
 				</View>
 				{children}
 			</View>

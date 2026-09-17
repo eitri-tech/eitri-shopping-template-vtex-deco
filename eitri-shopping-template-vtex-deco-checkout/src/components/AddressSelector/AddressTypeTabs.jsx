@@ -3,7 +3,7 @@ import { CustomButton } from 'eitri-shopping-template-vtex-deco-shared'
 
 export default function AddressTypeTabs({ selectedTab, onTabChange }) {
 	return (
-		<View className='flex flex-row bg-base-200 rounded-lg p-1 mb-4'>
+		<View className='flex flex-row bg-base-200 p-1 mb-4'>
 			<CustomButton
 				label={
 					<View className='flex flex-row items-center justify-center gap-2'>
@@ -38,7 +38,7 @@ export default function AddressTypeTabs({ selectedTab, onTabChange }) {
 						<Text>Entrega</Text>
 					</View>
 				}
-				className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+				className={`flex-1 py-2 px-4 text-sm font-medium transition-all duration-200 ${
 					selectedTab === 'delivery'
 						? 'bg-primary text-primary-content shadow-sm'
 						: 'text-base-content/70 hover:text-base-content border border-transparent'
@@ -70,7 +70,7 @@ export default function AddressTypeTabs({ selectedTab, onTabChange }) {
 						<Text>Retirada</Text>
 					</View>
 				}
-				className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+				className={`flex-1 py-2 px-4 text-sm font-medium transition-all duration-200 ${
 					selectedTab === 'pickup'
 						? 'bg-primary text-primary-content shadow-sm'
 						: 'text-base-content/70 hover:text-base-content border border-transparent'

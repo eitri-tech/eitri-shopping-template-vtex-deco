@@ -1,56 +1,63 @@
 import Eitri from 'eitri-bifrost'
+import { useEffect } from 'react'
+import { Page, View, TextInput } from 'eitri-luminus'
 import {
-	Loading,
 	HeaderContentWrapper,
 	HeaderSearchIcon,
+	HeaderClose,
 	BottomInset,
-	TrackingService
+	TrackingService,
+	DecoCMSContentRender,
+	useRetractableBottomBar
 } from 'eitri-shopping-template-vtex-deco-shared'
-import { getCmsContent } from '../services/CmsService'
-import CmsContentRender from '../components/CmsContentRender/CmsContentRender'
 
-export default function Categories() {
-	const [cmsContent, setCmsContent] = useState(null)
-	const [isLoading, setIsLoading] = useState(true)
-	const [pageTitle, setPageTitle] = useState(null)
+export default function Categories(props) {
+	useRetractableBottomBar()
+
+	const returnTo = props?.location?.state?.returnTo
 
 	useEffect(() => {
-		loadCms()
+		TrackingService.sendScreenView('Categorias', 'Categories')
 		Eitri.navigation.addOnResumeListener(() => {
 			TrackingService.sendScreenView('Categorias', 'Categories')
 		})
 	}, [])
 
-	const loadCms = async () => {
-		const { sections } = await getCmsContent('categories', 'categorias')
-		setCmsContent(sections)
-		setIsLoading(false)
-	}
-
 	const goToSearch = () => {
 		Eitri.navigation.navigate({
-			path: '/Search'
+			path: '/Search',
+			state: { returnTo: 'Categories' }
 		})
+	}
+
+	const goToHome = () => {
+		if (returnTo === 'Wishlist') {
+			return Eitri.close()
+		}
+
+		Eitri.bottomBar.changeTab({ index: 0 })
+		Eitri.navigation.navigate({ path: '/Home', replace: true })
 	}
 
 	return (
 		<Page title='Categorias'>
-			<HeaderContentWrapper className='justify-between'>
-				{pageTitle}
-				<HeaderSearchIcon onClick={goToSearch} />
+			<HeaderContentWrapper className='flex justify-between'>
+				<TextInput
+					placeholder='Encontre sua Joia'
+					insideLeft={<HeaderSearchIcon />}
+					className='flex-auto !bg-[#F6F4F7]'
+					onClick={goToSearch}
+				/>
+				<HeaderClose onClick={goToHome} />
 			</HeaderContentWrapper>
 
-			<Loading
-				fullScreen
-				isLoading={isLoading}
-			/>
-
-			<CmsContentRender
-				cmsContent={cmsContent}
-				setPageTitle={setPageTitle}
-			/>
+			<DecoCMSContentRender page='Categories' />
 
 			<BottomInset />
+			<View
+				bottomInset={'auto'}
+				className='w-full'
+			/>
 		</Page>
 	)
 }

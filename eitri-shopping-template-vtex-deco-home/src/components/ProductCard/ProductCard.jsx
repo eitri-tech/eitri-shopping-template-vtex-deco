@@ -3,27 +3,29 @@ import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { openCart, openProduct } from '../../services/NavigationService'
 import { formatPrice } from '../../utils/utils'
 import { App, EventBus } from 'eitri-shopping-vtex-shared'
-import { ProductCardFullImage, TrackingService, getBadgesForProducts } from 'eitri-shopping-template-vtex-deco-shared'
+import { AddedToCartModal, Datadog, ProductCardFullImage, TrackingService, getBadgesForProducts } from 'eitri-shopping-template-vtex-deco-shared'
 import { Vtex } from 'eitri-shopping-vtex-shared'
-import { useTranslation } from 'eitri-i18n'
 
 import { useCartItem, useWishlist } from './productCard.hooks'
 import { getProductVideo, formatInstallments, getFormattedListPrice } from './productCard.utils'
-import { useSnackBar } from '../../providers/SnackBar'
+import MetalSwatches from './MetalSwatches'
 
 // ========== Componente Principal ==========
 
-export default function ProductCard({ product, className }) {
+export default function ProductCard({ product, siblings, className }) {
 	const { addItem, cart } = useLocalShoppingCart()
-	const { showSnackBar } = useSnackBar()
-	const { t } = useTranslation()
 
 	const [badges, setBadges] = useState([])
 	const [loadingCartOp, setLoadingCartOp] = useState(false)
+	const [showAddedToCartModal, setShowAddedToCartModal] = useState(false)
 
 	const item = useMemo(() => {
+		if (product.items.some(item => !item?.sellers?.length)) {
+			Datadog.sendDatadogInfoLog({ product }, 'productCard')
+		}
+
 		const availableSku = product.items.find(item =>
-			item.sellers.some(seller => seller.commertialOffer?.AvailableQuantity > 0)
+			item?.sellers?.some(seller => seller.commertialOffer?.AvailableQuantity > 0)
 		)
 		return availableSku || product.items[0]
 	}, [product])
@@ -116,7 +118,7 @@ export default function ProductCard({ product, className }) {
 			if (goToCart) {
 				openCart()
 			}
-			showSnackBar('success', t('productCard.snackAdded'))
+			setShowAddedToCartModal(true)
 		} catch (error) {
 			console.error('Error adding to cart:', error)
 		} finally {
@@ -142,12 +144,21 @@ export default function ProductCard({ product, className }) {
 	}
 
 	// Monta os parâmetros para o componente de apresentação
+	const swatches = (
+		<MetalSwatches
+			currentProductId={product.productId}
+			siblings={siblings}
+			onSwatchPress={openProduct}
+		/>
+	)
+
 	const params = {
 		name: productData.name,
 		image: productData.image,
 		video: productData.video,
 		listPrice: productData.listPrice,
-		showListItem: App?.configs?.appConfigs?.productCard?.showListPrice ?? true,
+		showListItem: App?.configs?.appConfigs?.productCard?.showListPrice ?? false,
+		showWishlist: true,
 		rating: rating,
 		price: productData.price,
 		discountPercentage: productData.discountPercentage,
@@ -158,13 +169,33 @@ export default function ProductCard({ product, className }) {
 		loadingWishlistOp: wishlist.loading,
 		loadingCartOp,
 		itemQuantity,
+		imageAspectRatio: App?.configs?.appConfigs?.productCardImageAspectRatio,
 		onPressOnCard: handleCardPress,
 		onPressMainAction: handleAddToCart,
 		onPressOnWishlist: handleWishlistPress,
+		swatches,
 		className
 	}
 
 	const Implementation = ProductCardFullImage
 
-	return React.createElement(Implementation, params)
+	return (
+		<>
+			{React.createElement(Implementation, params)}
+			<AddedToCartModal
+				open={showAddedToCartModal}
+				product={{
+					name: productData.name,
+					image: productData.image,
+					price: productData.price,
+					listPrice: productData.listPrice
+				}}
+				onClose={() => setShowAddedToCartModal(false)}
+				onGoToCart={() => {
+					setShowAddedToCartModal(false)
+					openCart()
+				}}
+			/>
+		</>
+	)
 }

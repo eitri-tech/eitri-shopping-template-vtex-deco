@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { View } from 'eitri-luminus'
-import { getProductsService } from '../../services/ProductService'
-import { useState } from 'react'
-import SearchResults from '../../components/PageSearchComponents/SearchResults'
+import { useTranslation } from 'eitri-i18n'
+import { getProductsService, getProductSiblingsService } from '../../services/ProductService'
+import { getAgrupadorCode, groupSiblingsByCode } from 'eitri-shopping-template-vtex-deco-shared'
+import SearchResults from '../PageSearchComponents/SearchResults'
 import CatalogSort from './Components/CatalogSort'
 import { getDefaultSortParam } from '../../services/helpers/resolveSortParam'
 import CatalogFilter from './Components/CatalogFilter'
@@ -18,7 +19,8 @@ export default function ProductCatalogContent(props) {
 	 *  sort: string
 	 * }
 	 * */
-	const { params, showFilters, banner, ...rest } = props
+	const { params, showFilters, banner, title, hiddenSortOptions = [], ...rest } = props
+	const { t } = useTranslation()
 
 	const [productLoading, setProductLoading] = useState(false)
 	const [products, setProducts] = useState([])
@@ -26,6 +28,8 @@ export default function ProductCatalogContent(props) {
 	const [appliedFacets, setAppliedFacets] = useState([]) // Filtros efetivamente usados na busca
 	const [currentPage, setCurrentPage] = useState(1)
 	const [pagesHasEnded, setPageHasEnded] = useState(false)
+	const [siblingsByCode, setSiblingsByCode] = useState({})
+	const fetchedCodesRef = useRef(new Set())
 
 	const [minPriceRange, setMinPriceRange] = useState(null)
 	const [maxPriceRange, setMaxPriceRange] = useState(null)
@@ -40,6 +44,8 @@ export default function ProductCatalogContent(props) {
 			setPageHasEnded(false)
 			setCurrentPage(1)
 
+			fetchedCodesRef.current = new Set()
+			setSiblingsByCode({})
 			getProducts(initialParams, 1)
 		}
 	}, [params])
@@ -82,10 +88,25 @@ export default function ProductCatalogContent(props) {
 			setProducts(prev => (page === 1 ? result.products : [...prev, ...result.products]))
 			setTotalProducts(result?.recordsFiltered)
 			setCurrentPage(page)
+			loadSiblings(result.products)
 			setProductLoading(false)
 		} catch (error) {
 			console.log('error', error)
 			setProductLoading(false)
+		}
+	}
+
+	const loadSiblings = async pageProducts => {
+		try {
+			const codes = [...new Set(pageProducts.map(getAgrupadorCode).filter(Boolean))]
+			const newCodes = codes.filter(code => !fetchedCodesRef.current.has(code))
+			if (newCodes.length === 0) return
+			newCodes.forEach(code => fetchedCodesRef.current.add(code))
+			const siblingProducts = await getProductSiblingsService(newCodes)
+			const grouped = groupSiblingsByCode(siblingProducts)
+			setSiblingsByCode(prev => ({ ...prev, ...grouped }))
+		} catch (error) {
+			console.error('Error loading product siblings', error)
 		}
 	}
 
@@ -105,6 +126,8 @@ export default function ProductCatalogContent(props) {
 		setProducts([])
 		setCurrentPage(1)
 		setPageHasEnded(false)
+		fetchedCodesRef.current = new Set()
+		setSiblingsByCode({})
 		getProducts(newParams, 1)
 	}
 
@@ -113,6 +136,8 @@ export default function ProductCatalogContent(props) {
 		setProducts([])
 		setCurrentPage(1)
 		setPageHasEnded(false)
+		fetchedCodesRef.current = new Set()
+		setSiblingsByCode({})
 		getProducts(filters, 1)
 	}
 
@@ -132,31 +157,39 @@ export default function ProductCatalogContent(props) {
 
 			{products.length > 0 && showFilters && (
 				<>
-					<View className='p-4 flex flex-between gap-4 w-full'>
-						<CatalogFilter
-							minPriceRange={minPriceRange}
-							setMinPriceRange={setMinPriceRange}
-							maxPriceRange={maxPriceRange}
-							setMaxPriceRange={setMaxPriceRange}
-							currentFilters={appliedFacets}
-							onFilterChange={handleFilterChange}
-							onFilterClear={onFilterClear}
-						/>
-						<CatalogSort
-							currentSort={appliedFacets?.sort}
-							onSortChange={handleSortChange}
-						/>
-					</View>
-
 					{totalProducts > 0 && (
-						<View className='px-4'>
-							<Text>
-								{`Exibindo ${
-									totalProducts > 1 ? `${totalProducts} produtos` : `${totalProducts} produto`
-								}`}
+						<View className='px-4 pt-5 pb-3'>
+							<Text className='text-base text-black'>
+								{t(
+									totalProducts === 1
+										? 'productCatalog.resultCountSingle'
+										: 'productCatalog.resultCountMultiple',
+									{ count: totalProducts }
+								)}
 							</Text>
 						</View>
 					)}
+
+					<View className='mx-4 mb-5 flex w-auto gap-4'>
+						<View className='flex-1'>
+							<CatalogFilter
+								minPriceRange={minPriceRange}
+								setMinPriceRange={setMinPriceRange}
+								maxPriceRange={maxPriceRange}
+								setMaxPriceRange={setMaxPriceRange}
+								currentFilters={appliedFacets}
+								onFilterChange={handleFilterChange}
+								onFilterClear={onFilterClear}
+							/>
+						</View>
+						<View className='flex-1'>
+							<CatalogSort
+								currentSort={appliedFacets?.sort}
+								onSortChange={handleSortChange}
+								hiddenSortOptions={hiddenSortOptions}
+							/>
+						</View>
+					</View>
 				</>
 			)}
 
@@ -164,6 +197,7 @@ export default function ProductCatalogContent(props) {
 				<SearchResults
 					isLoading={productLoading}
 					searchResults={products}
+					siblingsByCode={siblingsByCode}
 				/>
 			</InfiniteScroll>
 		</View>

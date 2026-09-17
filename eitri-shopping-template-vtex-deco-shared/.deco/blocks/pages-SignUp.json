@@ -1,0 +1,23 @@
+{
+  "__resolveType": "website/pages/Page.tsx",
+  "name": "SignUp",
+  "path": "/cadastro",
+  "sections": [
+    {
+      "title": "Registrar",
+      "subtitle": "Informe seu email",
+      "formCodeVerification": "Código de verificação",
+      "labelButton": "Login",
+      "textSendCode": "Enviar código",
+      "textResendCode": "Reenviar código",
+      "alreadyHaveAccount": "Já possui conta? Entrar",
+      "__resolveType": "site/sections/AppPages/SignUp.tsx"
+    },
+    {
+      "title": "Precisa de ajuda?",
+      "whatsapp": "Fale conosco pelo Whatsapp",
+      "faq": "Perguntas frequentes",
+      "__resolveType": "site/sections/HelpSection.tsx"
+    }
+  ]
+}

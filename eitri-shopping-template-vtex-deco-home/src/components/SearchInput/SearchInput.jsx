@@ -2,7 +2,7 @@ import { Text, View } from 'eitri-luminus'
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import { autocompleteSuggestions } from '../../services/ProductService'
 import Eitri from 'eitri-bifrost'
-import { FiSearch, FiChevronLeft, FiX } from 'react-icons/fi'
+import { SearchIcon, ChevronLeftIcon, CloseIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 import QRCodeScanner from '../QRCodeScanner/QRCodeScanner'
 import TopSearches from '../TopSearches/TopSearches'
@@ -12,7 +12,7 @@ let timeoutId
 let skipSuggestion = false
 
 export default function SearchInput(props) {
-	const { onSubmit, incomingValue, autoFocus, onClickInput, alwaysShowBackButton } = props
+	const { onSubmit, incomingValue, autoFocus, onClickInput, alwaysShowBackButton, onBack } = props
 	const { t } = useTranslation()
 
 	const [searchTerm, setSearchTerm] = useState(incomingValue || '')
@@ -117,7 +117,11 @@ export default function SearchInput(props) {
 	}
 
 	const onBackPress = () => {
-		Eitri.navigation.back()
+		if (typeof onBack === 'function') {
+			onBack()
+		} else {
+			Eitri.navigation.back()
+		}
 	}
 
 	const handleClear = () => {
@@ -131,7 +135,7 @@ export default function SearchInput(props) {
 				<View
 					onClick={onBackPress}
 					className='mr-2'>
-					<FiChevronLeft
+					<ChevronLeftIcon
 						className='text-header-content'
 						size={24}
 					/>
@@ -155,12 +159,12 @@ export default function SearchInput(props) {
 
 				<View onClick={searchTerm ? handleClear : undefined}>
 					{searchTerm ? (
-						<FiX
+						<CloseIcon
 							size={24}
 							className='text-primary'
 						/>
 					) : (
-						<FiSearch
+						<SearchIcon
 							size={24}
 							className='text-primary'
 						/>
@@ -168,7 +172,7 @@ export default function SearchInput(props) {
 				</View>
 			</View>
 
-			<QRCodeScanner />
+			{/* <QRCodeScanner /> */}
 
 			{showSearchInsights && !searchTerm && (
 				<View className='absolute top-[45px] left-0 w-full bg-white rounded-lg max-h-[70vh] overflow-y-auto'>

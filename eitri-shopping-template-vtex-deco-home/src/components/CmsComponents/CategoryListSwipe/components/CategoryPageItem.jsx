@@ -1,11 +1,9 @@
 import { HeaderReturn, HeaderContentWrapper, HeaderText } from 'eitri-shopping-template-vtex-deco-shared'
 import Eitri from 'eitri-bifrost'
 import CategoryTitle from './CategoryTitle'
-import { useTranslation } from 'eitri-i18n'
 
 export default function CategoryPageItem(props) {
 	const { item, goToItem } = props
-	const { t } = useTranslation()
 
 	const [navigationStack, setNavigationStack] = useState([])
 
@@ -37,8 +35,23 @@ export default function CategoryPageItem(props) {
 		if (hasSubItems(selectedItem)) {
 			setNavigationStack(previousStack => [...previousStack, selectedItem])
 		} else {
-			goToItem(selectedItem)
+			openCategory(selectedItem)
 		}
+	}
+
+	const openCategory = selectedItem => {
+		const categoryNames = navigationStack.map(category => category.title).filter(Boolean)
+		if (categoryNames[categoryNames.length - 1] !== selectedItem.title) {
+			categoryNames.push(selectedItem.title)
+		}
+
+		goToItem({
+			...selectedItem,
+			action: {
+				...selectedItem.action,
+				categoryNames
+			}
+		})
 	}
 
 	const handleBack = () => {
@@ -67,16 +80,8 @@ export default function CategoryPageItem(props) {
 				</HeaderContentWrapper>
 				<View
 					bottomInset={'auto'}
-					className='bg-base-100 flex-1 overflow-y-auto'>
-					<View className='flex flex-col p-4 gap-4'>
-						{currentItem?.action && (
-							<CategoryTitle
-								icon={currentItem.icon}
-								hasSubItems={false}
-								title={t('categoryPage.seeAll', { title: currentItem.title })}
-								onClick={() => goToItem(currentItem)}
-							/>
-						)}
+					className='bg-white flex-1 overflow-y-auto'>
+					<View className='flex flex-col'>
 						{currentItem?.subcategories?.map(subItem => (
 							<CategoryTitle
 								key={subItem.title}

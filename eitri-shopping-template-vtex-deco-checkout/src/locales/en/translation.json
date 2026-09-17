@@ -1,0 +1,219 @@
+{
+	"home": {
+		"title": "Complete Order"
+	},
+	"orderCompleted": {
+		"title": "Order Confirmed",
+		"titleHeader": "Order completed",
+		"txtCongratulation": "Congratulations!",
+		"txtOrderSuccessful": "Your order was placed successfully.",
+		"txtOrderNumber": "Order number:",
+		"txtOrderFollow": "You will receive an email with all the details. You can also track your order under 'My orders'.",
+		"txtReady": "Done, your purchase is complete!",
+		"txtEmailConfirmation": "We sent an email confirmation with your order details",
+		"txtOrderCode": "Your order code is",
+		"labelSeeOrders": "View my orders",
+		"labelBack": "Back to home"
+	},
+	"paymentData": {
+		"title": "Payment",
+		"txtTotalPayment": "Total to pay",
+		"labelButton": "Continue",
+		"txtTitle": "Choose how to pay"
+	},
+	"checkoutReview": {
+		"txtLoading": "We are preparing your purchase",
+		"txtTitle": "Review and confirm",
+		"txtDelete": "Delete",
+		"txtError": "There was an error placing your order"
+	},
+	"freightSelector": {
+		"txtTitle": "How would you like to receive your product?",
+		"txtDeliverAt": "Deliver to {{street}}, {{number}} {{complement}}",
+		"txtContinue": "Continue",
+		"txtChangeAddress": "Change delivery address"
+	},
+	"freightGroupSelector": {
+		"txtTitle": "Choose how you would like to receive these products",
+		"txtPickup": "Pick up at {{name}}",
+		"txtDelivery": "Deliver to my address"
+	},
+	"pickupSelector": {
+		"txtHeader": "Pickup",
+		"txtTitle": "Which store would you like to pick up your product from?",
+		"txtSeeMore": "See more",
+		"txtSeeLess": "See less"
+	},
+	"installments": {
+		"txtHeader": "Installments",
+		"txtWithInterest": "with interest",
+		"txtNoInterest": "interest-free"
+	},
+	"addCardForm": {
+		"txtHeader": "New card",
+		"txtBrandsAccepted": "Accepted card brands:",
+		"labelContinue": "Continue",
+		"errorCardNumber": "Check the card number",
+		"errorDueDate": "Invalid expiration date"
+	},
+	"otpLogin": {
+		"txtMessage": "For security reasons, enter the code sent to {{email}}",
+		"placeholderCode": "Code sent by email",
+		"errorInvalidCode": "Invalid code",
+		"labelContinue": "Continue"
+	},
+	"personalData": {
+		"frmName": "First name",
+		"placeholderName": "Enter your first name",
+		"frmLastName": "Last name",
+		"placeholderLastName": "Enter your last name",
+		"frmTaxpayerId": "CPF",
+		"placeholderTaxpayerId": "Enter your CPF",
+		"frmPhone": "Phone",
+		"placeholderPhone": "Enter your phone number",
+		"frmCorporateName": "Company name",
+		"placeholderCorporateName": "Enter your company name",
+		"frmFantasyName": "Trading name",
+		"placeholderFantasyName": "Enter your trading name",
+		"frmCorporateDocument": "CNPJ",
+		"placeholderCorporateDocument": "Enter your CNPJ",
+		"frmCorporatePhone": "Phone",
+		"placeholderCorporatePhone": "Enter your phone number",
+		"frmStateInscription": "State registration",
+		"placeholderStateInscription": "Enter your state registration",
+		"title": "Personal information",
+		"frmEmail": "Email",
+		"placeholderEmail": "Enter your email",
+		"labelPerson": "Individual",
+		"labelCorporate": "Company",
+		"errorInvalidDoc": "The CPF entered is invalid",
+		"labelButton": "Continue"
+	},
+	"pixOrder": {
+		"txtTimeRemaining": "Time remaining",
+		"labelCopyCode": "Copy code",
+		"labelShare": "Share",
+		"labelShowQRCode": "Show QR Code",
+		"labelHideQRCode": "Hide QR Code",
+		"txtHeader": "PIX Payment",
+		"txtPixApproved": "With PIX, your purchase is approved instantly",
+		"txtOrderValue": "Order total:",
+		"txtPixCode": "PIX code",
+		"txtHowToPay": "How to pay with PIX",
+		"txtHowStep1": "Open your banking app",
+		"txtHowStep2": "Choose PIX as the payment method",
+		"txtHowStep3": "Paste the code above",
+		"txtProcessing": "The payment will be processed automatically after confirmation",
+		"snackCopied": "PIX code copied successfully!"
+	},
+	"finishCart": {
+		"errorOrder": "There was an error processing your order. Please review the products and payment details before trying again",
+		"title": "Checkout",
+		"errorItems": "Some items in your bag are no longer available.",
+		"txtProduct": "Product",
+		"txtProducts": "Products",
+		"txtTotal": "Total",
+		"txtItems": "Bag items",
+		"txtNoItems": "Your bag is empty",
+		"txtSubtotal": "Subtotal",
+		"labelButton": "Place Order"
+	},
+	"emptyCart": {
+		"title": "Complete Order",
+		"txtEmptyCart": "Your bag is empty",
+		"txtAddItem": "Add products to your bag",
+		"labelBack": "Back"
+	},
+	"addNewShippingAddress": {
+		"title": "Delivery",
+		"errorAddress": "Invalid address. Please check the information",
+		"errorDefault": "An unexpected error occurred. Please try again",
+		"txtCalculate": "Calculate shipping and delivery time",
+		"txtPickupAddress": "Pickup address",
+		"txtEdit": "Edit",
+		"txtZipCode": "Enter your postal code",
+		"frmNumber": "Number",
+		"frmComplement": "Additional information",
+		"frmReference": "Reference point",
+		"frmReceiveName": "Who will receive the order?",
+		"frmStreet": "Street / Avenue",
+		"frmNeighborhood": "Neighborhood",
+		"frmCity": "City",
+		"frmState": "State",
+		"labelButton": "Continue",
+		"ok": "OK",
+		"loading": "Please wait...",
+		"errorPostalCode": "Enter the postal code",
+		"errorPostalCodeInvalid": "The postal code must contain 8 digits",
+		"errorStreet": "Enter the street or avenue",
+		"errorNeighborhood": "Enter the neighborhood",
+		"errorCity": "Enter the city",
+		"errorState": "Enter the state",
+		"errorReceiverName": "Enter the recipient's name",
+		"errorNumber": "Enter the address number"
+	},
+	"simpleCard": {
+		"txtEdit": "CHANGE"
+	},
+	"deliveryData": {
+		"txtWithdrawal": "PICKUP",
+		"txtDelivery": "DELIVERY",
+		"txtNoNumber": "no number",
+		"txtAlert": "Your address information is incomplete. Please click here to update it.",
+		"txtStoreAddress": "Store Address",
+		"txtDeliveryAddress": "Delivery Address",
+		"txtPostalCode": "Postal code: {{code}}"
+	},
+	"selectedPaymentData": {
+		"txtPayment": "PAYMENT",
+		"txtFillCard": "Enter the card details"
+	},
+	"userData": {
+		"txtPersonData": "PERSONAL INFORMATION",
+		"txtMessageLeave": "Not you? Sign out"
+	},
+	"shippingMethods": {
+		"txtSelectDelivery": "How would you like to receive your product?"
+	},
+	"giftCardInput": {
+		"txtHideGiftCard": "Hide Gift Card",
+		"txtAddGiftCard": "Add Gift Card",
+		"labelGiftCard": "Gift Card",
+		"labelButtonOk": "OK",
+		"labelButtonRemove": "Remove"
+	},
+	"creditCard": {
+		"title": "Credit Card",
+		"labelCardNumber": "Card number",
+		"labelName": "Cardholder name",
+		"labelValidity": "Expiration date",
+		"labelCvv": "CVV",
+		"labelBrand": "Card brand",
+		"labelInstallment": "Installments",
+		"labelBillingAddress": "Billing address:",
+		"infoBillingAddress": "Your billing address is the same as your delivery address",
+		"labelZipCode": "Postal code",
+		"labelAddress": "Street / Avenue",
+		"labelNumber": "Number",
+		"labelComplement": "Additional information",
+		"labelNeighborhood": "Neighborhood",
+		"labelCity": "City",
+		"labelState": "State"
+	},
+	"addressSelector": {
+		"title": "Delivery Addresses",
+		"subtitle": "Select a delivery address",
+		"noAddresses": "No saved addresses",
+		"addFirstAddress": "Add First Address",
+		"addNewAddress": "Add New Address",
+		"default": "Default",
+		"noReceiver": "Recipient name not provided",
+		"loading": "Loading addresses...",
+		"selectedAddress": "Selected Address",
+		"otherAddresses": "Other Addresses",
+		"edit": "Edit",
+		"noPickupPoints": "No pickup points available",
+		"pickupTitle": "Pickup Points",
+		"pickupSubtitle": "Select a pickup point"
+	}
+}

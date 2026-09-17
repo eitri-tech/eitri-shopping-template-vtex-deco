@@ -1,0 +1,18 @@
+{
+  "name": "eitri-shopping-template-vtex-deco-shared",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Eitri shared app — deco tooling (schema/.deco generation for Studio). App runtime is managed by eitri-cli via eitri-app.conf.js.",
+  "scripts": {
+    "prestart": "npm run deco:init && npm run deco:generate",
+    "start": "cd .. && eitri app start",
+    "deco:init": "deco-eitri init",
+    "deco:generate": "deco-eitri generate",
+    "deco:import": "node scripts/deco-import/import-vtex-cms.mjs"
+  },
+  "devDependencies": {
+    "@decocms/eitri": "^7.20.0",
+    "eitri-cli": "^1.56.1",
+    "draftjs-to-html": "^0.9.1"
+  }
+}

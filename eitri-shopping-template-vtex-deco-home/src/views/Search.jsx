@@ -1,14 +1,21 @@
 import Eitri from 'eitri-bifrost'
-import { HeaderContentWrapper, TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
+import { HeaderContentWrapper, TrackingService, HEADER_VARIANT, useRetractableBottomBar } from 'eitri-shopping-template-vtex-deco-shared'
 import SearchInput from '../components/SearchInput/SearchInput'
 import { useLocalShoppingCart } from '../providers/LocalCart'
 import ProductCatalogContent from '../components/ProductCatalogContent/ProductCatalogContent'
 import { saveSearchHistory } from '../services/SearchMetadataService'
+import { RemoteConfig } from 'eitri-shopping-vtex-shared'
 
 export default function Search(props) {
 	const incomingSearchTerm = props?.history?.location?.state?.searchTerm || props?.location?.state?.searchTerm
+	const returnTo = props?.history?.location?.state?.returnTo || props?.location?.state?.returnTo
+	const hiddenSortOptionsConfig = RemoteConfig.getContent(
+		'appConfigs.home.hiddenCategorySortOptions'
+	)
+	const hiddenSortOptions = Array.isArray(hiddenSortOptionsConfig) ? hiddenSortOptionsConfig : []
 
 	const { startCart } = useLocalShoppingCart()
+	useRetractableBottomBar()
 
 	const [params, setParams] = useState(null)
 	const [pristine, setPristine] = useState(true)
@@ -40,6 +47,14 @@ export default function Search(props) {
 		TrackingService.sendScreenView('Busca', 'Search')
 	}, [])
 
+	const handleBack = () => {
+		if (returnTo) {
+			Eitri.navigation.navigate({ path: `/${returnTo}`, replace: true })
+		} else {
+			Eitri.navigation.back()
+		}
+	}
+
 	const handleSearchSubmit = async term => {
 		if (term) {
 			setPristine(false)
@@ -61,13 +76,14 @@ export default function Search(props) {
 	return (
 		<Page title='Busca'>
 			<HeaderContentWrapper
-				scrollEffect={false}
+				variant={HEADER_VARIANT.SCROLL_SOLID}
 				className='gap-3 w-full justify-between relative'>
 				<SearchInput
 					autoFocus={!incomingSearchTerm}
 					alwaysShowBackButton
 					incomingValue={params?.query}
 					onSubmit={handleSearchSubmit}
+					onBack={handleBack}
 				/>
 			</HeaderContentWrapper>
 
@@ -85,7 +101,9 @@ export default function Search(props) {
 				<ProductCatalogContent
 					bottomInset={'auto'}
 					params={params}
+					title={params?.query}
 					showFilters={true}
+					hiddenSortOptions={hiddenSortOptions}
 				/>
 			)}
 		</Page>

@@ -286,7 +286,7 @@ export default function PersonalData() {
 
 			{isLoading && <Loading fullScreen />}
 
-			<View className='m-4 p-4 flex flex-col justify-between flex-grow bg-white rounded shadow-sm border border-gray-300'>
+			<View className='m-4 p-4 flex flex-col justify-between flex-grow bg-white shadow-sm border border-gray-300'>
 				<View className='mb-2'>
 					<Text className='block text-lg font-bold text-center'>Informe seu e-mail para continuar</Text>
 					<Text className='block text-center'>Vamos verificar se você já fez alguma compra com a gente</Text>

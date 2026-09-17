@@ -1,0 +1,79 @@
+appId: tech.eitri.play
+tags:
+  - account
+  - login
+env:
+  APP_SLUG: eitri-shopping-template-vtex-deco-account
+---
+# NOTE: this flow validates the login STRUCTURE and the error/validation path
+# only. It intentionally uses fake, non-existent credentials and asserts that
+# the app reacts (does not silently "succeed" or crash) — it must NOT log in
+# with a real account. Do not swap in real credentials.
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+# CONFIRMED live: a fresh, non-deep-linked launch lands on account Home.jsx's
+# logged-out state — "Minha Conta" heading, "Entrar"/"Cadastrar" buttons,
+# plus the subtitle "Faça login ou crie sua conta para aproveitar vantagens
+# únicas." (visually confirmed via screenshot). "Entrar" (Home.jsx:230, key
+# home.labelEntrar) is the reliable wait target.
+- extendedWaitUntil:
+    visible: "Entrar"
+    timeout: 60000
+# Tap "Entrar" to navigate to AuthSelect.
+# CORRECTED after live testing: an earlier version gated this tap behind a
+# `runFlow: when: visible:` check on the subtitle text as an extra safety
+# net — that check never matched live (likely because the subtitle wraps
+# across two visual lines and isn't exposed as one single matchable text
+# node), even though the subtitle IS genuinely on screen and "Entrar" itself
+# was already confirmed visible above. Since "Entrar" alone is a sufficient,
+# already-verified landing signal, tap it directly instead of re-gating.
+- tapOn: "Entrar"
+# Confirm we're on AuthSelect. AuthSelect.jsx:90 (Page title / HeaderText),
+# key authSelect.title.
+- extendedWaitUntil:
+    visible: "Acesse sua conta"
+    timeout: 15000
+# Choose the email/password login method to go to SignIn.
+# AuthSelect.jsx:112, key authSelect.emailButton.
+- tapOn: "Entrar com E-mail e senha"
+# Confirm we're on SignIn. This is a hardcoded literal (NOT an i18n key),
+# SignIn.jsx:193 — different from AuthSelect's "Entrar" copy.
+- extendedWaitUntil:
+    visible: "Entrar com email e senha"
+    timeout: 15000
+# CORRECTED after live device testing — two real findings here:
+#
+# 1. This screen defaults to OTP/access-code mode, not password mode: only
+#    an "Email" field + "Enviar código" button are shown (SignIn.jsx's
+#    password fields and the "Login com email e senha" mode-toggle are
+#    conditional on a `loginProviders?.passwordAuthentication` remote-config
+#    flag — apparently OFF in this environment/workspace). There is no
+#    "Senha" field to fill here at all. This is itself a useful QA
+#    observation for ESS-936 (password login may be fully disabled), not a
+#    flow bug.
+# 2. The "Email" placeholder is a WebView <input> placeholder — same class
+#    of issue as the search input in navigation-search.yml — and is NOT
+#    reliably tappable via text matching (confirmed live: `tapOn: text:
+#    "Email"` failed even though the field was unfocused and the placeholder
+#    was clearly visible on screen). Falls back to a point tap, matching the
+#    established convention for WebView form fields in this project.
+- tapOn:
+    point: "50%,19%"
+- inputText: "naoexiste-teste@example.com"
+# Submit — requests an OTP code be sent to the (fake, non-existent) email.
+# key signIn.textSendCode = "Enviar código".
+- tapOn: "Enviar código"
+# CONFIRMED live: VTEX sends a code regardless of whether the email matches
+# a real account — submitting a non-existent email still advances to the
+# code-entry state (a new "Código de verificação" field appears, label
+# signUp.lbVerifyCode, plus a disabled "Entrar" and a "Reenviar código (NN)"
+# countdown button). This flow deliberately does NOT enter a real access
+# code (none was received, and none would be for a fake email), so it stops
+# here — this is the intended boundary, not a failure. "Código de
+# verificação" is a real rendered Text label (not a placeholder), so it's a
+# reliable, non-flaky landing signal for this final state.
+- extendedWaitUntil:
+    visible: "Código de verificação"
+    timeout: 20000

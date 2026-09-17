@@ -42,8 +42,49 @@ export const markLastViewedProduct = async product => {
 	}
 }
 
+const getValidBuyTogetherProducts = (products, currentProductId) => {
+	return (products || []).filter(product => {
+		if (!product?.productId || String(product.productId) === String(currentProductId)) {
+			return false
+		}
+
+		return product?.items?.some(item =>
+			item?.sellers?.some(seller => seller?.commertialOffer?.AvailableQuantity > 0)
+		)
+	})
+}
+
 export const showTogether = async productId => {
-	return Vtex.catalog.showTogether(productId)
+	try {
+		const products = getValidBuyTogetherProducts(
+			await Vtex.catalog.showTogether(productId),
+			productId
+		)
+		if (products?.length > 0) return products
+	} catch (error) {
+		console.error('Error loading catalog buy together products', error)
+	}
+
+	const recommendationTypes = ['buy', 'viewAndBought', 'suggestions', 'similars', 'view']
+
+	for (const type of recommendationTypes) {
+		try {
+			const products = getValidBuyTogetherProducts(
+				await Vtex.searchGraphql.productRecommendations({
+					identifier: { field: 'id', value: productId },
+					type,
+					groupBy: 'PRODUCT'
+				}),
+				productId
+			)
+
+			if (products?.length > 0) return products
+		} catch (error) {
+			console.error(`Error loading ${type} product recommendations`, error)
+		}
+	}
+
+	return []
 }
 
 export const autocompleteSuggestions = async value => {
@@ -52,4 +93,18 @@ export const autocompleteSuggestions = async value => {
 
 export const getProductByEan = async ean => {
 	return Vtex.searchGraphql.product({ identifier: { field: 'ean', value: ean } })
+}
+
+export const getProductSiblingsService = async agrupadorCode => {
+	if (!agrupadorCode) return []
+	// VTEX IS treats multiple entries with the same key as OR — a single code returns all siblings
+	const result = await Vtex.searchGraphql.productSearch({
+		selectedFacets: [{ key: 'codigo-agrupador', value: agrupadorCode }],
+		from: 0,
+		// Cap: a single product group rarely exceeds 10 siblings; 19 provides safe headroom
+		to: 19,
+		hideUnavailableItems: true,
+		options: { allowRedirect: false }
+	})
+	return result?.products || []
 }

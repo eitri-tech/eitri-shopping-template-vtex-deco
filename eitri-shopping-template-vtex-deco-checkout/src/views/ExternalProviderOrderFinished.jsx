@@ -20,7 +20,7 @@ export default function ExternalProviderOrderFinished(props) {
 					</View>
 				</View>
 
-				<View className='bg-white rounded shadow-sm border border-gray-300 p-4'>
+				<View className='bg-white shadow-sm border border-gray-300 p-4'>
 					<View className='mb-6 flex flex-col items-center'>
 						<Text className='text-2xl w-full font-bold text-center text-gray-800 mb-2'>
 							Solicitação enviada!

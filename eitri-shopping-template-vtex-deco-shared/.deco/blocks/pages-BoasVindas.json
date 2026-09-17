@@ -1,0 +1,26 @@
+{
+  "__resolveType": "website/pages/Page.tsx",
+  "name": "BoasVindas",
+  "path": "/boas-vindas",
+  "sections": [
+    {
+      "title": "Acesse sua conta",
+      "__resolveType": "site/sections/AppPages/WelcomeHeader.tsx"
+    },
+    {
+      "subtitle": "Entre de forma rápida e segura usando uma das opções abaixo:",
+      "emailCodeButton": "Receber código por E-mail",
+      "googleButton": "Entrar com o Google",
+      "emailPasswordButton": "Entrar com E-mail e senha",
+      "noAccountYet": "Ainda não possui conta?",
+      "registerNow": "Cadastre-se agora",
+      "__resolveType": "site/sections/AppPages/WelcomeLoginOptions.tsx"
+    },
+    {
+      "title": "Precisa de ajuda?",
+      "whatsapp": "Fale conosco pelo Whatsapp",
+      "faq": "Perguntas frequentes",
+      "__resolveType": "site/sections/HelpSection.tsx"
+    }
+  ]
+}

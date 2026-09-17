@@ -1,6 +1,6 @@
 {
 	"home": {
-		"title": "Cesta"
+		"title": "Sacola"
 	},
 	"cart": {
 		"labelGiftWrapping": "Embalagem de presente",
@@ -9,8 +9,8 @@
 	"cartItem": {
 		"txtAdd": "Adicionar",
 		"txtMessageUnavailable": "Este produto não está disponível!",
-		"txtRemoveCart": "Deseja excluir o produto da cesta?",
-		"txtRemoveCartItem": "Deseja remover {{name}} da cesta?",
+		"txtRemoveCart": "Deseja excluir o produto da sacola?",
+		"txtRemoveCartItem": "Deseja remover {{name}} da sacola?",
 		"cannotBeDelivered": "Este item não pode ser entregue",
 		"notAvailable": "Este item não está disponível"
 	},
@@ -34,8 +34,8 @@
 		"labelInsertCode": "Insira o código"
 	},
 	"emptyCart": {
-		"txtEmptyCart": "Sua cesta está vazia",
-		"txtMessageList": "Adicione produtos no sua cesta e eles serão listados aqui.",
+		"txtEmptyCart": "Sua sacola está vazia",
+		"txtMessageList": "Adicione produtos no sua sacola e eles serão listados aqui.",
 		"labelButton": "Comprar Agora"
 	},
 	"freight": {
@@ -76,5 +76,14 @@
 			"delete": "Excluir",
 			"cancel": "Cancelar"
 		}
+	},
+	"sellerCode": {
+		"txtTitle": "Código do Vendedor",
+		"placeholder": "Ex: V1234",
+		"labelAdd": "Adicionar",
+		"labelChange": "Alterar",
+		"txtSuccess": "Vendedor identificado!",
+		"errorNotFound": "Código do vendedor não encontrado.",
+		"errorGeneric": "Erro ao verificar o código. Tente novamente."
 	}
 }

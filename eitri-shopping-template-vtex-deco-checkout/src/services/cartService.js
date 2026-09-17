@@ -1,5 +1,6 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import Eitri from 'eitri-bifrost'
+import { fetchClientCode } from 'eitri-shopping-template-vtex-deco-shared'
 
 export const getCart = async () => {
 	return await Vtex.cart.getCartIfExists()
@@ -44,9 +45,26 @@ export const removeClientData = async () => {
 	return await getCart()
 }
 
+/**
+ * Registra a identidade do cliente no addon do Salesforce. O `customerId`
+ * daqui e o que o addon usa como contact key do Marketing Cloud (confirmado
+ * com o time de plataforma da Eitri), por isso passamos o codigo de cliente
+ * da loja — o mesmo usado na loja fisica e no e-commerce — e nao o id do
+ * perfil VTEX, que quebrava a unificacao do tracking entre canais.
+ *
+ * `fetchClientCode` exige sessao autenticada: no checkout como convidado ele
+ * nao devolve codigo e caimos no e-mail, o mesmo fallback do app de conta (ver
+ * resolveContactKey), para que o mesmo cliente nao receba contact keys
+ * diferentes dependendo de onde entrou. Aqui o `ok` da consulta e ignorado de
+ * proposito: e um notify unico do checkout, sem retry nem persistencia, e ficar
+ * sem identidade nenhuma no pedido e pior que cair no e-mail.
+ */
 export const registerToNotify = async userPayload => {
 	try {
-		Eitri.exposedApis.session.notifyLogin(userPayload)
+		const email = userPayload?.email || ''
+		const { clientCode } = await fetchClientCode()
+		const customerId = clientCode || email || userPayload?.customerId || ''
+		Eitri.exposedApis.session.notifyLogin({ ...userPayload, customerId })
 	} catch (e) {
 		console.log('erro on registerToNotify', e)
 	}

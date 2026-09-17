@@ -1,0 +1,73 @@
+# Esvazia a sacola e volta para a Home.
+#
+# Pré-condição: o app `home` já está aberto na view Home (rode
+# subflows/bootstrap.yml com APP_SLUG=eitri-shopping-template-vtex-deco-home antes).
+#
+# Por que isto existe: o orderForm do VTEX PERSISTE entre execuções
+# (`clearState: false` não limpa nada no servidor), então um flow que adiciona
+# item herda o carrinho sujo das rodadas anteriores. Medido no device: o badge
+# do header chegou a 4 itens acumulados.
+appId: tech.eitri.play
+---
+# ACHADO no device: em sessão anônima, um overlay promocional de tela cheia
+# ("Faça login e descubra quanto você possui disponível em sua carteira de
+# promotional overlay.") aparece por cima da Home a cada carregamento — inclusive
+# por cima do header — e não sai da árvore de acessibilidade, então
+# `extendedWaitUntil: visible: "Categorias"` no bootstrap passa mesmo com ele
+# na tela (o texto existe no DOM, só está coberto visualmente). Sem fechar
+# isto antes, os taps no logo do header abaixo caem no overlay e não avançam
+# o contador do easter egg. Ícone "X" sem texto/a11y — fecha por posição.
+# Medido no device: bounds [888,220][992,324] -> centro (87%, 11%).
+- runFlow:
+    when:
+      visible: "Faça login para acessar benefícios e ofertas exclusivas\\."
+    commands:
+      - tapOn:
+          point: "87%,11%"
+
+# Cartman é uma view de debug alcançada por easter egg: tocar o logo do
+# header N vezes (home/src/utils/utils.js:13-21 — contador começa em 10, ou
+# seja 11 taps no primeiro disparo do bundle, e reseta para 7 depois, logo 8
+# taps nas vezes seguintes). Como o número varia, o laço para assim que a
+# tela do Cartman aparece, em vez de usar uma contagem fixa.
+#
+# Logo do header: MainHeader.jsx:18, `absolute left-1/2 -translate-x-1/2`.
+# Medido no device: bounds [371,132][709,244] -> centro (50%, 8%).
+- repeat:
+    times: 15
+    while:
+      notVisible: "Limpar sacola"
+    commands:
+      - tapOn:
+          point: "50%,8%"
+- assertVisible: "Limpar sacola"
+# CORRIGIDO após teste no device: o botão é "Limpar sacola" (Cartman.jsx:239),
+# não "Limpar carrinho" — o texto foi renomeado em algum momento e este
+# subflow tinha ficado desatualizado (a asserção acima falhava sempre,
+# silenciosamente coberta pelo loop `repeat` que só olha o texto errado).
+# Chama Vtex.cart.clearCart() preservando o orderFormId (Cartman.jsx:39-42).
+# Preferido a `Nova sacola`, que trocaria o orderFormId. Atenção: clearCart()
+# NÃO chama setCart(), então as linhas "Item na bolsa: ..." ficam
+# desatualizadas na tela — não asserte sobre elas.
+- tapOn: "Limpar sacola"
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn: "Ir pra Home"
+- extendedWaitUntil:
+    visible: "Categorias"
+    timeout: 30000
+# O overlay promocional (ver ACHADO acima) volta a aparecer neste NOVO
+# carregamento da Home — quem consome este subflow espera um header
+# interagível ao final (ex.: add-one-item.yml toca o ícone de busca), então
+# fecha de novo aqui antes de devolver o controle.
+- runFlow:
+    when:
+      visible: "Faça login para acessar benefícios e ofertas exclusivas\\."
+    commands:
+      - tapOn:
+          point: "87%,11%"
+# O badge do header só renderiza quando a quantidade é > 0
+# (shared/HeaderCart.jsx:36), então com a sacola vazia ele some da árvore.
+# Verificado no device: o badge "4" desapareceu após esta sequência. Quem
+# consome este subflow confirma o resultado de forma inequívoca — adicionando
+# exatamente 1 item e exigindo que o badge seja exatamente "1".

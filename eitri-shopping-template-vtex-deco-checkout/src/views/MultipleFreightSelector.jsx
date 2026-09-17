@@ -5,53 +5,57 @@ import { navigate } from '../services/navigationService'
 import { useState } from 'react'
 import { productGroupShippingResolver, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import FixedBottom from '../components/FixedBottom/FixedBottom'
-import { HeaderContentWrapper, HeaderReturn, CustomButton, Loading, TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
-import { FaChevronRight } from 'react-icons/fa'
+import {
+	HeaderContentWrapper,
+	HeaderReturn,
+	CustomButton,
+	Loading,
+	TrackingService,
+	ChevronRightIcon
+} from 'eitri-shopping-template-vtex-deco-shared'
 
-function AddressSelectorCard({ sla, items }) {
+function DeliveryGroupCard({ index, total, sla, items }) {
 	const formatAddress = address => {
 		return `${address?.street}, ${address?.number || ''} ${address?.complement || ''} - ${address?.neighborhood}`
 	}
 
+	const title = sla?.isPickupInPoint
+		? `Retire na loja ${sla?.pickupStoreInfo.friendlyName}`
+		: sla?.formatedShippingEstimate
+
 	return (
-		<View className='flex flex-row items-start w-full gap-3'>
-			<View className='flex flex-col w-full gap-1'>
-				<View className='flex flex-col gap-4 mb-3'>
-					{items?.map(product => (
-						<View className={'flex flex-row items-start gap-3'}>
-							<View
-								key={product.imageUrl}
-								className='min-w-12 max-w-12'>
-								<Image
-									src={product.imageUrl}
-									width='100%'
-									height='100%'
-									className='object-cover'
-								/>
-							</View>
-							<View className={'text-sm'}>{product.name}</View>
+		<View className='flex flex-col gap-3'>
+			<Text className='text-xs font-bold uppercase tracking-wide text-gray-500'>{`Entrega ${index} de ${total}`}</Text>
+
+			<Text className='font-bold text-lg block'>{title}</Text>
+
+			<View className='flex flex-col gap-3'>
+				{items?.map(product => (
+					<View
+						key={product.imageUrl}
+						className='flex flex-row items-start gap-3'>
+						<View className='min-w-12 max-w-12'>
+							<Image
+								src={product.imageUrl}
+								width='100%'
+								height='100%'
+								className='object-cover'
+							/>
 						</View>
-					))}
-				</View>
-
-				{sla.isPickupInPoint && (
-					<View className='bg-primary px-2 py-1 rounded-full w-fit flex items-center justify-center'>
-						<Text className='text-xs text-primary-content'>{sla?.formatedShippingEstimate}</Text>
+						<Text className='text-sm'>{product.name}</Text>
 					</View>
-				)}
-
-				<Text className='text text-neutral-700'>
-					{sla?.pickupStoreInfo?.isPickupStore
-						? formatAddress(sla.pickupStoreInfo.address)
-						: formatAddress(sla.deliveryAddress)}
-				</Text>
-
-				<View className='flex items-center'>
-					<Text className={`font-semibold ${sla.formattedTotalPrice === 'Grátis' ? 'text-green-600' : ''}`}>
-						{sla?.formattedTotalPrice}
-					</Text>
-				</View>
+				))}
 			</View>
+
+			<Text className='text text-neutral-700'>
+				{sla?.pickupStoreInfo?.isPickupStore
+					? formatAddress(sla.pickupStoreInfo.address)
+					: formatAddress(sla.deliveryAddress)}
+			</Text>
+
+			<Text className={`font-semibold ${sla?.formattedTotalPrice === 'Grátis' ? 'text-green-600' : ''}`}>
+				{sla?.formattedTotalPrice}
+			</Text>
 		</View>
 	)
 }
@@ -77,6 +81,9 @@ export default function MultipleFreightSelector(props) {
 		return slas.find(sla => sla.id === currentSla)
 	}
 
+	const totalGroups = shippingOptions?.length || 0
+	const allResolved = totalGroups > 0 && shippingOptions.every(opt => opt.currentSla)
+
 	return (
 		<Page title='Seleção de frete múltiplo'>
 			<HeaderContentWrapper>
@@ -89,24 +96,31 @@ export default function MultipleFreightSelector(props) {
 			/>
 
 			<View className='flex-1 flex flex-col p-4 gap-4'>
-				<Text className='text-xl font-bold'>Como deseja receber seu produto?</Text>
+				<View className='flex flex-col gap-1'>
+					<Text className='text-2xl font-bold'>
+						{allResolved
+							? `Seu pedido chegará em ${totalGroups} ${totalGroups === 1 ? 'entrega' : 'entregas separadas'}`
+							: 'Como deseja receber seu produto?'}
+					</Text>
+					{allResolved && (
+						<Text className='text-sm text-gray-500'>
+							Cada item segue um prazo, conforme os detalhes abaixo.
+						</Text>
+					)}
+				</View>
 
 				<View className={'flex flex-col gap-4'}>
 					{shippingOptions?.map((group, index) => {
 						const currentSla = getCurrentSla(group.slas, group.currentSla)
 
-						const label = currentSla?.isPickupInPoint
-							? `Retire na loja ${currentSla?.pickupStoreInfo.friendlyName}`
-							: `${currentSla?.formatedShippingEstimate}`
-
 						return (
-							<GenericBox className='p-4 w-full flex flex-col'>
-								<View className='flex flex-row items-center justify-between pb-3 mb-3 border-b'>
-									<Text className='font-bold'>{`${currentSla ? label : `Escolha a entrega`}`}</Text>
-								</View>
-
+							<GenericBox
+								key={index}
+								className='p-4 w-full rounded-xl border border-gray-100 flex flex-col gap-4'>
 								{currentSla ? (
-									<AddressSelectorCard
+									<DeliveryGroupCard
+										index={index + 1}
+										total={totalGroups}
 										sla={currentSla}
 										items={group?.items}
 									/>
@@ -118,19 +132,17 @@ export default function MultipleFreightSelector(props) {
 											<Text className='font-bold text-lg block'>
 												{`Escolha como receber ${group?.items?.length === 1 ? 'seu produto' : 'seus produtos'}`}
 											</Text>
-											<FaChevronRight className='text-primary w-[24px]' />
+											<ChevronRightIcon className='text-primary w-[24px]' />
 										</View>
 									</View>
 								)}
 
 								{currentSla && group.slas.length > 1 && (
-									<>
-										<View className='border-b my-4'></View>
-
-										<View onClick={() => navigate('FreightGroupSelectorOptions', { group })}>
-											<Text className='text-primary font-bold'>Veja outras opções</Text>
-										</View>
-									</>
+									<View onClick={() => navigate('FreightGroupSelectorOptions', { group })}>
+										<Text className='text-primary font-bold underline'>
+											{'Ver outras opções de entrega para este item >'}
+										</Text>
+									</View>
 								)}
 							</GenericBox>
 						)

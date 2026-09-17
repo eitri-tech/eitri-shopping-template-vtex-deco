@@ -1,6 +1,10 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import Eitri from 'eitri-bifrost'
 
+export const doLogin = async (email, password) => {
+	return await Vtex.customer.loginWithEmailAndPassword(email, password)
+}
+
 export const requestLogin = () => {
 	return new Promise(async (resolve, reject) => {
 		if (await isLoggedIn()) {

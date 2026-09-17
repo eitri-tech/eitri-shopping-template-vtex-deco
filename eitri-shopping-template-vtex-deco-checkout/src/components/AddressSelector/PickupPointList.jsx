@@ -10,7 +10,7 @@ export default function PickupPointList({ options, onSelectFreightOption, loadin
 				{[1, 2, 3].map(i => (
 					<Skeleton
 						key={i}
-						className='h-[72px] w-full rounded-lg mb-2'
+						className='h-[72px] w-full mb-2'
 					/>
 				))}
 			</View>
@@ -57,7 +57,7 @@ export default function PickupPointList({ options, onSelectFreightOption, loadin
 					? [1, 2, 3].map(i => (
 							<Skeleton
 								key={i}
-								className='h-[72px] w-full rounded-lg mb-2'
+								className='h-[72px] w-full mb-2'
 							/>
 						))
 					: options.map((option, index) => (
@@ -77,7 +77,7 @@ function PickupPointCard({ option, isSelected = false, onClick }) {
 	// Exibe um cartão de ponto de retirada, destacando visualmente se está selecionado
 	return (
 		<View
-			className={`rounded-lg shadow-sm transition-all duration-200 border cursor-pointer hover:shadow-md ${
+			className={`shadow-sm transition-all duration-200 border cursor-pointer hover:shadow-md ${
 				isSelected ? 'border-2 border-primary' : 'border-neutral-300 hover:border-primary/30 bg-base-100'
 			}`}
 			onClick={onClick}>

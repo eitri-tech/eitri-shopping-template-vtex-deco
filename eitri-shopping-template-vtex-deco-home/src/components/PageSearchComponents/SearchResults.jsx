@@ -1,18 +1,18 @@
-import { Loading } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiXCircle } from 'react-icons/fi'
+import { Loading, CloseCircleIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { View, Text, Image } from 'eitri-luminus'
 import ProductCard from '../ProductCard/ProductCard'
 import { useTranslation } from 'eitri-i18n'
+import { getAgrupadorCode } from 'eitri-shopping-template-vtex-deco-shared'
 
 export default function SearchResults(props) {
-	const { searchResults, isLoading } = props
+	const { searchResults, isLoading, siblingsByCode } = props
 
 	const { t } = useTranslation()
 
 	if (searchResults.length === 0 && !isLoading) {
 		return (
 			<View className='flex flex-col items-center justify-center mt-32 gap-4'>
-				<FiXCircle
+				<CloseCircleIcon
 					className='text-primary'
 					size={42}
 				/>
@@ -31,7 +31,10 @@ export default function SearchResults(props) {
 					<View
 						key={product.productId}
 						className='w-full'>
-						<ProductCard product={product} />
+						<ProductCard
+							product={product}
+							siblings={siblingsByCode?.[getAgrupadorCode(product)]}
+						/>
 					</View>
 				))}
 			</View>

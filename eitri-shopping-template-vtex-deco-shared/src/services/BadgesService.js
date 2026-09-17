@@ -1,14 +1,25 @@
-import Eitri from 'eitri-bifrost'
+// O bundler do Eitri só empacota import() quando o caminho é string literal fixa
+// (mesmo padrão do PAGE_LOADERS em DecoCMSContentRender). As regras de badge são
+// editadas via Deco CMS e persistidas neste bloco.
+const loadBadgesBlock = () => import('../../.deco/blocks/config-Badges.json')
 
-export default async function getBadgesForProducts(product, currentSku, VtexContext, contentType) {
-	const flagContentSections = await getCmsContent(VtexContext, contentType)
-	const badge = []
+/**
+ * Monta os badges de um produto a partir de duas fontes:
+ *  - Fonte A: teasers da oferta comercial do SKU (não editável via CMS).
+ *  - Fonte B: regras de badge do Deco CMS (`config-Badges.json`).
+ *
+ * A assinatura mantém `_vtexContext`/`_contentType` por compatibilidade com os
+ * consumidores existentes, mas eles não são mais usados (a fonte é o Deco).
+ */
+export default async function getBadgesForProducts(product, currentSku, _vtexContext, _contentType) {
+	const badges = []
 
+	// Fonte A — teasers da oferta comercial do SKU
 	const sellerDefault = currentSku?.sellers?.find(s => s.sellerDefault)
-	for (const teaser of sellerDefault?.commertialOffer?.teasers) {
+	for (const teaser of sellerDefault?.commertialOffer?.teasers ?? []) {
 		const promoText = parsePromo(teaser.name)
 		if (promoText) {
-			badge.push({
+			badges.push({
 				text: promoText,
 				color: '#8b153f',
 				bgColor: '#ffffff'
@@ -16,24 +27,35 @@ export default async function getBadgesForProducts(product, currentSku, VtexCont
 		}
 	}
 
-	for (const section of flagContentSections) {
-		if (section.data?.type === 'product' && section.data?.values?.includes(product.productId)) {
-			badge.push(section.data)
-		}
-		if (section.data?.type === 'category') {
-			const hasCategory = section.data?.values?.some(catId =>
-				product?.categoryTree?.some(prodCat => String(prodCat.id) === catId)
-			)
-			if (hasCategory) badge.push(section.data)
-		}
-		if (section.data?.type === 'collection') {
-			const hasCategory = section.data?.values?.some(catId =>
-				product?.productClusters?.some(prodCluster => String(prodCluster.id) === catId)
-			)
-			if (hasCategory) badge.push(section.data)
-		}
+	// Fonte B — regras de badge do Deco CMS
+	const rules = await loadDecoBadgeRules()
+	for (const rule of rules) {
+		if (matchesProduct(rule, product)) badges.push(rule)
 	}
-	return badge.filter((item, index, arr) => arr.findIndex(b => JSON.stringify(b) === JSON.stringify(item)) === index)
+
+	return badges.filter((item, index, arr) => arr.findIndex(b => JSON.stringify(b) === JSON.stringify(item)) === index)
+}
+
+/**
+ * Verifica se uma regra de badge se aplica ao produto, conforme o `type`:
+ *  - product: `values` inclui o `productId`.
+ *  - category: algum `values` bate com um id de `categoryTree`.
+ *  - collection: algum `values` bate com um id de `productClusters`.
+ */
+function matchesProduct(rule, product) {
+	const values = (rule?.values ?? []).map(String)
+	if (!values.length) return false
+
+	if (rule.type === 'product') {
+		return values.includes(String(product?.productId))
+	}
+	if (rule.type === 'category') {
+		return values.some(id => product?.categoryTree?.some(cat => String(cat.id) === id))
+	}
+	if (rule.type === 'collection') {
+		return values.some(id => product?.productClusters?.some(cluster => String(cluster.id) === id))
+	}
+	return false
 }
 
 function parsePromo(text) {
@@ -65,69 +87,19 @@ function parsePromo(text) {
 	}
 }
 
-let promiseHolder = {}
-export const getCmsContent = async (Vtex, contentType) => {
-	if (!promiseHolder[contentType]) {
-		promiseHolder[contentType] = fetchData(Vtex, contentType)
-	}
-	return promiseHolder[contentType]
-}
-
-export const fetchData = async (Vtex, contentType) => {
+/**
+ * Carrega as regras de badge do Deco CMS já filtradas por vigência.
+ * O JSON é estático no bundle, então não há cache/rede a gerir.
+ */
+export const loadDecoBadgeRules = async () => {
 	try {
-		const { faststore } = Vtex?.configs
-		const cachedPage = await loadPageFromCache(contentType)
-
-		if (cachedPage) {
-			loadVtexCmsPage(faststore, contentType, Vtex)
-				.then(page => {
-					if (page) {
-						savePageInCache(contentType, page)
-					}
-				})
-				.catch(e => {})
-
-			return cachedPage
-		}
-
-		const page = await loadVtexCmsPage(faststore, contentType, Vtex)
-		if (page) {
-			savePageInCache(contentType, page)
-			return page
-		} else {
-			return null
-		}
-	} catch (e) {
-		console.error('Error trying get content', e)
-	}
-
-	return null
-}
-
-export const loadVtexCmsPage = async (faststore, contentType, Vtex) => {
-	try {
-		const result = await Vtex.cms.getPagesByContentTypes(faststore, contentType)
-		let sections = result?.data?.reduce((acc, page) => {
-			acc = [...acc, ...page.sections]
-			return acc
-		}, [])
-
-		if (!sections) return null
-
+		const mod = await loadBadgesBlock()
+		const rules = mod?.default?.rules ?? mod?.rules ?? []
 		const now = new Date()
-
-		const ALLOWED_SECTIONS = ['Badges', 'Flags']
-
-		return sections?.filter(section => {
-			if (!ALLOWED_SECTIONS.includes(section.name)) return false
-
-			const { startDate, endDate } = section?.data || {}
-
-			return isWithinValidDateRange(startDate, endDate, now)
-		})
-	} catch (error) {
-		console.error('Error loading VTEX CMS page:', error)
-		return null
+		return rules.filter(rule => isWithinValidDateRange(rule?.startDate, rule?.endDate, now))
+	} catch (e) {
+		console.error('[BadgesService] Falha ao carregar config-Badges.json', e)
+		return []
 	}
 }
 
@@ -144,32 +116,4 @@ const isWithinValidDateRange = (startDateStr, endDateStr, now) => {
 	if (end && now > end) return false
 
 	return true
-}
-
-export const loadPageFromCache = async cacheKey => {
-	try {
-		const content = await Eitri.sharedStorage.getItemJson(cacheKey)
-		if (!content || !content.page) return
-
-		const inputDate = new Date(content.cachedIn)
-		const currentDate = new Date()
-		const differenceInMs = currentDate - inputDate
-		const twentyFourHoursInMs = 86400000
-		if (differenceInMs > twentyFourHoursInMs) {
-			console.log('Cache expirado, buscando novo...')
-			return null
-		}
-		return content.page
-	} catch (error) {
-		console.error('Error trying load from cache', error)
-		return null
-	}
-}
-
-export const savePageInCache = async (cacheKey, page) => {
-	try {
-		Eitri.sharedStorage.setItemJson(cacheKey, { cachedIn: new Date().toISOString(), page })
-	} catch (error) {
-		console.error('Error trying save in cache', error)
-	}
 }

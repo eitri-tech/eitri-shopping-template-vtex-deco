@@ -1,3 +1,5 @@
+import Eitri from 'eitri-bifrost'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
 import { setNewAddress, setLogisticInfo } from '../services/freigthService'
 import {
 	getCart,
@@ -7,20 +9,39 @@ import {
 	changeItemQuantity,
 	removeCartItem,
 	removeCoupon,
-	removeItemOffer
+	removeItemOffer,
+	updateVendorInOpenTextField
 } from '../services/cartService'
+import { getSellerConfig, lookupSellerCode, buildPartIdentifier, updateMarketingDataForVendor } from '../services/sellerCodeService'
 
 const LocalCart = createContext({})
 
 export default function CartProvider({ children }) {
 	const [cart, setCart] = useState(null)
 	const [cartIsLoading, setCartInLoading] = useState(null)
+	const [vendor, setVendor] = useState(null)
+
+	const updateTabBadge = async newCart => {
+		try {
+			const tabIndex = await getCartTabBadgeIndex()
+
+			Eitri.bottomBar.updateTabBadge({
+				index: tabIndex,
+				content: newCart?.items?.length
+					? `${newCart?.items?.reduce((acc, item) => acc + item.quantity, 0)}`
+					: null
+			})
+		} catch (e) {
+			console.log('Erro ao atualizar tab badge: ', e)
+		}
+	}
 
 	const executeCartOperation = async (operation, ...args) => {
 		setCartInLoading(true)
 		const newCart = await operation(...args)
 		if (newCart) {
 			setCart(newCart)
+			updateTabBadge(newCart)
 		}
 		setCartInLoading(false)
 		return newCart
@@ -66,6 +87,27 @@ export default function CartProvider({ children }) {
 		return executeCartOperation(addCoupon, coupon)
 	}
 
+	const applySellerCode = async code => {
+		const config = await getSellerConfig()
+		if (!config?.enabled) throw new Error('DISABLED')
+
+		const found = await lookupSellerCode(code, config)
+		if (!found) throw new Error('NOT_FOUND')
+
+		const vendorText = buildPartIdentifier(config, found, code)
+		const newCart = await executeCartOperation(updateVendorInOpenTextField, cart, vendorText)
+
+		try {
+			await updateMarketingDataForVendor(newCart || cart, config)
+			await executeCartOperation(getCart)
+		} catch (e) {
+			console.error('applySellerCode: marketingData update failed', e)
+		}
+
+		setVendor(found)
+		return found
+	}
+
 	return (
 		<LocalCart.Provider
 			value={{
@@ -81,7 +123,10 @@ export default function CartProvider({ children }) {
 				setNewAddress: _setNewAddress,
 				removeCoupon: _removeCoupon,
 				setLogisticInfo: _setLogisticInfo,
-				addCoupon: _addCoupon
+				addCoupon: _addCoupon,
+				vendor,
+				setVendor,
+				applySellerCode
 			}}>
 			{children}
 		</LocalCart.Provider>

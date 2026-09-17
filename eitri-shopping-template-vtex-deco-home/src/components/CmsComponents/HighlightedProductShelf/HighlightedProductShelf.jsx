@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getProductsService } from '../../../services/ProductService'
 import ProductCard from '../../ProductCard/ProductCard'
-import { LuChevronRight } from 'react-icons/lu'
+import { ChevronRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import Eitri from 'eitri-bifrost'
 import ShelfOfProducts from '../../ShelfOfProducts/ShelfOfProducts'
 import { useTranslation } from 'eitri-i18n'
@@ -133,7 +133,7 @@ export default function HighlightedProductShelf({ data }) {
 					className='flex items-center gap-1'
 					onClick={onSeeMore}>
 					<Text className='text-sm'>{t('highlightedShelf.seeMore')}</Text>
-					<LuChevronRight />
+					<ChevronRightIcon />
 				</View>
 			</View>
 

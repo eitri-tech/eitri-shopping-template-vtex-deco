@@ -1,0 +1,6 @@
+{
+  "image": "https://placehold.co/1200x600/222/fff.png?text=Hero+Banner",
+  "alt": "Store hero banner",
+  "description": "Discover our latest collection",
+  "__resolveType": "site/sections/Banners/Hero.tsx"
+}

@@ -8,7 +8,7 @@ export default function SaveButton(props) {
 	return (
 		<View onPress={handleSaveFavorite}>
 			<View
-				className={`flex border border-${isInWishlist ? 'primary-700' : 'neutral-500'} rounded-sm h-[30px] w-[85px] justify-center items-center`}>
+				className={`flex border border-${isInWishlist ? 'primary-700' : 'neutral-500'} h-[30px] w-[85px] justify-center items-center`}>
 				<View className='flex justify-center items-center w-full'>
 					<svg
 						width='16px'

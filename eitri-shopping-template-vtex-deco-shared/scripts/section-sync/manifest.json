@@ -1,0 +1,167 @@
+{
+  "_comment": "Mapeia cada section migrada (shared) para os arquivos de origem no home. 'baseline' é o commit a partir do qual as mudanças upstream são comparadas — atualize com `node sync.mjs bump <key>` depois de reaplicar as mudanças na versão tipada. Caminhos são relativos à raiz do repositório.",
+  "entries": [
+    {
+      "key": "overheader",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/OverHeader.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/OverHeader"
+      ],
+      "baseline": "f6121232a310fe81a8f7c245069f725dbca73485"
+    },
+    {
+      "key": "banner",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/Banners/MultipleImageBanner.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/Banner",
+        "eitri-shopping-template-vtex-deco-home/src/components/SectionTitle/SectionTitle.jsx"
+      ],
+      "baseline": "804020b1f232e6316c89bc5d91f453844d33eb3d"
+    },
+    {
+      "key": "category-gallery",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/CategoryGallery.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/CategoryGallery"
+      ],
+      "baseline": "9e846d0dab679d842d31c8f643cef55a9f4de319"
+    },
+    {
+      "key": "product-shelf",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/ProductShelf.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/ProductShelf",
+        "eitri-shopping-template-vtex-deco-home/src/components/ShelfOfProducts",
+        "eitri-shopping-template-vtex-deco-home/src/components/ProductCard"
+      ],
+      "baseline": "9e846d0dab679d842d31c8f643cef55a9f4de319"
+    },
+    {
+      "key": "category-list-swipe",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/CategoryListSwipe.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/CategoryListSwipe"
+      ],
+      "baseline": "f6121232a310fe81a8f7c245069f725dbca73485"
+    },
+    {
+      "key": "product-tiles",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/ProductTiles.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/ProductTiles"
+      ],
+      "baseline": "49b1ed114354b729342b5e2a0df421c6814ba220"
+    },
+    {
+      "key": "highlighted-product-shelf",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/HighlightedProductShelf.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/HighlightedProductShelf"
+      ],
+      "baseline": "f6121232a310fe81a8f7c245069f725dbca73485"
+    },
+    {
+      "key": "category-tree",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/CategoryTree.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/CategoryTree"
+      ],
+      "baseline": "49b1ed114354b729342b5e2a0df421c6814ba220"
+    },
+    {
+      "key": "category-accordion",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/CategoryAccordion.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/CategoryAccordion"
+      ],
+      "baseline": "f6121232a310fe81a8f7c245069f725dbca73485"
+    },
+    {
+      "key": "vtex-ads-banner",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/VtexAdsBanner.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/VtexAdsBanner",
+        "eitri-shopping-template-vtex-deco-home/src/services/VtexAdsService.js"
+      ],
+      "baseline": "49b1ed114354b729342b5e2a0df421c6814ba220"
+    },
+    {
+      "key": "last-seen-products",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/LastSeenProducts.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/LastSeenProducts"
+      ],
+      "baseline": "49b1ed114354b729342b5e2a0df421c6814ba220"
+    },
+    {
+      "key": "blog-post-shelf",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/BlogPostShelf.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/Blog",
+        "eitri-shopping-template-vtex-deco-home/src/components/SwiperContent/SwiperContent.jsx"
+      ],
+      "baseline": "49b1ed114354b729342b5e2a0df421c6814ba220"
+    },
+    {
+      "key": "category-list-vtex",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/CategoryListVtex.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/CategoryListVtex"
+      ],
+      "baseline": "f6121232a310fe81a8f7c245069f725dbca73485"
+    },
+    {
+      "key": "product-infinite-scroll",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/ProductInfiniteScroll.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/ProductInfiniteScroll",
+        "eitri-shopping-template-vtex-deco-home/src/components/ProductCatalogContent",
+        "eitri-shopping-template-vtex-deco-home/src/components/InfiniteScroll",
+        "eitri-shopping-template-vtex-deco-home/src/components/CustomModal",
+        "eitri-shopping-template-vtex-deco-home/src/components/PageSearchComponents/SearchResults.jsx",
+        "eitri-shopping-template-vtex-deco-home/src/utils/lists.js"
+      ],
+      "baseline": "9d1f1800d872e7c2e06756b017b63bb5cfbe6a78"
+    },
+    {
+      "key": "rich-text",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/RichText.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/RichText"
+      ],
+      "baseline": "49b1ed114354b729342b5e2a0df421c6814ba220"
+    },
+    {
+      "key": "experiences",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/Experiences.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/Experiences"
+      ],
+      "baseline": "f6121232a310fe81a8f7c245069f725dbca73485"
+    },
+    {
+      "key": "newsletter",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/sections/NewsLetter.tsx",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/components/CmsComponents/NewsLetter"
+      ],
+      "baseline": "b1dee25586b204d37f5e8efe513a04524a603c44"
+    },
+    {
+      "key": "infra",
+      "target": "eitri-shopping-template-vtex-deco-shared/src/services + providers (ResolveCmsActions, NavigationService, ProductService, CartService, CustomerService, LocalCart, SnackBar, formatPrice)",
+      "sources": [
+        "eitri-shopping-template-vtex-deco-home/src/services/ResolveCmsActions.js",
+        "eitri-shopping-template-vtex-deco-home/src/services/NavigationService.js",
+        "eitri-shopping-template-vtex-deco-home/src/services/ProductService.js",
+        "eitri-shopping-template-vtex-deco-home/src/services/CartService.js",
+        "eitri-shopping-template-vtex-deco-home/src/services/CustomerService.js",
+        "eitri-shopping-template-vtex-deco-home/src/services/helpers/resolveSortParam.js",
+        "eitri-shopping-template-vtex-deco-home/src/providers/LocalCart.jsx",
+        "eitri-shopping-template-vtex-deco-home/src/providers/SnackBar.jsx",
+        "eitri-shopping-template-vtex-deco-home/src/utils/utils.js"
+      ],
+      "baseline": "080e681cd5531f3fc1f69cbfb8ebccdc0507c586"
+    }
+  ]
+}

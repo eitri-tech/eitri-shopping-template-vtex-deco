@@ -1,7 +1,6 @@
 import { View, Text, Image } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
-import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiChevronRight } from 'react-icons/fi'
+import { GenericBox, ChevronRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import SectionTitle from '../../SectionTitle/SectionTitle'
 import { useState } from 'react'
 import { processActions } from '../../../services/ResolveCmsActions'
@@ -40,7 +39,7 @@ function CategoryItem({ item, isLast }) {
 				<Text className='text-sm font-semibold text-gray-800 grow'>{item.title}</Text>
 
 				{hasSubItems && (
-					<FiChevronRight
+					<ChevronRightIcon
 						size={18}
 						className={`text-gray-400 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-90' : ''}`}
 					/>
@@ -64,7 +63,7 @@ function CategoryItem({ item, isLast }) {
 							)}
 							<Text className='text-sm text-gray-600 grow'>{sub.title}</Text>
 							{sub.action?.type !== 'none' && (
-								<FiChevronRight
+								<ChevronRightIcon
 									size={14}
 									className='text-neutral-300 shrink-0'
 								/>

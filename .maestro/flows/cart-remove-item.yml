@@ -1,0 +1,67 @@
+appId: tech.eitri.play
+tags:
+  - cart
+  - remove
+env:
+  APP_SLUG: eitri-shopping-template-vtex-deco-home
+---
+# Remoção de item da sacola, do zero: limpa o carrinho, adiciona exatamente um
+# item e remove, exigindo o estado de sacola vazia no fim.
+#
+# O flow é autossuficiente de propósito — não depende de nenhum outro ter
+# rodado antes. Isso importa porque o Maestro executa os arquivos em ordem
+# alfabética, e "cart-remove-item" viria ANTES de "pdp-add-to-cart".
+#
+# Efeito colateral útil: como o passo final exige "Sua sacola está vazia", um
+# verde aqui também prova que o `Limpar carrinho` do subflow clear-cart
+# realmente esvaziou a sacola — o Cartman não atualiza a própria tela após
+# limpar (Cartman.jsx:39-42 não chama setCart), então essa é a verificação.
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+- extendedWaitUntil:
+    visible: "Categorias"
+    timeout: 90000
+- runFlow:
+    file: ../subflows/clear-cart.yml
+- runFlow:
+    file: ../subflows/add-one-item.yml
+
+# O badge do header só renderiza com quantidade > 0 (shared/HeaderCart.jsx:36),
+# então exigir exatamente "1" prova as duas coisas ao mesmo tempo: a sacola
+# estava vazia antes e um único item entrou. O matcher é de string inteira,
+# então "1" não casa com preços ("R$ 600,00") nem parcelas ("7X de ...").
+- assertVisible: "1"
+
+# Ícone da sacola no header. Medido no device: bounds [951,151][1023,222] ->
+# centro (91%, 8%). Só funciona porque add-one-item termina SEM ter rolado a
+# PDP — o header da PDP não é fixo e sai de vista com scroll.
+- tapOn:
+    point: "91%,8%"
+- extendedWaitUntil:
+    visible: "Finalizar Compra"
+    timeout: 60000
+
+# O controle de remover é um ícone puro (CloseIcon/FiX, CartItem.jsx:143-145),
+# sem texto nem accessibility label — tap por posição é obrigatório. Medido no
+# device no primeiro card da lista: bounds [924,616][992,687] -> (89%, 27%).
+- tapOn:
+    point: "89%,27%"
+# Modal de confirmação (CartItem.jsx:186-191). A mensagem interpola o nome do
+# produto (cartItem.txtRemoveCartItem = "Deseja remover {{name}} da sacola?"),
+# por isso o regex.
+- extendedWaitUntil:
+    visible: "Excluir"
+    timeout: 15000
+- assertVisible: "Deseja remover .* da sacola\\?"
+# Confirmar é "Excluir" (modal.confirm.delete), NÃO "Remover". Tocar fora do
+# modal não fecha: ModalConfirm.jsx:14-16 chama um `onClose` que nunca é
+# passado, virando no-op silencioso.
+- tapOn: "Excluir"
+
+# Remover o último item faz o cart Home.jsx:30-38 navegar (replace: true) para
+# a view EmptyCart. emptyCart.txtEmptyCart, EmptyCart.jsx:53.
+- extendedWaitUntil:
+    visible: "Sua sacola está vazia"
+    timeout: 40000

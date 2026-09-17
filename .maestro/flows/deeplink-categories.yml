@@ -1,0 +1,77 @@
+appId: tech.eitri.play
+tags:
+  - deeplink
+env:
+  # EXPERIMENTAL: appending "?route=Categories" to the slug assumes the
+  # dev-loader's slug EditText will pass the extra query string through to
+  # `Eitri.getInitializationInfos()` the same way a real deeplink/initParams
+  # payload would. This is UNCONFIRMED — see the comment block below.
+  APP_SLUG: "eitri-shopping-template-vtex-deco-home?route=Categories"
+---
+# ============================================================================
+# EXPERIMENTAL / BEST-EFFORT FLOW — CONFIRMED BLOCKED, kept for documentation.
+#
+# Goal: exercise the home app's deeplink handling, where on mount it reads
+# `Eitri.getInitializationInfos()` and, if a `route` init param is present
+# (e.g. route=Categories), calls
+# `Eitri.navigation.navigate({ path: route, state: rest, replace: true })`
+# to jump straight past the default Home landing screen.
+#
+# CONFIRMED live (not just unconfirmed-assumption anymore): the Eitri Play
+# "Run Eitri-App" dev-loader's slug field is a plain Android EditText with
+# sentence-autocapitalize enabled. Typing "eitri-shopping-template-vtex-deco-home?
+# route=Categories" into it via Maestro's `inputText` gets MANGLED by the
+# keyboard's autocap rules — the "?" is treated as end-of-sentence
+# punctuation, so the IME injects a space and capitalizes the next letter,
+# turning it into "...home? Route=Categories" (confirmed via live
+# screenshot). That string cannot be parsed as `route=Categories` by the
+# app's init-params reader.
+#
+# `pasteText: ${APP_SLUG}` was tried as a workaround (paste bypasses
+# keystroke-level IME autocap) but this Maestro CLI version rejects
+# `pasteText` with a string argument (`getFieldName(...) must not be null`
+# parse error) — it apparently expects clipboard content set some other way
+# (e.g. `copyTextFrom` an existing element), which doesn't apply to a
+# literal string like this.
+#
+# CONCLUSION: with the tooling available today, this specific dev-loader
+# path cannot reliably pass a `route=...` deeplink param through to the app.
+# This is a genuine, confirmed GAP (not a guess) — document it as such (see
+# docs/maestro.md) rather than treating a future green/red run of this flow
+# as meaningful evidence either way. Exercising deeplinks properly would
+# require either a different injection point (e.g. an adb intent/deeplink if
+# the native shell exposes one, or a real QR-code-based
+# eitri-shopping-*-deeplink-resolver flow) — out of scope for this pass.
+# ============================================================================
+
+# Usa o mesmo bootstrap dos demais flows, só que com um APP_SLUG contendo a
+# query string — é justamente isso que o dev launcher não consegue processar.
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+
+# CONFIRMED live: tapping "Run" with the mangled slug does not even launch
+# the app — Eitri Play silently fails to resolve the malformed
+# "...home? Route=Categories" string as a valid eitri-app slug and stays on
+# its own launcher screen (SPACE / DEVELOPMENT / PUBLISHED EITRI-APPS list),
+# confirmed via live screenshot. So the correct, meaningful assertion for
+# this flow is that we're STILL on the Eitri Play launcher afterwards — that
+# is the deterministic, confirmed outcome of this gap, not a guess.
+- extendedWaitUntil:
+    visible: "Run Eitri-App"
+    timeout: 15000
+
+# ----------------------------------------------------------------------------
+# RESULT: this flow passing means the deeplink-via-dev-loader gap is
+# reproduced (app never launches with a mangled route param) — it is a
+# regression check on the KNOWN GAP, not a working deeplink test. If this
+# flow ever starts FAILING (i.e. the app unexpectedly launches), that could
+# mean Eitri Play's launcher input handling changed and this flow should be
+# revisited/upgraded into an actual deeplink verification.
+#
+# To properly exercise ESS-936's deeplink requirement, a different injection
+# point is needed — e.g. an adb-level intent/deeplink if the native shell
+# exposes one, or a real QR-code-based eitri-shopping-*-deeplink-resolver
+# flow — both out of scope for this pass.
+# ----------------------------------------------------------------------------

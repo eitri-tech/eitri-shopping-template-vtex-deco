@@ -35,3 +35,20 @@ export const addCoupon = async coupon => {
 export const removeCoupon = async () => {
 	return await Vtex.checkout.addPromoCode('')
 }
+
+export const updateVendorInOpenTextField = async (cart, vendorText) => {
+	let current = {}
+	try {
+		if (cart?.openTextField?.value) {
+			current = JSON.parse(cart.openTextField.value)
+		}
+	} catch {
+		current = {}
+	}
+	if (vendorText) {
+		current.vendor = vendorText
+	} else {
+		delete current.vendor
+	}
+	return await Vtex.cart.addOpenTextFieldToCart(JSON.stringify(current))
+}

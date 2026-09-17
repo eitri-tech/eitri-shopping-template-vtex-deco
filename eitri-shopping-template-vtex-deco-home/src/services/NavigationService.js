@@ -10,6 +10,32 @@ export const openCart = async () => {
 	}
 }
 
+export const openCheckout = orderFormId => {
+	try {
+		Eitri.nativeNavigation.open({
+			slug: 'checkout',
+			initParams: { orderFormId }
+		})
+	} catch (e) {
+		console.error('Erro ao navegar para o checkout', e)
+	}
+}
+
+// Navegador do sistema, não WebView: o fluxo que sai daqui pode terminar em
+// pagamento, e reCAPTCHA/gateway não são confiáveis dentro de WebView.
+export const openBrowser = url => {
+	try {
+		// `inApp: true` abre uma Chrome Custom Tab (o app empacota
+		// androidx.browser.customtabs) — motor e cookies do Chrome, sem WebView e sem
+		// resolução de intent. Obrigatório aqui: as URLs desta função estão no
+		// domínio da loja, que o app reivindica no intent filter (`GLOB: .*`),
+		// então navegador externo devolveria o clique pro próprio app, em loop.
+		Eitri.openBrowser({ url, inApp: true })
+	} catch (e) {
+		console.error('Erro ao abrir o navegador', e)
+	}
+}
+
 export const openAccount = async action => {
 	Eitri.nativeNavigation.open({
 		slug: 'account',
@@ -58,8 +84,16 @@ export const normalizePath = path => {
 	const queryParams = new URLSearchParams(pathComponents[1])
 	const normalizedData = { facets: [] }
 
+	// Intelligent Search: facets vêm como query params `filter.<key>=<value>`,
+	// podendo repetir a mesma key (ex.: filter.material=x&filter.material=y).
+	const filterEntries = [...queryParams.entries()].filter(([key]) => key.startsWith('filter.'))
+
 	if (pathData[0] === 's' && queryParams.has('q')) {
 		normalizedData.query = decodeURIComponent(queryParams.get('q').replace(/\+/g, ' '))
+	} else if (filterEntries.length) {
+		filterEntries.forEach(([key, value]) => {
+			normalizedData.facets.push({ key: key.slice('filter.'.length), value })
+		})
 	} else if (queryParams.has('map')) {
 		const mapKeys = queryParams.get('map').split(',')
 		pathData.forEach((value, index) => {
@@ -85,7 +119,8 @@ export const normalizePath = path => {
 	const skipKeys = new Set([
 		'map', 'facets', 'page',
 		...IGNORED_FACET_KEYS,
-		...(queryParams.has('facets') ? queryParams.get('facets').split(',') : [])
+		...(queryParams.has('facets') ? queryParams.get('facets').split(',') : []),
+		...filterEntries.map(([key]) => key)
 	])
 	for (const [key, value] of queryParams.entries()) {
 		if (!skipKeys.has(key)) {

@@ -191,7 +191,7 @@ export default function StoreCardForm(props) {
 				{/*	</View>*/}
 				{/*</View>*/}
 
-				<View className='bg-white rounded p-4 flex flex-col gap-2'>
+				<View className='bg-white p-4 flex flex-col gap-2'>
 					<View>
 						<CustomInput
 							placeholder={'Insira o número do seu cartão'}

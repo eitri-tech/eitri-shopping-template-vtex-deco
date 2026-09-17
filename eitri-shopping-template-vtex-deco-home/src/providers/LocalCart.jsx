@@ -1,4 +1,5 @@
 import Eitri from 'eitri-bifrost'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
 import { getCart, addItemToCart, removeCartItem, updateItemOnCart } from '../services/CartService'
 const LocalCart = createContext({})
 import { EventBusChannels, EventBus } from 'eitri-shopping-vtex-shared'
@@ -22,8 +23,10 @@ export default function CartProvider({ children }) {
 
 	const updateTabBadge = async newCart => {
 		try {
+			const tabIndex = await getCartTabBadgeIndex()
+
 			Eitri.bottomBar.updateTabBadge({
-				index: 2,
+				index: tabIndex,
 				content: newCart?.items?.length
 					? `${newCart?.items?.reduce((acc, item) => acc + item.quantity, 0)}`
 					: null
@@ -37,7 +40,7 @@ export default function CartProvider({ children }) {
 		try {
 			setCartInLoading(true)
 			const newCart = await operation(...args)
-			updateTabBadge()
+			updateTabBadge(newCart)
 			setCart(newCart)
 			setCartInLoading(false)
 			return newCart

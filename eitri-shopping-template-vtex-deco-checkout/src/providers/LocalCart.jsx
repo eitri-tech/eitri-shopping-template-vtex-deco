@@ -1,4 +1,6 @@
 import { createContext, useContext, useState } from 'react'
+import Eitri from 'eitri-bifrost'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
 import {
 	addItem,
 	addUserData,
@@ -19,12 +21,34 @@ export default function CartProvider({ children }) {
 	const [selectedPaymentData, setSelectedPaymentData] = useState()
 	const [cardInfo, setCardInfo] = useState()
 
+	const updateTabBadge = async newCart => {
+		try {
+			const tabIndex = await getCartTabBadgeIndex()
+
+			Eitri.bottomBar.updateTabBadge({
+				index: tabIndex,
+				content: newCart?.items?.length
+					? `${newCart?.items?.reduce((acc, item) => acc + item.quantity, 0)}`
+					: null
+			})
+		} catch (e) {
+			console.log('Erro ao atualizar tab badge: ', e)
+		}
+	}
+
 	const executeCartOperation = async (operation, ...args) => {
 		setCartIsLoading(true)
-		const newCart = await operation(...args)
-		setCart(newCart)
-		setCartIsLoading(false)
-		return newCart
+		try {
+			const newCart = await operation(...args)
+			setCart(newCart)
+			updateTabBadge(newCart)
+			return newCart
+		} catch (e) {
+			console.error('[LocalCart] executeCartOperation failed:', e)
+			throw e
+		} finally {
+			setCartIsLoading(false)
+		}
 	}
 
 	const startCart = async () => {

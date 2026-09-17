@@ -1,11 +1,10 @@
 import { View, Text, Image } from 'eitri-luminus'
 import Quantity from '../Quantity/Quantity'
-import { HeaderWishList, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
+import { HeaderWishList, GenericBox, CloseIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { addToWishlist, checkWishlistItem, removeItemFromWishlist } from '../../services/customerService'
 import ModalConfirm from '../ModalConfirm/ModalConfirm'
 import { useTranslation } from 'eitri-i18n'
 import { formatAmountInCents } from '../../utils/utils'
-import { IoCloseSharp } from 'react-icons/io5'
 import { openProduct } from '../../services/navigationService'
 
 export default function CartItem(props) {
@@ -99,7 +98,7 @@ export default function CartItem(props) {
 
 					<View className='flex-1 min-w-0'>
 						{item.availability !== 'available' && (
-							<View className='mb-2 p-2 bg-red-50 border border-red-200 rounded'>
+							<View className='mb-2 p-2 bg-red-50 border border-red-200'>
 								<Text className='text-sm text-red-600 font-medium'>
 									{item.availability === 'cannotBeDelivered'
 										? t('cartItem.cannotBeDelivered')
@@ -142,7 +141,7 @@ export default function CartItem(props) {
 							</View>
 
 							<View onClick={handleRemoveCartItemIntention}>
-								<IoCloseSharp className={'text-primary text-2xl'} />
+								<CloseIcon className={'text-primary text-2xl'} />
 							</View>
 						</View>
 					</View>

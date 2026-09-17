@@ -38,7 +38,7 @@ export default function CardIcon(props) {
 		return (
 			<Image
 				src={icon}
-				className={`w-[100px] rounded ${className}`}
+				className={`w-[100px] ${className}`}
 			/>
 		)
 	}
@@ -49,7 +49,7 @@ export default function CardIcon(props) {
 				src={storeCard}
 				width={width}
 				height={height}
-				className={`aspect-[856/540] rounded ${className}`}
+				className={`aspect-[856/540] ${className}`}
 			/>
 		)
 	}
@@ -63,7 +63,7 @@ export default function CardIcon(props) {
 			src={icon}
 			width={width}
 			height={height}
-			className={`aspect-[39/25] rounded ${className}`}
+			className={`aspect-[39/25] ${className}`}
 		/>
 	)
 }

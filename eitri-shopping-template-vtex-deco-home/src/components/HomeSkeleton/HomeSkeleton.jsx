@@ -1,18 +1,15 @@
-import { Skeleton, View } from 'eitri-luminus'
+import { Lottie, View } from 'eitri-luminus'
+import animationData from '../../../public/assets/loading.json'
 
 export default function HomeSkeleton(props) {
 	const { show } = props
 	return (
-		<View className={`p-4 ${show ? 'block' : 'hidden'}`}>
-			<View className='flex flex-col gap-4'>
-				<Skeleton className='w-full min-h-[200px] rounded' />
-				<View className='flex flex-row gap-4'>
-					<Skeleton className='w-full min-h-[200px] rounded' />
-					<Skeleton className='w-full min-h-[200px] rounded' />
-					<Skeleton className='w-full min-h-[200px] rounded' />
-				</View>
-				<Skeleton className='w-full h-screen rounded' />
-			</View>
+		<View className={`fixed inset-0 z-50 flex justify-center items-center bg-white transition-opacity duration-[5000ms] ${show ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+			<Lottie
+				autoPlay
+				loop
+				src={animationData}
+			/>
 		</View>
 	)
 }

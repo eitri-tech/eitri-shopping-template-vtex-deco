@@ -3,10 +3,11 @@ import { View, Text } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
 import { LIST_ORDERING } from '../../../utils/lists'
 import { CustomButton } from 'eitri-shopping-template-vtex-deco-shared'
+import { LuArrowUpDown } from 'react-icons/lu'
 import CustomModal from '../../CustomModal/CustomModal'
 
 export default function CatalogSort(props) {
-	const { currentSort, onSortChange } = props
+	const { currentSort, onSortChange, hiddenSortOptions = [] } = props
 
 	const [showModal, setShowModal] = useState(false)
 
@@ -17,38 +18,22 @@ export default function CatalogSort(props) {
 		setShowModal(false)
 	}
 
-	const getCurrentSortLabel = () => {
-		const currentOption = LIST_ORDERING.values.find(option => option.value === currentSort)
-		return currentOption ? t(currentOption.name) : t('lists.labelRelevance')
-	}
-
 	const isCurrentSort = sortOption => {
 		return currentSort === sortOption.value || currentSort === sortOption.id
 	}
 
+	const visibleSortOptions = LIST_ORDERING.values.filter(
+		option => !hiddenSortOptions.includes(option.value) && !hiddenSortOptions.includes(option.id)
+	)
+
 	return (
 		<>
-			<CustomButton
+			<View
 				onClick={() => setShowModal(true)}
-				outlined
-				leftIcon={
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						width='16'
-						height='16'
-						viewBox='0 0 24 24'
-						fill='none'
-						stroke='currentColor'
-						strokeWidth='2'
-						strokeLinecap='round'
-						strokeLinejoin='round'>
-						<path d='M3 6h18' />
-						<path d='M7 12h10' />
-						<path d='M10 18h4' />
-					</svg>
-				}
-				label={getCurrentSortLabel()}
-			/>
+				className='h-[46px] w-full flex items-center justify-center gap-3 bg-[#E8E6DF]'>
+				<Text className='text-lg font-normal text-black'>{t('lists.controlLabel')}</Text>
+				<LuArrowUpDown size={22}/>
+			</View>
 
 			<CustomModal
 				open={showModal}
@@ -59,7 +44,7 @@ export default function CatalogSort(props) {
 					<Text className='text-lg font-semibold'>{t('lists.title')}</Text>
 
 					<View className='flex flex-col mt-4'>
-						{LIST_ORDERING.values.map((option, index) => (
+						{visibleSortOptions.map(option => (
 							<View
 								key={option.value}
 								onClick={() => handleSortSelect(option.value)}

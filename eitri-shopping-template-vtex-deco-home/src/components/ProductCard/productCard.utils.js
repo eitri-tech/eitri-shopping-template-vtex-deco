@@ -25,7 +25,7 @@ export const formatInstallments = seller => {
 
 	if (!maxInstallments || maxInstallments.NumberOfInstallments === 1) return ''
 
-	return `em até ${maxInstallments.NumberOfInstallments}x ${formatPrice(maxInstallments.Value)}`
+	return `${maxInstallments.NumberOfInstallments}x de ${formatPrice(maxInstallments.Value)} sem juros`
 }
 
 export const calculateBadge = (product, sellerDefault) => {

@@ -63,10 +63,6 @@ export default function Home(props) {
 	}
 
 	const handleNavigation = async cart => {
-		// navigate('CheckoutReview')
-		// return
-		// console.log('cart=====>', cart?.orderFormId)
-
 		if (!cart || cart.items.length === 0) {
 			return navigate('EmptyCart')
 		}

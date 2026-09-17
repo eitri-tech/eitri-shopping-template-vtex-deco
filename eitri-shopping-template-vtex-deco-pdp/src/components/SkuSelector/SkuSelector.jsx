@@ -1,7 +1,53 @@
 import { useState, useMemo } from 'react'
 import { RemoteConfig } from 'eitri-shopping-vtex-shared'
-import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import { sortSku } from '../../utils/skuSort'
+import { FiMinus } from 'react-icons/fi'
+import { GoPlus } from 'react-icons/go'
+
+const AVAILABLE = 'available'
+const UNAVAILABLE = 'unavailable'
+
+function keysFromEnties(entries) {
+	return entries.map(([key]) => key)
+}
+
+function groupBy(items, groupFn) {
+	if (typeof Map.groupBy === 'function') {
+		return Map.groupBy(items, groupFn)
+	}
+
+	const grouped = items.reduce((acc, item) => {
+		const key = groupFn(item)
+		acc[key] = acc[key] || []
+		acc[key].push(item)
+		return acc
+	}, {})
+
+	return new Map(Object.entries(grouped))
+}
+
+/**
+ * Group by availability
+ * @param {string[]} values
+ * @param {*} statusMap
+ * @param {boolean} hideUnavailable
+ */
+function getVisibleValues(statusMap, hideUnavailable) {
+	const statusEntry = Object.entries(statusMap)
+	const groupFn = ([, { availableExists }]) => (availableExists ? AVAILABLE : UNAVAILABLE)
+	const group = groupBy(statusEntry, groupFn)
+
+	const groupAvailable = keysFromEnties(group.get(AVAILABLE) || [])
+	const visibleValues = sortSku(groupAvailable)
+
+	if (!hideUnavailable) {
+		const unavailableItems = keysFromEnties(group.get(UNAVAILABLE) || [])
+		const unavailableValues = sortSku(unavailableItems)
+		visibleValues.push(...unavailableValues)
+	}
+
+	return visibleValues
+}
 
 // Get unique values per attribute
 function getUniqueValues(skus, key) {
@@ -30,7 +76,8 @@ function getOptionStatus(skus, attributeKeys, key, selections) {
 // Find selected SKU
 function findSelectedSku(skus, attributeKeys, selections) {
 	if (Object.keys(selections).length < attributeKeys.length) return null
-	return skus.find(s => attributeKeys.every(k => s.attributes[k] === selections[k])) || null
+	const matchingSkus = skus.filter(s => attributeKeys.every(k => s.attributes[k] === selections[k]))
+	return matchingSkus.find(s => s.available) || matchingSkus[0] || null
 }
 
 const COR_MAP = {
@@ -70,21 +117,26 @@ function ColorSwatch({ color, selected, status, onClick }) {
 	)
 }
 
-function OptionChip({ imageUrl, value, selected, status, onClick }) {
+function OptionChip({ imageUrl, value, selected, status, onClick, standardizedSize, hideUnavailable }) {
 	const unavailable = !status.availableExists
 	const inexistent = !status.exists
+	const disabled = unavailable || inexistent
+
+	if (unavailable && hideUnavailable) return null
 
 	return (
 		<View
-			onClick={!inexistent ? onClick : undefined}
-			className={`border border-2 px-3 py-2 rounded text-sm transition-all duration-200 select-none flex flex-col gap-2 items-center justify-center
-						${inexistent ? 'opacity-20 cursor-not-allowed border-gray-300 text-gray-600' : ''}
+			onClick={!disabled ? onClick : undefined}
+			className={`relative border border-2 rounded font-bold font-mono text-sm transition-all duration-200 select-none flex flex-col gap-2 items-center justify-center
+						${standardizedSize ? 'min-w-[44px] min-h-[40px] px-3 py-2' : 'px-3 py-2'}
+						${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
+						${inexistent ? 'opacity-20 border-gray-300 text-gray-600' : ''}
 						${
-							selected
-								? 'border border-primary text-primary'
+							selected && !disabled
+								? 'border-primary bg-primary text-primary-content'
 								: unavailable && !inexistent
 									? 'bg-white text-gray-400 border-gray-200'
-									: 'bg-white text-gray-600 border-gray-300'
+									: 'bg-white text-primary border-primary'
 						}
       `}>
 			{imageUrl && (
@@ -109,6 +161,7 @@ export default function SkuSelector(props) {
 	const { product, currentSku, onSkuChange } = props
 
 	const [selections, setSelections] = useState({})
+	const [isUnavailableHidden, setHideUnavailable] = useState(true)
 
 	useEffect(() => {
 		if (!currentSku?.variations?.length) return
@@ -133,7 +186,7 @@ export default function SkuSelector(props) {
 					if (hiddenVariations?.includes(item.name)) return acc
 					acc[item.name] = item.values?.[0] ?? null
 					return acc
-				}, {})
+				}, {}) ?? {}
 			}
 		})
 
@@ -150,27 +203,29 @@ export default function SkuSelector(props) {
 
 		const next = { ...selections, [key]: value }
 		const newSku = findSelectedSku(skus, attributeKeys, next)
+		if (!newSku?.available) return
+
 		onSkuChange?.(newSku)
 	}
 
 	if (attributeKeys?.length === 0) return null
 
+	const hideUnavailable = RemoteConfig.getContent('appConfigs.pdp.hideUnavailableVariations') === true
+
 	return (
-		<GenericBox className={'flex flex-col gap-4'}>
+		<View className='flex flex-col gap-4 w-full'>
 			{attributeKeys.map(key => {
-				const values = getUniqueValues(skus, key)
+				const isRingSize = key?.toLowerCase().includes('aro')
 				const statusMap = getOptionStatus(skus, attributeKeys, key, selections)
+				const visibleValues = getVisibleValues(statusMap, hideUnavailable)
 
 				return (
 					<View key={key}>
-						<View className='flex items-center gap-1 mb-2'>
-							<Text className='text-sm text-gray-600'>{key}:</Text>
-							{selections[key] && (
-								<Text className='text-sm text-gray-700 font-semibold'>{selections[key]}</Text>
-							)}
+						<View className='mb-4'>
+							<Text className='text-sm font-bold'>{key}</Text>
 						</View>
 						<View className='flex flex-row flex-wrap gap-2'>
-							{sortSku(values).map(value => {
+							{visibleValues.map(value => {
 								let imageUrl = ''
 								const isCor = key?.toLowerCase() === 'cor'
 								if (isCor) {
@@ -180,7 +235,7 @@ export default function SkuSelector(props) {
 												variation => variation.name === key && variation.values?.[0] === value
 											)
 										) || null
-									imageUrl = item?.images[0]?.imageUrl || ''
+									imageUrl = item?.images.at(0)?.imageUrl || ''
 								}
 
 								return (
@@ -191,13 +246,22 @@ export default function SkuSelector(props) {
 										selected={selections[key] === value}
 										status={statusMap[value]}
 										onClick={() => handleSelect(key, value)}
+										standardizedSize={isRingSize}
+										hideUnavailable={isUnavailableHidden}
 									/>
 								)
 							})}
+							{!hideUnavailable && (
+								<View
+									className={`relative text-sm transition-all duration-200 select-none flex flex-col gap-2 items-center justify-center`}
+									onClick={() => setHideUnavailable(x => !x)}>
+									{isUnavailableHidden ? <GoPlus size={30} /> : <FiMinus size={30} />}
+								</View>
+							)}
 						</View>
 					</View>
 				)
 			})}
-		</GenericBox>
+		</View>
 	)
 }

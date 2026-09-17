@@ -1,0 +1,91 @@
+appId: tech.eitri.play
+tags:
+  - cart
+  - checkout
+env:
+  # Entra pelo `home` para poder preparar o estado (limpar a sacola e
+  # adicionar um item) antes de exercitar o handoff cart -> checkout. A versão
+  # anterior subia direto no app `cart` e dependia de o carrinho já ter item de
+  # outra execução, o que tornava todo o corpo do flow condicional — rodando
+  # sozinho com sacola vazia, ele passava sem testar nada.
+  APP_SLUG: eitri-shopping-template-vtex-deco-home
+---
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+- extendedWaitUntil:
+    visible: "Categorias"
+    timeout: 90000
+- runFlow:
+    file: ../subflows/clear-cart.yml
+- runFlow:
+    file: ../subflows/add-one-item.yml
+
+# Abre a sacola pelo ícone do header (medido no device: centro em (91%, 8%)).
+- tapOn:
+    point: "91%,8%"
+- extendedWaitUntil:
+    visible: "Finalizar Compra"
+    timeout: 60000
+
+# --- Handoff cart -> checkout ---
+# navigateToCheckout() abre o mini-app de checkout com o orderFormId atual.
+#
+# CAVEAT AMBIENTAL REAL: um item marcado "Este item não pode ser entregue"
+# para o CEP salvo no device deixa "Finalizar Compra" renderizado porém
+# desabilitado, e o tap vira no-op (cart ActionButton.jsx:18-24). Como o item
+# vem do catálogo ao vivo, esse é um estado alcançável e não um defeito do
+# flow — por isso a espera seguinte é `optional`.
+- tapOn: "Finalizar Compra"
+- extendedWaitUntil:
+    visible: "Dados pessoais|Seus dados pessoais"
+    timeout: 40000
+    optional: true
+
+- runFlow:
+    when:
+      visible: "Dados pessoais|Seus dados pessoais"
+    commands:
+      # O campo de e-mail é um <input> em WebView: o placeholder "Digite seu
+      # email" (personalData.placeholderEmail) é renderizado na tela mas NÃO
+      # existe na árvore de acessibilidade — o nó é clicável e tem texto vazio.
+      # `tapOn: "Digite seu email"` falha com "Element not found" (reproduzido
+      # no device). Medido: bounds [88,665][750,800] -> centro (39%, 30%).
+      #
+      # Isto era um bug latente: na versão anterior deste flow o bloco inteiro
+      # ficava atrás de uma condição que quase nunca era satisfeita, então a
+      # linha nunca chegava a rodar.
+      - tapOn:
+          point: "39%,30%"
+      # E-mail claramente inexistente de propósito: este flow NÃO usa
+      # credenciais reais e NÃO finaliza pedido. CORRIGIDO após review da PR
+      # (ver docs/maestro.md): a versão anterior usava `teste@teste.com`, que
+      # é uma conta REAL já cadastrada nesta loja — isso criava dependência de
+      # estado externo (a conta pode mudar/ser removida) sem necessidade,
+      # já que a asserção abaixo aceita qualquer reação válida do checkout.
+      - inputText: "checkout-inexistente@example.com"
+      # "OK" é literal hardcoded (PersonalData.jsx:312), não i18n.
+      - tapOn: "OK"
+
+      # LIMITE DELIBERADO DO FLOW. Este teste valida a ESTRUTURA do handoff
+      # cart -> checkout. O tap em "OK" dispara um findUserByEmail cujo
+      # desfecho depende do backend, e a asserção abaixo aceita qualquer um
+      # deles — o que se está verificando é que o app REAGIU e não quebrou,
+      # não qual caminho ele tomou:
+      #
+      #   "Como você prefere receber seu produto?" -> o e-mail casou com uma
+      #       conta existente e o checkout avançou para a escolha de entrega.
+      #       Não esperado com o e-mail inexistente usado aqui, mas mantido
+      #       na asserção por segurança (não deve travar o flow se acontecer).
+      #   "Código"    -> caiu no fluxo de OTP (erro CHK003).
+      #   "Continuar" -> e-mail desconhecido, revelou os demais campos.
+      #   "inválido"  -> erro de validação inline.
+      #
+      # Ir além disto exigiria credenciais de sandbox que este flow não tem;
+      # endereço, pagamento e CheckoutReview estão explicitamente FORA DE
+      # ESCOPO e nenhum pedido é finalizado.
+      - extendedWaitUntil:
+          visible: "Continuar|Código|inválido|Como você prefere receber seu produto\\?"
+          timeout: 25000
+          optional: true

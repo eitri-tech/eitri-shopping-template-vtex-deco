@@ -1,0 +1,57 @@
+# SCOPE: this flow ONLY covers the OS-level notification permission prompt
+# that `Eitri.notification.requestPermission()` (called from
+# eitri-shopping-template-vtex-deco-home/src/views/Home.jsx when
+# `checkPermission()` returns 'DENIED') can trigger on Home mount — a
+# native Android system dialog, not app content.
+#
+# It explicitly does NOT and CANNOT test actual push notification delivery
+# or tap-to-open behavior: no push-receive/tap-handling code exists
+# anywhere in this repo's JS. That behavior is entirely native-side,
+# outside this repo's WebView content, and out of scope for Maestro here
+# (Maestro drives the WebView UI, not arbitrary native OS surfaces/push
+# payloads). This is a documented limitation of this flow, not a gap to
+# "fix" later within it.
+appId: tech.eitri.play
+tags:
+  - push
+env:
+  APP_SLUG: eitri-shopping-template-vtex-deco-home
+---
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+# Home mount calls Eitri.notification.checkPermission(), and if the status
+# is 'DENIED', Eitri.notification.requestPermission() — which can surface
+# the standard Android OS "Allow <AppName> to send you notifications?"
+# TODO: replace <AppName> with the actual app display name for your store
+# system dialog on first launch after a fresh install/permission reset.
+# This only appears once per install (or after a permission reset), so on
+# repeat runs this step is a no-op and control falls through to the final
+# wait below.
+#
+# NOTE (uncertain, needs live confirmation): the device locale in this
+# project is pt-BR, so "Permitir" is tried first. The exact button text is
+# OS-version-dependent and unconfirmed — it could also render in English
+# ("Allow"), or newer Android versions may show extra options like
+# "While using the app" / "Only this time" instead of a plain
+# Allow/Deny pair. Confirm the actual wording live via `inspect_screen`
+# (or `maestro studio`) on first run against a real device and adjust the
+# `visible` matcher(s) below accordingly — add more runFlow/when blocks
+# for "Allow", "Enquanto usa o app", etc. as needed.
+- runFlow:
+    when:
+      visible: "Permitir"
+    commands:
+      - tapOn: "Permitir"
+# "Categorias" is part of the home content itself; the "Inicio" bottom tab
+# only exists when the app runs inside the native tab shell. Reaching this
+# confirms Home loaded normally whether the permission dialog appeared and
+# was dismissed above, or never appeared at all (e.g. permission already
+# granted/denied in a previous run). It may render below the fold, so scroll
+# down until it shows up instead of asserting on the initial viewport.
+- scrollUntilVisible:
+    element:
+      text: "Categorias"
+    direction: DOWN
+    timeout: 60000

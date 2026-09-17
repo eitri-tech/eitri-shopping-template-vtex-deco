@@ -109,19 +109,19 @@
 	"finishCart": {
 		"errorOrder": "Houve um erro ao processar o seu pedido. Por favor revise os produtos e dados de pagamento antes de tentar novamente",
 		"title": "Checkout",
-		"errorItems": "Alguns itens dda sua cesta não estão mais disponíveis.",
+		"errorItems": "Alguns itens dda sua sacola não estão mais disponíveis.",
 		"txtProduct": "Produto",
 		"txtProducts": "Produtos",
 		"txtTotal": "Total",
-		"txtItems": "Itens da cesta",
-		"txtNoItems": "Nenhum item na cesta",
+		"txtItems": "Itens da sacola",
+		"txtNoItems": "Nenhum item na sacola",
 		"txtSubtotal": "Subtotal",
 		"labelButton": "Finalizar Compra"
 	},
 	"emptyCart": {
 		"title": "Finalizar Pedido",
-		"txtEmptyCart": "Sua cesta está vazia",
-		"txtAddItem": "Adicione produtos na sua cesta",
+		"txtEmptyCart": "Sua sacola está vazia",
+		"txtAddItem": "Adicione produtos na sua sacola",
 		"labelBack": "Voltar"
 	},
 	"addNewShippingAddress": {
@@ -144,6 +144,7 @@
 		"ok": "OK",
 		"loading": "Aguarde...",
 		"errorPostalCode": "Informe o CEP",
+		"errorPostalCodeInvalid": "CEP deve ter 8 dígitos",
 		"errorStreet": "Informe a rua/avenida",
 		"errorNeighborhood": "Informe o bairro",
 		"errorCity": "Informe a cidade",
@@ -210,6 +211,9 @@
 		"loading": "Carregando endereços...",
 		"selectedAddress": "Endereço Selecionado",
 		"otherAddresses": "Outros Endereços",
-		"edit": "Editar"
+		"edit": "Editar",
+		"noPickupPoints": "Nenhum ponto de retirada disponível",
+		"pickupTitle": "Pontos de Retirada",
+		"pickupSubtitle": "Selecione um ponto de retirada"
 	}
 }

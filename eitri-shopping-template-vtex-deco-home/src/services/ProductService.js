@@ -80,23 +80,12 @@ export const getProductsFacetsService = async params => {
 		throw new Error('Invalid parameters provided to getProductsFacetsService')
 	}
 
-	// Garantir que selectedFacets seja um array válido ou null
-	const selectedFacets = Array.isArray(params?.facets) ? params.facets : null
-
 	const options = {
-		fullText: params?.query || params?.q || '',
-		selectedFacets: selectedFacets,
+		query: params?.query || params?.q || '',
 		hideUnavailableItems: true
 	}
 
-	// Remover propriedades undefined que podem causar problemas no GraphQL
-	Object.keys(options).forEach(key => {
-		if (options[key] === undefined) {
-			delete options[key]
-		}
-	})
-
-	const result = await Vtex.searchGraphql.facets(options)
+	const result = await Vtex.intelligentSearch.facets(params.facets || [], options)
 
 	// Validar e garantir estrutura do resultado
 	if (!result || typeof result !== 'object') {
@@ -165,4 +154,24 @@ export const getCategoryTree = async levels => {
 
 export const getProductByEan = async ean => {
 	return await Vtex.searchGraphql.product({ identifier: { field: 'ean', value: ean } })
+}
+
+export const getProductSiblingsService = async agrupadorCodes => {
+	if (!Array.isArray(agrupadorCodes) || agrupadorCodes.length === 0) {
+		return []
+	}
+
+	const options = {
+		// VTEX IS treats multiple entries with the same key as OR — returns all products matching any of the codes
+		selectedFacets: agrupadorCodes.map(code => ({ key: 'codigo-agrupador', value: code })),
+		from: 0,
+		// Cap: 12 products/page × ~4 siblings max = ~48; 99 provides safe headroom without over-fetching
+		to: 99,
+		hideUnavailableItems: true,
+		options: {
+			allowRedirect: false
+		}
+	}
+
+	return (await Vtex.searchGraphql.productSearch(options))?.products || []
 }

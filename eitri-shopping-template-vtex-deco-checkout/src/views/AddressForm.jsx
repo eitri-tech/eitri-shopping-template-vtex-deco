@@ -322,7 +322,7 @@ export default function AddressForm(props) {
 				isLoading={cartIsLoading}
 			/>
 
-			<View className='flex flex-col gap-2 p-4 m-4 bg-white rounded shadow-sm border border-gray-300'>
+			<View className='flex flex-col gap-2 p-4 m-4 bg-white shadow-sm border border-gray-300'>
 				<PostalCodeInput
 					value={address?.postalCode}
 					onChange={onChangePostalCodeInput}
@@ -350,7 +350,7 @@ export default function AddressForm(props) {
 
 			{addressError && (
 				<View className={'p-4'}>
-					<View className='bg-red-100 border border-red-400 px-4 py-3 rounded'>
+					<View className='bg-red-100 border border-red-400 px-4 py-3'>
 						<Text className='text-red-700 font-medium'>{addressError}</Text>
 					</View>
 				</View>

@@ -4,11 +4,6 @@ eitri-apps:
   alias: home
   focus: true
   shared: false
-- path: ./eitri-shopping-template-vtex-deco-account
-  workspace: eitri-shopping-template-vtex-deco-account
-  alias: account
-  focus: false
-  shared: false
 - path: ./eitri-shopping-template-vtex-deco-checkout
   workspace: eitri-shopping-template-vtex-deco-checkout
   alias: checkout
@@ -29,5 +24,13 @@ eitri-apps:
   alias: cart
   focus: false
   shared: false
-application-id: 1701f922-8738-4143-97c6-a7af1d90b81b
+#Monte Carlo
+application-id: 53fee33a-50d3-4360-947f-45539e0c5634
+
+#App2
+# application-id:
+
+#App3
+# application-id:
+
 check-js: false

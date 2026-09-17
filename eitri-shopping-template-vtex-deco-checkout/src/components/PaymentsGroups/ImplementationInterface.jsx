@@ -5,6 +5,7 @@ import InstantPayment from './Groups/InstantPayment'
 import GiftCard from './Groups/GiftCard'
 import GooglePay from '@/components/PaymentsGroups/Groups/GooglePay'
 import StoreCard from './Groups/StoreCard'
+import ExternalPayment from './Groups/ExternalPayment'
 
 export default function ImplementationInterface(props) {
 	const { groupName, systemGroup, onSelectPaymentMethod } = props

@@ -1,0 +1,54 @@
+# Sobe um Eitri-App do workspace local pelo dev launcher do Eitri Play.
+#
+# Requer `eitri app start` rodando no host e o Eitri Play pareado. Recebe o
+# slug do app em ${APP_SLUG} (passe via `env:` no runFlow que chama este
+# arquivo).
+#
+# Por que o app publicado NÃO é usado: a lista "PUBLISHED EITRI-APPS" roda a
+# versão publicada, não a cópia local — inútil para validar um diff antes do
+# PR, que é o caso de uso descrito no AGENTS.md.
+appId: tech.eitri.play
+---
+# `launchApp` já faz force-stop por padrão, o que devolve o launcher ao
+# estado colapsado (medido no device) — por isso o `tapOn: "Run Eitri-App"`
+# abaixo sempre EXPANDE o painel, nunca o fecha.
+- launchApp:
+    appId: tech.eitri.play
+    clearState: false
+- runFlow:
+    when:
+      visible: "Run Eitri-App"
+    commands:
+      # "Run Eitri-App" é um acordeão: colapsado, o campo de slug e o botão
+      # "Run" não existem na hierarquia. Este tap expande a seção.
+      - tapOn: "Run Eitri-App"
+      # O EditText do slug só aparece na árvore de acessibilidade QUANDO TEM
+      # TEXTO — vazio (o caso normal aqui) ele não é exposto, então não há
+      # seletor de texto nem relativo possível e o tap por posição é
+      # obrigatório. Medido no device (1080x2400): o campo fica entre
+      # "Run Eitri-App" (y≈1163-1254) e "Run" (y≈1507-1553), centro ≈ y 1380
+      # = 57%. Seletores relativos (`below:`/`above:`) foram testados e
+      # falham: sem o nó na árvore, `below` casa numa linha da lista de apps
+      # publicados e abre o app errado.
+      - tapOn:
+          point: "50%,57%"
+      # O valor do campo PERSISTE entre execuções (confirmado no device: veio
+      # pré-preenchido de uma sessão anterior). Sem isso, `inputText`
+      # concatena no valor antigo e o slug fica inválido. 60 caracteres cobre
+      # o slug mais longo deste workspace, mas não uma tentativa anterior de
+      # deeplink com query string (ver deeplink-categories.yml) — um resíduo
+      # maior que 60 chars deixaria sufixo no campo e o dev launcher não
+      # resolveria o app, quebrando a suíte de forma intermitente. Valor bem
+      # generoso para garantir limpeza total independente do que sobrou.
+      - eraseText: 200
+      - inputText: ${APP_SLUG}
+      # BUG ENCONTRADO no device: com o teclado aberto, o botão "Run" fica
+      # fora do viewport renderizado da WebView (que encolhe por
+      # adjustResize) e some da árvore de acessibilidade. `tapOn: "Run"`
+      # NÃO falha nesse caso — ele "sucede" silenciosamente tocando na
+      # posição de um elemento errado (ex.: o próprio EditText), sem nunca
+      # lançar o app. Sintoma observado: o flow todo passa pelo bootstrap
+      # sem erro e só falha bem depois, na espera por conteúdo do app (ex.:
+      # "Categorias"), deixando a tela presa no launcher do Eitri Play.
+      - hideKeyboard
+      - tapOn: "Run"

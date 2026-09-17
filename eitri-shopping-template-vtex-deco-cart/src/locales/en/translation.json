@@ -1,0 +1,80 @@
+{
+	"home": {
+		"title": "Bag"
+	},
+	"cart": {
+		"labelGiftWrapping": "Gift wrapping",
+		"labelInstalmentUntil": "Pay in up to"
+	},
+	"cartItem": {
+		"txtAdd": "Add",
+		"txtMessageUnavailable": "This product is unavailable!",
+		"txtRemoveCart": "Do you want to remove this product from your bag?",
+		"txtRemoveCartItem": "Do you want to remove {{name}} from your bag?",
+		"cannotBeDelivered": "This item cannot be delivered",
+		"notAvailable": "This item is unavailable"
+	},
+	"cartSummary": {
+		"txtSubtotal": "Subtotal",
+		"txtDiscount": "Discount",
+		"txtDelivery": "Delivery",
+		"txtTotal": "Total",
+		"labelFinish": "Proceed to checkout"
+	},
+	"minimumOrderValue": {
+		"missing": "Add {{value}} to reach the minimum order value",
+		"reached": "Minimum order value reached"
+	},
+	"coupon": {
+		"txtAppliedCoupon": "Coupon applied!",
+		"txtInvalidCoupon": "Invalid coupon",
+		"txtExpiredCoupon": "Expired coupon",
+		"txtCoupon": "Discount coupon",
+		"txtAdd": "Add",
+		"labelInsertCode": "Enter the code"
+	},
+	"emptyCart": {
+		"txtEmptyCart": "Your bag is empty",
+		"txtMessageList": "Add products to your bag and they will appear here.",
+		"labelButton": "Shop now"
+	},
+	"freight": {
+		"errorCep": "Enter a valid postal code",
+		"errorCalcFreight": "Unable to calculate shipping",
+		"errorEditFreight": "Unable to update shipping",
+		"txtDelivery": "Delivery",
+		"txtCalculate": "Calculate",
+		"labelZipCode": "Postal code",
+		"txtUnknow": "I don't know my postal code",
+		"tabDelivery": "Delivery options",
+		"tabPickup": "Pickup options",
+		"noDeliveryOptions": "No delivery options available",
+		"noPickupOptions": "No pickup options available",
+		"unavailableWithZip": "Product(s) unavailable for postal code {{postalCode}}:",
+		"unavailableGeneral": "Product(s) unavailable for delivery:",
+		"unavailableProduct": "Unavailable product",
+		"txtChangeZip": "Enter another postal code to check availability.",
+		"labelCalculate": "Calculate"
+	},
+	"modalOfferingGender": {
+		"labelReceiverGift": "Who is the gift for?",
+		"labelSelectGender": "Select a gender",
+		"txtBoy": "Boy",
+		"txtGirl": "Girl",
+		"txtConfirm": "Confirm",
+		"txtCancel": "Cancel"
+	},
+	"saveButton": {
+		"save": "Save",
+		"saved": "Saved"
+	},
+	"cartTemplate": {
+		"labelContinue": "Continue shopping"
+	},
+	"modal": {
+		"confirm": {
+			"delete": "Delete",
+			"cancel": "Cancel"
+		}
+	}
+}

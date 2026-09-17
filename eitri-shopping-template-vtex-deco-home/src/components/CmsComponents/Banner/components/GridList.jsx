@@ -1,4 +1,4 @@
-import { Text, View } from 'eitri-luminus'
+import { Text, View, Image } from 'eitri-luminus'
 import SectionTitle from '../../../SectionTitle/SectionTitle'
 export default function GridList(props) {
 	const { data, onClick } = props

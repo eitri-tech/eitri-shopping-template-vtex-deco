@@ -5,7 +5,11 @@ export default function SectionTitle(props) {
 
 	return (
 		<View className={`mb-2 px-4 ${className || ''}`}>
-			<Text className='font-bold text-xl text-gray-600'>{title}</Text>
+			<Text
+				fontFamily='Inter'
+				className='font-semibold text-2xl text-black'>
+				{title}
+			</Text>
 		</View>
 	)
 }

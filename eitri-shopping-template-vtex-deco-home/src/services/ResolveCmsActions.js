@@ -2,13 +2,30 @@ import { openProductById, openProductBySlug, resolveNavigation } from './Navigat
 import Eitri from 'eitri-bifrost'
 import { TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
 
-const handleSearchAction = value => {
-	Eitri.navigation.navigate({
-		path: 'Search',
-		state: {
-			searchTerm: value
-		}
-	})
+const handleSearchAction = action => {
+	const value = typeof action === 'string' ? action : action?.value
+	const facets = typeof action === 'object' ? action?.facets : undefined
+
+	if (facets?.length) {
+		Eitri.navigation.navigate({
+			path: 'ProductCatalog',
+			state: {
+				params: {
+					facets,
+					query: value,
+					sort: action?.sort || ''
+				},
+				title: action?.title || ''
+			}
+		})
+	} else {
+		Eitri.navigation.navigate({
+			path: 'Search',
+			state: {
+				searchTerm: value
+			}
+		})
+	}
 }
 const handleCollectionAction = action => {
 	const facets = [{ key: 'productClusterIds', value: action?.value }, ...(action?.facets || [])]
@@ -53,7 +70,12 @@ const handleCategoryAction = action => {
 	}
 	Eitri.navigation.navigate({
 		path: 'ProductCatalog',
-		state: { params, title: action?.title, banner: action?.banner }
+		state: {
+			params,
+			title: action?.title,
+			categoryNames: action?.categoryNames,
+			banner: action?.banner
+		}
 	})
 }
 const handleProductAction = value => {
@@ -95,12 +117,12 @@ export const processActions = sliderData => {
 		})
 	}
 
-	console.log('sliderData', sliderData)
+	// console.log('sliderData', sliderData)
 
 	const action = sliderData?.action
 	switch (action?.type) {
 		case 'search':
-			handleSearchAction(action.value)
+			handleSearchAction(action)
 			break
 		case 'collection':
 			handleCollectionAction(action)
@@ -125,6 +147,7 @@ export const processActions = sliderData => {
 			break
 		case 'facets':
 			openFacets(action)
+			break;
 		default:
 			console.log(`Unknown action type: ${action.type}`)
 	}

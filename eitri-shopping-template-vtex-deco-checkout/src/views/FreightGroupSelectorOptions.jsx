@@ -76,7 +76,7 @@ export default function FreightGroupSelectorOptions(props) {
 						<View className={'flex flex-row items-start gap-3'}>
 							<Image
 								src={product.imageUrl}
-								className='w-10 object-contain rounded'
+								className='w-10 object-contain'
 							/>
 							<View className='flex flex-col gap-1'>{product.name}</View>
 						</View>

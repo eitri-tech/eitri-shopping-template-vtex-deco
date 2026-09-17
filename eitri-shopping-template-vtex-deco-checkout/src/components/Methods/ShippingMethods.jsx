@@ -39,7 +39,7 @@ export default function ShippingMethods(props) {
 function ShippingMethodCard({ option, isSelected = false, onClick }) {
 	return (
 		<View
-			className={`rounded-lg shadow-sm transition-all duration-200 border cursor-pointer hover:shadow-md ${
+			className={`shadow-sm transition-all duration-200 border cursor-pointer hover:shadow-md ${
 				isSelected ? 'border-2 border-primary' : 'border-neutral-300 hover:border-primary/30 bg-base-100'
 			}`}
 			onClick={onClick}>

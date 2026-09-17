@@ -47,10 +47,8 @@ export default function CollapseWrapper(props) {
 	}, [defaultCollapsed])
 
 	return (
-		<View className='w-full overflow-x-hidden'>
-			<View
-				onClick={() => setCollapsed(!collapsed)}
-				className='cursor-pointer'>
+		<View className='w-full overflow-x-hidden mb-2'>
+			<View onClick={() => setCollapsed(!collapsed)}>
 				<View className='flex items-center justify-between w-full py-2'>
 					<Text className='text-lg font-semibold'>{title}</Text>
 					<View className='transition-transform duration-200'>
@@ -70,8 +68,8 @@ export default function CollapseWrapper(props) {
 					</View>
 				</View>
 			</View>
-			{!collapsed && <View>{children}</View>}
 			<Divisor />
+			{!collapsed && <View className={'pt-4 pb-2'}>{children}</View>}
 		</View>
 	)
 }

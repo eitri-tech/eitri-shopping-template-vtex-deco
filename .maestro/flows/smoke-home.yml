@@ -1,0 +1,23 @@
+appId: tech.eitri.play
+tags:
+  - smoke
+env:
+  APP_SLUG: eitri-shopping-template-vtex-deco-home
+---
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+# "Categorias" é conteúdo da própria Home (seção do CMS); a tab "Inicio" só
+# existe quando o app roda dentro da shell nativa de tabs, que o dev launcher
+# não fornece.
+#
+# Medido no device: com o CMS atual "Categorias" fica em ~72% da viewport, ou
+# seja visível sem rolar — mas colado na dobra. Como o conteúdo acima é
+# montado por CMS e pode crescer a qualquer momento, o `scrollUntilVisible`
+# cobre os dois casos (não rola se já estiver visível).
+- scrollUntilVisible:
+    element:
+      text: "Categorias"
+    direction: DOWN
+    timeout: 60000

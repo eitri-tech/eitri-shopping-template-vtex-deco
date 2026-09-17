@@ -1,10 +1,48 @@
 import Eitri from 'eitri-bifrost'
+import Datadog from './Datadog'
 
 export default class TrackingService {
 	static _logInTerminal = (...args) => {
 		const TURNED_ON = false
 		if (!TURNED_ON) return
 		console.log('[TRACKING]', ...args)
+	}
+
+	static _sfModulePromise = null
+
+	static _getSfLogEvent = async () => {
+		if (!TrackingService._sfModulePromise) {
+			TrackingService._sfModulePromise = Eitri.modules()
+				.then(modules => modules?.salesforce?.logEvent ?? null)
+				.catch(() => null)
+		}
+		return TrackingService._sfModulePromise
+	}
+
+	static sendSalesforceEvent = async (eventName, data = {}) => {
+		try {
+			const logEvent = await TrackingService._getSfLogEvent()
+			if (!logEvent) {
+				console.warn('[Salesforce] Module unavailable, event not sent:', eventName)
+				Datadog.sendDatadogWarningLog({ eventName, reason: 'salesforce_module_unavailable' }, 'sendSalesforceEvent')
+				return
+			}
+			await logEvent({ eventName, data })
+			TrackingService._logInTerminal('Salesforce', eventName, data)
+		} catch (error) {
+			console.error('[Salesforce] Error on', eventName, error)
+			Datadog.sendDatadogLogError(error, 'sendSalesforceEvent', { eventName })
+		}
+	}
+
+	static _flattenForSalesforce = (data = {}) => {
+		const result = {}
+		for (const [key, value] of Object.entries(data)) {
+			if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+				result[key] = value
+			}
+		}
+		return result
 	}
 
 	static _resolveCategory = item => {
@@ -83,6 +121,12 @@ export default class TrackingService {
 
 	static sendScreenView = async (friendlyScreenName, screenFilename) => {
 		Eitri.exposedApis.fb.currentScreen({ screen: friendlyScreenName, screenClass: screenFilename })
+
+		// Salesforce
+		TrackingService.sendSalesforceEvent('screen_view', {
+			screen_name: friendlyScreenName || '',
+			screen_class: screenFilename || ''
+		})
 	}
 
 	static insiderVisitHomepage = async () => {
@@ -98,7 +142,10 @@ export default class TrackingService {
 	 * Registra quando um anúncio é exibido para o usuário.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#ad_impression
 	 */
-	static adImpressionEvent = async data => TrackingService.sendRecommendedGaEvent('ad_impression', data)
+	static adImpressionEvent = async data => {
+		TrackingService.sendRecommendedGaEvent('ad_impression', data)
+		TrackingService.sendSalesforceEvent('ad_impression', TrackingService._flattenForSalesforce(data))
+	}
 
 	/**
 	 * Registra quando o usuário envia dados de pagamento no checkout.
@@ -130,6 +177,18 @@ export default class TrackingService {
 			// 	currency: 'BRL',
 			// 	payment_type: paymentType || ''
 			// })
+
+			// Salesforce
+			try {
+				TrackingService.sendSalesforceEvent('add_payment_info', {
+					currency: 'BRL',
+					payment_type: paymentType || '',
+					value: value || 0,
+					items_count: cart.items?.length || 0
+				})
+			} catch (e) {
+				console.error('[Salesforce] Error on add_payment_info', e)
+			}
 		} catch (e) {
 			console.log('Error on trackAddPaymentInfo', e)
 		}
@@ -169,6 +228,22 @@ export default class TrackingService {
 		} catch (error) {
 			console.error('[SHARED] Error on addShippingInfo', error)
 		}
+
+		// Salesforce
+		try {
+			const sfShipping = cart?.shippingData?.logisticsInfo?.map(item => item.selectedSla)
+			const sfUniqueSla = [...new Set(sfShipping)]
+			const sfTotalItemPrice = cart.totalizers.find(item => item.id === 'Items')?.value / 100
+
+			TrackingService.sendSalesforceEvent('add_shipping_info', {
+				currency: cart?.storePreferencesData?.currencyCode || 'BRL',
+				value: sfTotalItemPrice || 0,
+				shipping_tier: sfUniqueSla.join(';'),
+				items_count: cart.items?.length || 0
+			})
+		} catch (e) {
+			console.error('[Salesforce] Error on add_shipping_info', e)
+		}
 	}
 
 	/**
@@ -176,10 +251,10 @@ export default class TrackingService {
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#add_to_cart
 	 */
 	static addToCartEvent = async product => {
+		const item = this._resolveGAProductMetadata(product)
+
 		// GA
 		try {
-			const item = this._resolveGAProductMetadata(product)
-
 			const params = {
 				currency: 'BRL',
 				value: item.price,
@@ -201,13 +276,42 @@ export default class TrackingService {
 		} catch (error) {
 			console.error(error, 'insider.addItemToCart')
 		}
+
+		// Salesforce
+		try {
+			TrackingService.sendSalesforceEvent('add_to_cart', {
+				currency: 'BRL',
+				value: item.price || 0,
+				item_id: item.item_id || '',
+				item_name: item.item_name || '',
+				item_brand: item.item_brand || ''
+			})
+		} catch (e) {
+			console.error('[Salesforce] Error on add_to_cart', e)
+		}
 	}
 
 	/**
 	 * Registra quando um item é adicionado à lista de desejos.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#add_to_wishlist
 	 */
-	static addToWishlistEvent = async data => TrackingService.sendRecommendedGaEvent('add_to_wishlist', data)
+	static addToWishlistEvent = async data => {
+		TrackingService.sendRecommendedGaEvent('add_to_wishlist', data)
+
+		// Salesforce
+		try {
+			const sfData = {}
+			if (data?.items?.[0]) {
+				sfData.item_id = data.items[0].item_id || ''
+				sfData.item_name = data.items[0].item_name || ''
+			}
+			if (data?.currency) sfData.currency = data.currency
+			if (data?.value != null) sfData.value = data.value
+			TrackingService.sendSalesforceEvent('add_to_wishlist', sfData)
+		} catch (e) {
+			console.error('[Salesforce] Error on add_to_wishlist', e)
+		}
+	}
 
 	/**
 	 * Registra quando o usuário inicia o checkout.
@@ -227,11 +331,30 @@ export default class TrackingService {
 		} catch (e) {
 			console.log('Error on trackBeginCheckout', e)
 		}
+
+		// Salesforce
+		try {
+			const sfTotalizer = cart?.totalizers?.find(i => i.id === 'Items')
+			const sfValue = sfTotalizer?.value ? sfTotalizer.value / 100 : cart.value ? cart.value / 100 : 0
+			TrackingService.sendSalesforceEvent('begin_checkout', {
+				currency: 'BRL',
+				value: sfValue,
+				coupon: cart.marketingData?.coupon || '',
+				items_count: cart.items?.length || 0,
+				item_ids: cart.items?.map(i => i.productId).join(',') || ''
+			})
+		} catch (e) {
+			console.error('[Salesforce] Error on begin_checkout', e)
+		}
 	}
 
 	/**
 	 * Registra quando o usuário faz login.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#login
+	 *
+	 * Nao carrega a contact key: a identidade do Marketing Cloud vem do
+	 * `customerId` do `session.notifyLogin` (ver resolveContactKey no app de
+	 * conta), nao de atributo de evento.
 	 */
 	static loginEvent = async method => {
 		// GA
@@ -239,6 +362,9 @@ export default class TrackingService {
 
 		// Insider
 		Eitri.exposedApis.insider.signUpConfirmation()
+
+		// Salesforce
+		TrackingService.sendSalesforceEvent('login', { method: method || '' })
 	}
 
 	/**
@@ -304,6 +430,24 @@ export default class TrackingService {
 		} catch (e) {
 			console.error('insider.purchase', e)
 		}
+
+		// Salesforce
+		try {
+			const sfShippingPrice = cart.totalizers.find(item => item.id === 'Shipping')?.value / 100
+
+			TrackingService.sendSalesforceEvent('purchase', {
+				currency: 'BRL',
+				value: cart?.value && cart.value > 0 ? cart.value / 100 : 0,
+				transaction_id: orderId || '',
+				shipping: sfShippingPrice || 0,
+				coupon: cart?.marketingData?.coupon || '',
+				items_count: cart.items?.length || 0,
+				item_ids: cart.items?.map(i => i.productId).join(',') || '',
+				item_names: cart.items?.map(i => i.name).join(',') || ''
+			})
+		} catch (e) {
+			console.error('[Salesforce] Error on purchase', e)
+		}
 	}
 
 	/**
@@ -338,6 +482,20 @@ export default class TrackingService {
 		} catch (error) {
 			console.error(error, 'insider.itemRemovedFromCart')
 		}
+
+		// Salesforce
+		try {
+			const cartItem = this._resolveGACartItemMetadata(itemRemoved)
+			TrackingService.sendSalesforceEvent('remove_from_cart', {
+				currency: 'BRL',
+				value: cartItem.price || 0,
+				item_id: cartItem.item_id || '',
+				item_name: cartItem.item_name || '',
+				quantity: cartItem.quantity || 1
+			})
+		} catch (e) {
+			console.error('[Salesforce] Error on remove_from_cart', e)
+		}
 	}
 
 	/**
@@ -345,22 +503,29 @@ export default class TrackingService {
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#search
 	 */
 	static searchEvent = async term => {
-		TrackingService.sendRecommendedGaEvent('search', {
-			search_term: term
-		})
+		TrackingService.sendRecommendedGaEvent('search', { search_term: term })
+
+		// Salesforce
+		TrackingService.sendSalesforceEvent('search', { search_term: term || '' })
 	}
 
 	/**
 	 * Registra quando o usuário seleciona um conteúdo.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#select_content
 	 */
-	static selectContentEvent = async data => TrackingService.sendRecommendedGaEvent('select_content', data)
+	static selectContentEvent = async data => {
+		TrackingService.sendRecommendedGaEvent('select_content', data)
+		TrackingService.sendSalesforceEvent('select_content', TrackingService._flattenForSalesforce(data))
+	}
 
 	/**
 	 * Registra quando o usuário seleciona um item.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#select_item
 	 */
-	static selectItemEvent = async data => TrackingService.sendRecommendedGaEvent('select_item', data)
+	static selectItemEvent = async data => {
+		TrackingService.sendRecommendedGaEvent('select_item', data)
+		TrackingService.sendSalesforceEvent('select_item', TrackingService._flattenForSalesforce(data))
+	}
 
 	/**
 	 * Registra quando o usuário seleciona uma promoção.
@@ -369,6 +534,7 @@ export default class TrackingService {
 	static selectPromotionEvent = async data => {
 		try {
 			TrackingService.sendRecommendedGaEvent('select_promotion', data)
+			TrackingService.sendSalesforceEvent('select_promotion', TrackingService._flattenForSalesforce(data))
 		} catch (e) {}
 	}
 
@@ -377,16 +543,28 @@ export default class TrackingService {
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#share
 	 */
 	static shareEvent = async itemId => {
-		TrackingService.sendRecommendedGaEvent('share', {
-			item_id: itemId
-		})
+		TrackingService.sendRecommendedGaEvent('share', { item_id: itemId })
+
+		// Salesforce
+		TrackingService.sendSalesforceEvent('share', { item_id: itemId || '' })
 	}
 
 	/**
 	 * Registra quando o usuário cria conta (signup).
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#sign_up
 	 */
-	static signUpEvent = async data => TrackingService.sendRecommendedGaEvent('sign_up', data)
+	static signUpEvent = async data => {
+		TrackingService.sendRecommendedGaEvent('sign_up', data)
+
+		// Salesforce
+		try {
+			const sfData = {}
+			if (data?.method) sfData.method = data.method
+			TrackingService.sendSalesforceEvent('sign_up', sfData)
+		} catch (e) {
+			console.error('[Salesforce] Error on sign_up', e)
+		}
+	}
 
 	/**
 	 * Registra visualização do carrinho.
@@ -426,6 +604,20 @@ export default class TrackingService {
 		} catch (e) {
 			console.error('insider.visitCartPage', e)
 		}
+
+		// Salesforce
+		try {
+			const sfTotalizer = cart?.totalizers?.find(i => i.id === 'Items')
+			const sfValue = sfTotalizer?.value ? sfTotalizer.value / 100 : cart.value ? cart.value / 100 : 0
+			TrackingService.sendSalesforceEvent('view_cart', {
+				currency: 'BRL',
+				value: sfValue,
+				items_count: cart.items?.length || 0,
+				item_ids: cart.items?.map(i => i.productId).join(',') || ''
+			})
+		} catch (e) {
+			console.error('[Salesforce] Error on view_cart', e)
+		}
 	}
 
 	/**
@@ -433,9 +625,10 @@ export default class TrackingService {
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#view_item
 	 */
 	static viewItemEvent = async product => {
+		const item = this._resolveGAProductMetadata(product)
+
 		// GA
 		try {
-			const item = this._resolveGAProductMetadata(product)
 			const data = {
 				currency: 'BRL',
 				value: item?.price,
@@ -457,23 +650,45 @@ export default class TrackingService {
 		} catch (e) {
 			console.error('insiderVisitProductPage', e)
 		}
+
+		// Salesforce
+		try {
+			TrackingService.sendSalesforceEvent('view_item', {
+				currency: 'BRL',
+				value: item.price || 0,
+				item_id: item.item_id || '',
+				item_name: item.item_name || '',
+				item_brand: item.item_brand || ''
+			})
+		} catch (e) {
+			console.error('[Salesforce] Error on view_item', e)
+		}
 	}
 
 	/**
 	 * Registra visualização de lista de itens.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#view_item_list
 	 */
-	static viewItemListEvent = async data => TrackingService.sendRecommendedGaEvent('view_item_list', data)
+	static viewItemListEvent = async data => {
+		TrackingService.sendRecommendedGaEvent('view_item_list', data)
+		TrackingService.sendSalesforceEvent('view_item_list', TrackingService._flattenForSalesforce(data))
+	}
 
 	/**
 	 * Registra visualização de promoção.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#view_promotion
 	 */
-	static viewPromotionEvent = async data => TrackingService.sendRecommendedGaEvent('view_promotion', data)
+	static viewPromotionEvent = async data => {
+		TrackingService.sendRecommendedGaEvent('view_promotion', data)
+		TrackingService.sendSalesforceEvent('view_promotion', TrackingService._flattenForSalesforce(data))
+	}
 
 	/**
 	 * Registra visualização de resultados de busca.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#view_search_results
 	 */
-	static viewSearchResultsEvent = async data => TrackingService.sendRecommendedGaEvent('view_search_results', data)
+	static viewSearchResultsEvent = async data => {
+		TrackingService.sendRecommendedGaEvent('view_search_results', data)
+		TrackingService.sendSalesforceEvent('view_search_results', TrackingService._flattenForSalesforce(data))
+	}
 }

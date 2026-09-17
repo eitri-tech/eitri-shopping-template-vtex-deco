@@ -38,7 +38,7 @@ export default function OrderCompleted(props) {
 
 			<View className='p-4'>
 				{/* Payment Confirmation Section */}
-				<View className='bg-white rounded p-4'>
+				<View className='bg-white p-4'>
 					<View className='flex flex-col items-center justify-center mb-4 gap-2'>
 						<View className='w-16 h-16 bg-green-100 rounded-full flex items-center justify-center'>
 							<Text className='text-2xl'>✓</Text>

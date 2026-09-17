@@ -12,10 +12,13 @@ export default function CustomButton(props) {
 		isLoading,
 		width,
 		borderRadius,
+		height,
 		className,
 		outlined,
 		children,
 		leftIcon,
+		bold = true,
+		textClassName,
 		...rest
 	} = props
 
@@ -43,26 +46,28 @@ export default function CustomButton(props) {
 		return isLoading || disabled ? 'text-gray-500' : 'text-primary-content'
 	})()
 
+	const _fontWeight = bold ? 'font-bold' : 'font-normal'
+
 	const renderContent = () => {
 		if (leftIcon) {
 			return (
 				<View className='flex items-center gap-2'>
 					<View className={_contentColor}>{leftIcon}</View>
-					<Text className={`font-bold ${_contentColor}`}>{label}</Text>
+					<Text className={`${_fontWeight} ${_contentColor} ${textClassName || ''}`}>{label}</Text>
 				</View>
 			)
 		}
 
-		return <Text className={`font-bold ${_contentColor}`}>{label}</Text>
+		return <Text className={`${_fontWeight} ${_contentColor} ${textClassName || ''}`}>{label}</Text>
 	}
 
 	return (
 		<View
 			onClick={_onPress}
 			className={`
-				flex items-center justify-center 
-				h-[45px]
-				rounded-lg
+				flex items-center justify-center
+				${height || 'h-[45px]'}
+				${borderRadius || ''}
 				w-full
 				${_backgroundColor ? `${_backgroundColor}` : ''}
 				${variant === 'outlined' || outlined ? `border border-primary border-2` : ''}

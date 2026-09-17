@@ -4,7 +4,7 @@ export default function CategoryTitle(props) {
 	return (
 		<View
 			onClick={onClick}
-			className='p-4 flex justify-between items-center shadow-md bg-white'>
+			className='p-4 flex justify-between items-center bg-white'>
 			<View className='flex items-center gap-4'>
 				{icon && (
 					<Image
@@ -14,26 +14,9 @@ export default function CategoryTitle(props) {
 				)}
 				<Text className='font-bold'>{title}</Text>
 			</View>
-			{hasSubItems && (
-				<svg
-					xmlns='http://www.w3.org/2000/svg'
-					width='24'
-					height='24'
-					viewBox='0 0 24 24'
-					fill='none'
-					stroke='currentColor'
-					strokeWidth='2'
-					strokeLinecap='round'
-					strokeLinejoin='round'
-					className=''>
-					<line
-						x1='5'
-						y1='12'
-						x2='19'
-						y2='12'></line>
-					<polyline points='12 5 19 12 12 19'></polyline>
-				</svg>
-			)}
+			<svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M1.38892 1.38889L7.63892 7.63889L1.38892 13.8889" stroke="#0C0C0C" stroke-width="2.77778" stroke-linecap="round" stroke-linejoin="round" />
+			</svg>
 		</View>
 	)
 }
