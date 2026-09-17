@@ -50,11 +50,13 @@ export default function Home() {
 			setInitialLoading(false)
 		}
 
-		startConfigure()
-			.then(resolveRedirectAndCartAndCms)
-			.catch(e => {
-				console.error('Erro startConfigure: ', e)
-			})
+		try {
+			await startConfigure()
+		} catch (e) {
+			console.error('Erro startConfigure: ', e)
+		}
+
+		await resolveRedirectAndCartAndCms()
 	}
 
 	const resolveRedirectAndCartAndCms = async () => {

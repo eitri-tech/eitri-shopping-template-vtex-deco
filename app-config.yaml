@@ -24,8 +24,27 @@ eitri-apps:
   alias: cart
   focus: false
   shared: false
+bottom-tab-view-simulation:
+  eitri-apps:
+  - slug: eitri-shopping-template-vtex-deco-home
+    title: Inicio
+    initialization-params:
+      type: string
+      value: tabIndex=0
+  - slug: eitri-shopping-template-vtex-deco-home
+    title: Categorias
+    initialization-params:
+      type: string
+      value: tabIndex=1&route=Categories
+  - slug: eitri-shopping-template-vtex-deco-cart
+    title: Sacola
+    initialization-params:
+      type: string
+      value: tabIndex=2
+
+
 #Monte Carlo
-application-id: 53fee33a-50d3-4360-947f-45539e0c5634
+application-id: 1701f922-8738-4143-97c6-a7af1d90b81b
 
 #App2
 # application-id:
