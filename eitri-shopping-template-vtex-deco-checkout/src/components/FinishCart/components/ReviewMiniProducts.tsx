@@ -1,8 +1,16 @@
 import { View, Text, Image } from 'eitri-luminus'
-import type { VtexCartItem } from '../../../types/vtex'
+
+// Deliberately minimal (not VtexCartItem[]) — this also renders shippingResolver's per-group
+// `ProductRef[]` (id/imageUrl/name only, no index signature), which real cart items always
+// satisfy but which itself doesn't satisfy a stricter, index-signature-bearing cart item type.
+interface MiniProduct {
+	id?: string
+	imageUrl?: string
+	name?: string
+}
 
 interface ReviewMiniProductsProps {
-	products?: VtexCartItem[]
+	products?: MiniProduct[]
 }
 
 export default function ReviewMiniProducts(props: ReviewMiniProductsProps) {

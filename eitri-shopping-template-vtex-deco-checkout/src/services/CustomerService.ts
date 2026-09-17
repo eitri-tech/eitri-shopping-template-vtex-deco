@@ -52,3 +52,8 @@ export async function sendAccessKeyByEmail(email: string): Promise<unknown> {
 export async function loginWithEmailAndKey(email: string, verificationCode: string): Promise<unknown> {
 	return await Vtex.customer.loginWithEmailAndAccessKey(email, verificationCode)
 }
+
+export async function removeAccount(accountId: string): Promise<unknown> {
+	// Lives on the checkout service, not customer — `Vtex.customer.removeAccount` doesn't exist.
+	return await Vtex.checkout.removeAccount(accountId)
+}

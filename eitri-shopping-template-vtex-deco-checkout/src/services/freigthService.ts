@@ -1,5 +1,5 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
-import type { VtexAddress, VtexCart } from '../types/vtex'
+import type { VtexAddress, VtexCart, VtexResolvedPostalCode } from '../types/vtex'
 
 export default async function setFreight(payload: unknown): Promise<VtexCart> {
 	const newCart = await Vtex.checkout.setLogisticInfo(payload)
@@ -30,6 +30,6 @@ export const setShippingAddress = async (address: VtexAddress): Promise<VtexCart
 	return newCart
 }
 
-export const resolvePostalCode = async (postalCode: string): Promise<unknown> => {
+export const resolvePostalCode = async (postalCode: string): Promise<VtexResolvedPostalCode> => {
 	return await Vtex.cart.resolvePostalCode(postalCode)
 }

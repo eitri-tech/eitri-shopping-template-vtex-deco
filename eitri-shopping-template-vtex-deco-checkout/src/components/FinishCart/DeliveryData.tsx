@@ -1,42 +1,42 @@
+import { Text, View } from 'eitri-luminus'
 import SimpleCard from '../Card/SimpleCard'
 import iconTruck from '../../assets/images/truck.svg'
 import iconStore from '../../assets/images/store.svg'
 import { useTranslation } from 'eitri-i18n'
 import { useLocalShoppingCart } from '../../providers/LocalCart'
-import { getShippingAddress } from '../../utils/getShippingAddress'
 import { navigate } from '../../services/navigationService'
-import { Text, View } from 'eitri-luminus'
 import { shippingResolver } from 'eitri-shopping-template-vtex-deco-shared'
+import type { ShippingResolverResult } from 'eitri-shopping-template-vtex-deco-shared'
 import ReviewMiniProducts from './components/ReviewMiniProducts'
 
-export default function DeliveryData(props) {
+type CurrentDelivery = ShippingResolverResult['current'][number]
+
+export default function DeliveryData() {
 	const { cart } = useLocalShoppingCart()
 	const { t } = useTranslation()
 
-	const shipping = shippingResolver(cart)
+	const shipping = cart ? shippingResolver(cart) : null
 
-	const onPressMainAction = async () => {
+	const onPressMainAction = () => {
 		navigate('ShippingMethods')
 	}
 
+	const currentDeliveries: CurrentDelivery[] = shipping?.current ?? []
+
 	return (
-		<View className={'flex flex-col gap-4'}>
-			{shipping?.current?.map(currentDelivery => (
+		<View className='flex flex-col gap-4'>
+			{currentDeliveries.map(currentDelivery => (
 				<SimpleCard
 					key={currentDelivery.id}
-					isFilled={true}
-					title={
-						currentDelivery?.isPickupInPoint
-							? t('deliveryData.txtWithdrawal')
-							: t('deliveryData.txtDelivery')
-					}
+					isFilled
+					title={currentDelivery?.isPickupInPoint ? t('deliveryData.txtWithdrawal') : t('deliveryData.txtDelivery')}
 					icon={currentDelivery?.isPickupInPoint ? iconStore : iconTruck}
 					onPress={onPressMainAction}>
 					<View className='flex flex-row'>
 						{currentDelivery?.isPickupInPoint ? (
 							<View className='flex flex-col gap-3'>
 								<View className='flex flex-row items-center justify-between gap-2'>
-									<Text className='text-sm font-medium'>{currentDelivery?.name}</Text>
+									<Text className='text-sm font-medium'>{currentDelivery?.name ?? ''}</Text>
 									<Text
 										className={`text-sm font-bold ${
 											currentDelivery.formatedPrice === 'Grátis' ? 'text-green-600' : ''
@@ -76,23 +76,25 @@ export default function DeliveryData(props) {
 									<Text className='text-sm font-medium mb-2'>{t('deliveryData.txtStoreAddress')}</Text>
 									<View className='flex flex-col gap-1'>
 										<Text className='text-xs text-neutral-600'>
-											{`${currentDelivery?.pickupStoreInfo?.address?.street}, ${currentDelivery?.pickupStoreInfo?.address?.number}${
+											{`${currentDelivery?.pickupStoreInfo?.address?.street ?? ''}, ${currentDelivery?.pickupStoreInfo?.address?.number ?? ''}${
 												currentDelivery?.pickupStoreInfo?.address?.complement
 													? ` - ${currentDelivery?.pickupStoreInfo?.address?.complement}`
 													: ''
 											}`}
 										</Text>
 										<Text className='text-xs text-neutral-600'>
-											{`${currentDelivery?.pickupStoreInfo?.address?.neighborhood}, ${currentDelivery?.pickupStoreInfo?.address?.city} - ${currentDelivery?.pickupStoreInfo?.address?.state}`}
+											{`${currentDelivery?.pickupStoreInfo?.address?.neighborhood ?? ''}, ${currentDelivery?.pickupStoreInfo?.address?.city ?? ''} - ${currentDelivery?.pickupStoreInfo?.address?.state ?? ''}`}
 										</Text>
 										<Text className='text-xs text-neutral-600'>
-											{t('deliveryData.txtPostalCode', { code: currentDelivery?.pickupStoreInfo?.address?.postalCode })}
+											{t('deliveryData.txtPostalCode', {
+												code: currentDelivery?.pickupStoreInfo?.address?.postalCode ?? ''
+											})}
 										</Text>
 									</View>
 								</View>
 
 								{/* Important Information */}
-								{currentDelivery?.pickupStoreInfo?.additionalInfo && (
+								{currentDelivery?.pickupStoreInfo?.additionalInfo != null && (
 									<View className='bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400'>
 										<View className='flex flex-row items-start gap-2'>
 											<svg
@@ -115,7 +117,7 @@ export default function DeliveryData(props) {
 												/>
 											</svg>
 											<Text className='text-xs text-blue-800 leading-relaxed'>
-												{currentDelivery?.pickupStoreInfo?.additionalInfo}
+												{String(currentDelivery.pickupStoreInfo.additionalInfo)}
 											</Text>
 										</View>
 									</View>
@@ -126,7 +128,7 @@ export default function DeliveryData(props) {
 						) : (
 							<View className='flex flex-col gap-3 w-full'>
 								<View className='flex flex-row items-center justify-between'>
-									<Text className='text-sm font-medium'>{currentDelivery.name}</Text>
+									<Text className='text-sm font-medium'>{currentDelivery.name ?? ''}</Text>
 									<Text
 										className={`text-sm font-bold ${
 											currentDelivery.formatedPrice === 'Grátis' ? 'text-green-600' : ''
@@ -166,18 +168,16 @@ export default function DeliveryData(props) {
 									<Text className='text-sm font-medium mb-2'>{t('deliveryData.txtDeliveryAddress')}</Text>
 									<View className='flex flex-col gap-1'>
 										<Text className='text-xs text-neutral-600'>
-											{`${currentDelivery?.address?.street}, ${
-												currentDelivery?.address?.number === null
+											{`${currentDelivery?.address?.street ?? ''}, ${
+												currentDelivery?.address?.number == null
 													? t('deliveryData.txtNoNumber')
-													: currentDelivery?.address?.number
-											}${currentDelivery?.address?.complement ? ` - ${currentDelivery?.address?.complement}` : ''}`}
+													: currentDelivery.address.number
+											}${currentDelivery?.address?.complement ? ` - ${currentDelivery.address.complement}` : ''}`}
 										</Text>
 										<Text className='text-xs text-neutral-600'>
-											{`${currentDelivery?.address?.neighborhood}, ${currentDelivery?.address?.city} - ${currentDelivery?.address?.state}`}
+											{`${currentDelivery?.address?.neighborhood ?? ''}, ${currentDelivery?.address?.city ?? ''} - ${currentDelivery?.address?.state ?? ''}`}
 										</Text>
-										<Text className='text-xs text-neutral-600'>
-											{`CEP: ${currentDelivery?.address?.postalCode}`}
-										</Text>
+										<Text className='text-xs text-neutral-600'>{`CEP: ${currentDelivery?.address?.postalCode ?? ''}`}</Text>
 									</View>
 								</View>
 

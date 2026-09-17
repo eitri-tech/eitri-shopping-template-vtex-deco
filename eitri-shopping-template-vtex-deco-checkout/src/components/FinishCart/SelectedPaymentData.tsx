@@ -7,32 +7,29 @@ import { useLocalShoppingCart } from '../../providers/LocalCart'
 import CardIcon from '../Icons/CardIcons/CardIcon'
 import pixImage from '../../assets/images/pix.png'
 import googlePayImage from '../../assets/images/GPay_Acceptance_Mark_800.png'
+import type { CheckoutCardInfo, VtexPaymentInfo } from '../../types/vtex'
 
-function CreditCardVisual({ cardInfo, cardName }) {
-	const { t } = useTranslation()
+const CARD_GRADIENTS: Record<string, string> = {
+	visa: 'from-blue-600 via-blue-700 to-blue-800',
+	mastercard: 'from-orange-500 via-red-500 to-red-600',
+	elo: 'from-green-600 via-green-700 to-green-800',
+	amex: 'from-teal-500 via-teal-600 to-teal-700',
+	hipercard: 'from-purple-600 via-purple-700 to-purple-800',
+	diners: 'from-indigo-600 via-indigo-700 to-indigo-800',
+	discover: 'from-orange-600 via-orange-700 to-orange-800'
+}
 
-	// Determinar a cor do cartão baseado na bandeira detectada
-	const getCardGradient = brand => {
-		const loBrand = brand.toLowerCase()
-		switch (loBrand) {
-			case 'visa':
-				return 'from-blue-600 via-blue-700 to-blue-800'
-			case 'mastercard':
-				return 'from-orange-500 via-red-500 to-red-600'
-			case 'elo':
-				return 'from-green-600 via-green-700 to-green-800'
-			case 'amex':
-				return 'from-teal-500 via-teal-600 to-teal-700'
-			case 'hipercard':
-				return 'from-purple-600 via-purple-700 to-purple-800'
-			case 'diners':
-				return 'from-indigo-600 via-indigo-700 to-indigo-800'
-			case 'discover':
-				return 'from-orange-600 via-orange-700 to-orange-800'
-			default:
-				return 'from-slate-600 via-slate-700 to-slate-800'
-		}
-	}
+// Determinar a cor do cartão baseado na bandeira detectada
+const getCardGradient = (brand?: string): string =>
+	CARD_GRADIENTS[brand?.toLowerCase() ?? ''] ?? 'from-slate-600 via-slate-700 to-slate-800'
+
+interface CreditCardVisualProps {
+	cardInfo?: CheckoutCardInfo | null
+	cardName?: string
+}
+
+function CreditCardVisual(props: CreditCardVisualProps) {
+	const { cardInfo, cardName } = props
 
 	return (
 		<View
@@ -65,18 +62,18 @@ function CreditCardVisual({ cardInfo, cardName }) {
 					{cardInfo?.holderName && (
 						<View className='flex flex-col gap-1'>
 							<Text className='text-white/60 text-xs'>Titular</Text>
-							<Text className='text-white text-sm font-medium'>{cardInfo?.holderName}</Text>
+							<Text className='text-white text-sm font-medium'>{cardInfo.holderName}</Text>
 						</View>
 					)}
 
 					<View className='flex flex-col gap-1 items-end'>
 						<Text className='text-white/60 text-xs'>CVV</Text>
-						<Text className='text-white text-sm font-medium'>{cardInfo?.validationCode}</Text>
+						<Text className='text-white text-sm font-medium'>{cardInfo?.validationCode ?? ''}</Text>
 					</View>
 					{cardInfo?.dueDate && (
 						<View className='flex flex-col gap-1 items-end'>
 							<Text className='text-white/60 text-xs'>Válido até</Text>
-							<Text className='text-white text-sm font-medium'>{cardInfo?.dueDate}</Text>
+							<Text className='text-white text-sm font-medium'>{cardInfo.dueDate}</Text>
 						</View>
 					)}
 				</View>
@@ -85,35 +82,49 @@ function CreditCardVisual({ cardInfo, cardName }) {
 	)
 }
 
-export default function SelectedPaymentData(props) {
+interface SelectedPaymentDataProps {
+	onPress?: () => void
+}
+
+interface PaymentSystemDetails {
+	groupName?: string
+	name?: string
+	value?: number
+	installment?: number
+	installmentText: string
+}
+
+export default function SelectedPaymentData(props: SelectedPaymentDataProps) {
 	const { onPress } = props
 
 	const { cart, cardInfo } = useLocalShoppingCart()
 
 	const { t } = useTranslation()
-	const paymentSystem = cart?.paymentData?.payments?.[0]
+	const payments = cart?.paymentData?.payments ?? []
+	const giftCards = cart?.paymentData?.giftCards ?? []
 
-	const getPaymentSystemDetails = paymentSystem => {
-		const ps = cart?.paymentData?.paymentSystems?.find(ps => ps.stringId === paymentSystem.paymentSystem)
+	const getPaymentSystemDetails = (payment: VtexPaymentInfo): PaymentSystemDetails => {
+		const ps = (cart?.paymentData?.paymentSystems ?? []).find(system => system.stringId === payment.paymentSystem)
+		const merchantInstallments = payment.merchantSellerPayments?.[0]
 		return {
 			groupName: ps?.groupName,
-			name: ps.name,
-			value: paymentSystem.value,
-			installment: paymentSystem.installment,
-			installmentText: `${paymentSystem?.merchantSellerPayments?.[0]?.installments}x de ${formatAmountInCents(paymentSystem?.merchantSellerPayments?.[0]?.installmentValue)}`
+			name: ps?.name,
+			value: payment.value,
+			installment: payment.installment,
+			installmentText: `${merchantInstallments?.installments ?? ''}x de ${formatAmountInCents(merchantInstallments?.installmentValue)}`
 		}
 	}
 
 	return (
 		<SimpleCard
-			isFilled={paymentSystem || cart?.paymentData?.giftCards?.length > 0}
+			isFilled={payments.length > 0 || giftCards.length > 0}
 			onPress={onPress}
 			title={t('selectedPaymentData.txtPayment')}
 			icon={iconCard}>
-			<View className={'flex flex-col gap-4'}>
-				{cart?.paymentData?.payments?.length > 0 && (
+			<View className='flex flex-col gap-4'>
+				{payments.length > 0 && (
 					<View className='flex flex-col gap-4'>
-						{cart?.paymentData?.payments?.map(payment => {
+						{payments.map(payment => {
 							const { name, groupName, installmentText } = getPaymentSystemDetails(payment)
 
 							if (groupName === 'creditCardPaymentGroup') {
@@ -131,9 +142,7 @@ export default function SelectedPaymentData(props) {
 										<View className='bg-white border border-gray-200 rounded-lg p-3'>
 											<View className='flex flex-col items-center gap-1'>
 												<Text className='text-xs text-gray-600'>Parcelamento</Text>
-												<Text className='text-sm font-bold text-primary'>
-													{installmentText}
-												</Text>
+												<Text className='text-sm font-bold text-primary'>{installmentText}</Text>
 											</View>
 										</View>
 									</View>
@@ -171,26 +180,24 @@ export default function SelectedPaymentData(props) {
 								<View
 									key={payment.paymentSystem}
 									className='flex items-center gap-2'>
-									<Text className='text-sm font-medium text-base-content/80'>{name}</Text>
+									<Text className='text-sm font-medium text-base-content/80'>{name ?? ''}</Text>
 								</View>
 							)
 						})}
 					</View>
 				)}
-				{cart?.paymentData?.giftCards && cart?.paymentData?.giftCards?.length > 0 && (
+				{giftCards.length > 0 && (
 					<View className='flex flex-col gap-3'>
 						<View className='flex items-center gap-2'>
-							<Text className='text-sm font-medium text-base-content/80'>
-								Pagamento com vale presente:
-							</Text>
+							<Text className='text-sm font-medium text-base-content/80'>Pagamento com vale presente:</Text>
 						</View>
 
 						<View className='flex flex-col gap-2'>
-							{cart?.paymentData?.giftCards
-								?.filter(gift => gift.redemptionCode)
+							{giftCards
+								.filter(gift => gift.redemptionCode)
 								.map((gift, index) => (
 									<View
-										key={index}
+										key={gift.id ?? index}
 										className='flex items-center justify-between p-3 bg-neutral-50 rounded'>
 										<View className='flex flex-col'>
 											<Text className='text-xs text-base-content/60'>Código</Text>

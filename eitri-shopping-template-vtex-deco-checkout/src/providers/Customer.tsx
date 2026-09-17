@@ -5,9 +5,11 @@ import { getCustomerData } from '../services/CustomerService'
 // tsconfig used for type-checking this whole bundle can only point it at one app, so it always
 // fails to resolve here. Relative import instead; same module, verifiable either way.
 import { getUserByEmail } from '../services/cartService'
+import type { VtexAvailableAccount } from '../types/vtex'
 
 interface CheckoutProfile {
 	userProfile?: { email?: string; [key: string]: unknown }
+	availableAccounts?: VtexAvailableAccount[]
 	[key: string]: unknown
 }
 

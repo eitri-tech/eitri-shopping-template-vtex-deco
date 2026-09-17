@@ -18,6 +18,17 @@ export interface VtexBusinessHour {
 	[key: string]: unknown
 }
 
+/** Result of Vtex.cart.resolvePostalCode — a partial address VTEX derives from a CEP alone. */
+export interface VtexResolvedPostalCode {
+	street?: string
+	neighborhood?: string
+	city?: string
+	state?: string
+	country?: string
+	geoCoordinates?: number[]
+	[key: string]: unknown
+}
+
 export interface VtexPickupStoreInfo {
 	address?: VtexAddress
 	friendlyName?: string
@@ -28,17 +39,22 @@ export interface VtexPickupStoreInfo {
 export interface VtexSla {
 	id: string
 	name?: string
-	price?: number
-	shippingEstimate?: string
+	// price/shippingEstimate/deliveryChannel are always present on a real VTEX orderForm SLA
+	// entry (price is 0 for free shipping, never absent) — required, not optional, matching
+	// the shared package's own VtexSla.
+	price: number
+	shippingEstimate: string
 	shippingEstimateDate?: string
-	deliveryChannel?: string
+	deliveryChannel: string
 	pickupStoreInfo?: VtexPickupStoreInfo
 	selected?: boolean
 	[key: string]: unknown
 }
 
 export interface VtexLogisticsInfo {
-	itemIndex?: number
+	// Always present on real VTEX orderForm entries (it's how this array correlates 1:1 with
+	// cart items) — required, not optional, matching the shared package's own VtexLogisticsInfo.
+	itemIndex: number
 	addressId?: string
 	selectedSla?: string
 	selectedDeliveryChannel?: string
@@ -74,11 +90,37 @@ export interface VtexPaymentSystem {
 	[key: string]: unknown
 }
 
+export interface VtexGiftCard {
+	id?: string
+	redemptionCode?: string
+	value?: number
+	inUse?: boolean
+	isSpecialCard?: boolean
+	[key: string]: unknown
+}
+
+export interface VtexAvailableAccount {
+	accountId?: string
+	cardNumber?: string
+	paymentSystem?: string
+	paymentSystemName?: string
+	[key: string]: unknown
+}
+
+export interface VtexPaymentInfo {
+	paymentSystem?: string
+	value?: number
+	installment?: number
+	merchantSellerPayments?: Array<{ installments?: number; installmentValue?: number; [key: string]: unknown }>
+	[key: string]: unknown
+}
+
 export interface VtexPaymentData {
-	payments?: Array<{ paymentSystem?: string; [key: string]: unknown }>
+	payments?: VtexPaymentInfo[]
 	paymentSystems?: VtexPaymentSystem[]
 	installmentOptions?: VtexInstallmentOption[]
-	giftCards?: unknown[]
+	giftCards?: VtexGiftCard[]
+	availableAccounts?: VtexAvailableAccount[]
 	[key: string]: unknown
 }
 
@@ -155,13 +197,23 @@ export interface CheckoutSelectedPayment {
 	[key: string]: unknown
 }
 
-/** Card data captured by the card forms / Google Pay — kept in LocalCart, never persisted. */
+/**
+ * Card data kept in LocalCart, never persisted. Doubles as two shapes depending on the flow:
+ * a freshly-captured card (cardNumber/holderName/dueDate/metadata from AddCardForm or Google
+ * Pay), or a saved VtexAvailableAccount the user picked in CreditCard.tsx (accountId/cardNumber/
+ * paymentSystem/validationCode), which also carries an optional billing address override.
+ */
 export interface CheckoutCardInfo {
 	cardNumber?: string
 	holderName?: string
 	dueDate?: string
 	validationCode?: string
 	metadata?: string
+	accountId?: string
+	paymentSystem?: string
+	paymentSystemName?: string
+	addressId?: string | null
+	address?: VtexAddress | null
 	[key: string]: unknown
 }
 

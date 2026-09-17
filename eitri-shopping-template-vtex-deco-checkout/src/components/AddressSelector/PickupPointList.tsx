@@ -1,7 +1,15 @@
 import { Loading, Skeleton, Text, View } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
+import type { ShippingOption } from '../Methods/ShippingMethods'
 
-export default function PickupPointList({ options, onSelectFreightOption, loading }) {
+interface PickupPointListProps {
+	options?: ShippingOption[] | null
+	onSelectFreightOption?: (option: ShippingOption) => void
+	loading?: boolean
+}
+
+export default function PickupPointList(props: PickupPointListProps) {
+	const { options, onSelectFreightOption, loading } = props
 	const { t } = useTranslation()
 
 	if (!options && loading) {
@@ -18,6 +26,8 @@ export default function PickupPointList({ options, onSelectFreightOption, loadin
 	}
 
 	if (!options) {
+		// Raw eitri-luminus Loading (not the shared wrapper) — it has no `isLoading` prop, it
+		// always renders; this branch already only runs when there's something to show.
 		return (
 			<View className='flex flex-col items-center justify-center py-8'>
 				<Loading />
@@ -35,10 +45,8 @@ export default function PickupPointList({ options, onSelectFreightOption, loadin
 		)
 	}
 
-	const currentSelectedOption = options?.find(option => option.isCurrent)
-
-	const handlePickupChange = option => {
-		onSelectFreightOption(option)
+	const handlePickupChange = (option: ShippingOption) => {
+		if (typeof onSelectFreightOption === 'function') onSelectFreightOption(option)
 	}
 
 	return (
@@ -62,9 +70,9 @@ export default function PickupPointList({ options, onSelectFreightOption, loadin
 						))
 					: options.map((option, index) => (
 							<PickupPointCard
-								key={option.label || index}
+								key={option?.label || index}
 								option={option}
-								isSelected={!!option.isCurrent}
+								isSelected={!!option?.isCurrent}
 								onClick={() => handlePickupChange(option)}
 							/>
 						))}
@@ -73,21 +81,27 @@ export default function PickupPointList({ options, onSelectFreightOption, loadin
 	)
 }
 
-function PickupPointCard({ option, isSelected = false, onClick }) {
+interface PickupPointCardProps {
+	option: ShippingOption
+	isSelected?: boolean
+	onClick?: () => void
+}
+
+function PickupPointCard(props: PickupPointCardProps) {
+	const { option, isSelected = false, onClick } = props
 	// Exibe um cartão de ponto de retirada, destacando visualmente se está selecionado
+	const address = option?.address as { street?: string } | undefined
 	return (
 		<View
-			className={`rounded-lg shadow-sm transition-all duration-200 border cursor-pointer hover:shadow-md ${
-				isSelected ? 'border-2 border-primary' : 'border-neutral-300 hover:border-primary/30 bg-base-100'
+			className={`rounded-lg shadow-sm transition-all duration-200 border ${
+				isSelected ? 'border-2 border-primary' : 'border-neutral-300 bg-base-100'
 			}`}
 			onClick={onClick}>
 			<View className='p-4'>
 				<View className='flex flex-row justify-between items-start'>
 					<View className='flex flex-col gap-1 flex-1'>
-						<Text className='font-semibold text-base-content text-base mb-1'>{option.label}</Text>
-						{option.address && (
-							<Text className='text-sm text-base-content/70 mb-1'>{option?.address?.street}</Text>
-						)}
+						<Text className='font-semibold text-base-content text-base mb-1'>{option?.label ?? ''}</Text>
+						{address && <Text className='text-sm text-base-content/70 mb-1'>{address.street ?? ''}</Text>}
 					</View>
 					<View className='flex flex-col items-end gap-1'>
 						{isSelected && (

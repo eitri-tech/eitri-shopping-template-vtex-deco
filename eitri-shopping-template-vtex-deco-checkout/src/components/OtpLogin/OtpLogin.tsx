@@ -1,10 +1,18 @@
-import { View } from 'eitri-luminus'
+import { useEffect, useState } from 'react'
+import type { ChangeEvent, MouseEvent } from 'react'
+import { View, Text } from 'eitri-luminus'
 import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { loginWithEmailAndKey, sendAccessKeyByEmail } from '../../services/CustomerService'
 import { CustomButton, BottomInset, CustomInput, Loading } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 
-export default function OtpLogin(props) {
+interface OtpLoginProps {
+	open?: boolean
+	onClose?: () => void
+	onLogged: () => void
+}
+
+export default function OtpLogin(props: OtpLoginProps) {
 	const { open, onClose, onLogged } = props
 	const { cart, startCart } = useLocalShoppingCart()
 	const { t } = useTranslation()
@@ -16,32 +24,33 @@ export default function OtpLogin(props) {
 
 	const [email, setEmail] = useState('')
 
-	useEffect(() => {
-		if (!open) return
-		sendOtpEmail(cart?.clientProfileData?.email)
-		setEmail(cart?.clientProfileData?.email)
-	}, [cart, open])
-
-	const sendOtpEmail = async email => {
+	const sendOtpEmail = async (targetEmail?: string) => {
 		try {
-			if (!email) return
+			if (!targetEmail) return
 			if (timeOutToResentEmail > 0) {
 				return
 			}
-			console.error('Enviando email:', email)
-			await sendAccessKeyByEmail(email)
+			await sendAccessKeyByEmail(targetEmail)
 		} catch (e) {
 			console.error('Erro ao enviar email:', e)
 			setTimeOutToResentEmail(0)
 		}
 	}
 
+	useEffect(() => {
+		if (!open) return
+		const clientEmail = cart?.clientProfileData?.email
+		sendOtpEmail(clientEmail)
+		setEmail(clientEmail ?? '')
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [cart, open])
+
 	const loginWithEmailAndAccessKey = async () => {
 		try {
 			setLoadingLogin(true)
 			const loggedIn = await loginWithEmailAndKey(email, verificationCode)
 			if (loggedIn === 'Success') {
-				await startCart()
+				await startCart?.()
 				onLogged()
 			} else {
 				setLoginError(true)
@@ -54,10 +63,10 @@ export default function OtpLogin(props) {
 		}
 	}
 
-	const maskEmailSimple = email => {
-		if (!email) return ''
-		const [local, domain] = email.split('@')
-		if (!domain) return email
+	const maskEmailSimple = (rawEmail?: string): string => {
+		if (!rawEmail) return ''
+		const [local, domain] = rawEmail.split('@')
+		if (!domain) return rawEmail
 		if (local.length <= 2) return local[0] + '*@' + domain
 		const masked = local[0] + '*'.repeat(local.length - 1)
 		return `${masked}@${domain}`
@@ -68,11 +77,9 @@ export default function OtpLogin(props) {
 	return (
 		<View
 			className='z-[9999] !bg-black/70 !opacity-100 fixed inset-0 flex items-end justify-center'
-			onClick={() => {
-				if (typeof onClose === 'function') onClose()
-			}}>
+			onClick={() => onClose?.()}>
 			<View
-				onClick={e => e.stopPropagation()}
+				onClick={(e?: MouseEvent<HTMLElement>) => e?.stopPropagation()}
 				className='bg-white !rounded-t-sm w-screen max-h-[70vh] overflow-y-auto pointer-events-auto p-4'>
 				<Text className='text-lg font-semibold'>
 					{t('otpLogin.txtMessage', { email: maskEmailSimple(email) })}
@@ -84,17 +91,19 @@ export default function OtpLogin(props) {
 							placeholder={t('otpLogin.placeholderCode')}
 							inputMode='numeric'
 							value={verificationCode}
-							onChange={e => setVerificationCode(e.target.value)}
+							onChange={(e: ChangeEvent<HTMLInputElement>) => setVerificationCode(e.target.value)}
 							height='45px'
 						/>
 						<View className='min-h-[20px]'>
-							{loginError && <Text className='font-bold text-red-500 text-sm'>{t('otpLogin.errorInvalidCode')}</Text>}
+							{loginError && (
+								<Text className='font-bold text-red-500 text-sm'>{t('otpLogin.errorInvalidCode')}</Text>
+							)}
 						</View>
 					</View>
 
 					{loadingLogin ? (
 						<View className='flex justify-center'>
-							<Loading inline />
+							<Loading isLoading />
 						</View>
 					) : (
 						<CustomButton

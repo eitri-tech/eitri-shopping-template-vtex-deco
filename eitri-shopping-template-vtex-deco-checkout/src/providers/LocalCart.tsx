@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react'
-import type { ReactNode } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import {
 	addItem,
 	addUserData,
@@ -31,10 +31,12 @@ interface CartContextValue {
 	generateNewCart?: () => Promise<VtexCart>
 	addItem?: (payload: unknown) => Promise<void>
 	selectedPaymentData?: CheckoutSelectedPayment | null
-	setSelectedPaymentData?: (data: CheckoutSelectedPayment | null) => void
+	// These wrap the underlying `useState` setter directly (see below), so callers can pass
+	// either a value or a `prev => next` updater — plain-callback typing rejected the latter.
+	setSelectedPaymentData?: Dispatch<SetStateAction<CheckoutSelectedPayment | null>>
 	cartIsLoading?: boolean | null
 	cardInfo?: CheckoutCardInfo | null
-	setCardInfo?: (info: CheckoutCardInfo | null) => void
+	setCardInfo?: Dispatch<SetStateAction<CheckoutCardInfo | null>>
 }
 
 const LocalCart = createContext<CartContextValue>({})
