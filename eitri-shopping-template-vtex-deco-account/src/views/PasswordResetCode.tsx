@@ -1,16 +1,18 @@
-import {
-	HeaderContentWrapper,
-	HeaderReturn,
-	HeaderText,
-	CustomButton,
-	CustomInput
-} from 'eitri-shopping-template-vtex-deco-shared'
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
+import { Page, View, Text } from 'eitri-luminus'
+import { HeaderContentWrapper, HeaderReturn, HeaderText, CustomButton, CustomInput } from 'eitri-shopping-template-vtex-deco-shared'
 import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import { sendScreenView } from '../services/TrackingService'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
+import type { RouteProps } from '../types/route'
 
-export default function PasswordResetCode(props) {
+interface PasswordResetCodeState {
+	email?: string
+}
+
+export default function PasswordResetCode(props: RouteProps<PasswordResetCodeState>) {
 	const [recoveryCode, setRecoveryCode] = useState('')
 
 	const RECOVERY_CODE_LENGTH = 6
@@ -28,10 +30,10 @@ export default function PasswordResetCode(props) {
 		if (recoveryCode.length !== RECOVERY_CODE_LENGTH) {
 			return
 		}
-		navigate(PAGES.PASSWORD_RESET_NEW_PASS, { email: email, recoveryCode })
+		navigate(PAGES.PASSWORD_RESET_NEW_PASS, { email, recoveryCode })
 	}
 
-	const onCodeFilled = e => {
+	const onCodeFilled = (e: ChangeEvent<HTMLInputElement>) => {
 		setRecoveryCode(e.target.value)
 	}
 
@@ -47,7 +49,7 @@ export default function PasswordResetCode(props) {
 					<Text className='w-full font-bold text-xl'>{t('passwordResetCode.forgotPass')}</Text>
 					<Text className='text text-gray-600'>
 						{t('passwordResetCode.messageEmail')}
-						<Text className='font-bold text-gray-700 ml-1'>{email}</Text>
+						<Text className='font-bold text-gray-700 ml-1'>{email ?? ''}</Text>
 					</Text>
 				</View>
 

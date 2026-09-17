@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
+import { Page, View, Text } from 'eitri-luminus'
 import {
 	Loading,
 	HeaderContentWrapper,
@@ -13,8 +16,13 @@ import { sendScreenView } from '../services/TrackingService'
 import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
+import type { RouteProps } from '../types/route'
 
-export default function PasswordReset(props) {
+interface PasswordResetState {
+	email?: string
+}
+
+export default function PasswordReset(props: RouteProps<PasswordResetState>) {
 	const { t } = useTranslation()
 
 	const [username, setUsername] = useState('')
@@ -53,7 +61,7 @@ export default function PasswordReset(props) {
 				fullScreen={true}
 			/>
 
-			<HeaderContentWrapper className=''>
+			<HeaderContentWrapper>
 				<HeaderReturn />
 				<HeaderText text={t('passwordReset.headerText')} />
 			</HeaderContentWrapper>
@@ -70,7 +78,7 @@ export default function PasswordReset(props) {
 							inputMode='email'
 							placeholder={t('passwordReset.setEmail')}
 							value={username}
-							onChange={e => setUsername(e.target.value)}
+							onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
 						/>
 					</View>
 

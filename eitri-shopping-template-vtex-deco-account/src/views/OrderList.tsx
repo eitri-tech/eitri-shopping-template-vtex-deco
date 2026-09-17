@@ -1,11 +1,6 @@
-import {
-	Loading,
-	HeaderContentWrapper,
-	HeaderText,
-	HeaderReturn,
-	BottomInset,
-	GenericBox
-} from 'eitri-shopping-template-vtex-deco-shared'
+import { useEffect, useRef, useState } from 'react'
+import { Page, View } from 'eitri-luminus'
+import { Loading, HeaderContentWrapper, HeaderText, HeaderReturn, BottomInset } from 'eitri-shopping-template-vtex-deco-shared'
 import NoItem from '../components/NoItem/NoItem'
 import { sendScreenView } from '../services/TrackingService'
 import { useTranslation } from 'eitri-i18n'
@@ -14,11 +9,16 @@ import { listOrders } from '../services/CustomerService'
 import ProtectedView from '../components/ProtectedView/ProtectedView'
 import InfiniteScroll from '../components/InfiniteScroll/InfiniteScroll'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
-import SnackBarComponent from '../providers/SnackBar'
+import type { VtexOrder } from '../types/vtex'
 
-export default function OrderList(props) {
+interface ListOrdersResult {
+	paging?: { pages?: number }
+	list?: VtexOrder[]
+}
+
+export default function OrderList() {
 	const { t } = useTranslation()
-	const [orders, setOrders] = useState([])
+	const [orders, setOrders] = useState<VtexOrder[]>([])
 	const [isLoading, setIsLoading] = useState(false)
 	const [pageHasEnded, setPageHasEnded] = useState(false)
 
@@ -43,13 +43,13 @@ export default function OrderList(props) {
 			}
 			isFetchingRef.current = true
 			setIsLoading(true)
-			const result = await listOrders(pageRef.current)
-			maxPages.current = result?.paging?.pages
+			const result = (await listOrders(pageRef.current)) as ListOrdersResult | undefined
+			maxPages.current = result?.paging?.pages ?? Infinity
 			if (!result?.list?.length) {
 				setPageHasEnded(true)
 				return
 			}
-			setOrders(prev => [...prev, ...result.list])
+			setOrders(prev => [...prev, ...(result.list ?? [])])
 			pageRef.current += 1
 		} catch (error) {
 			console.log('erro ao buscar orders', error)
