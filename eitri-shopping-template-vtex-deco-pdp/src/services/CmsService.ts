@@ -1,6 +1,6 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 
-export const hasLandingPageToSeller = async sellerId => {
+export const hasLandingPageToSeller = async (sellerId: string): Promise<boolean | null> => {
 	try {
 		const { faststore } = Vtex.configs
 

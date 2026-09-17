@@ -1,4 +1,4 @@
-const baseOrder = {
+const baseOrder: Record<string, number> = {
 	PP: 1,
 	P: 2,
 	M: 3,
@@ -8,7 +8,7 @@ const baseOrder = {
 	EG: 7
 }
 
-function getOrder(size) {
+function getOrder(size: string | number): number {
 	const s = size.toString().trim().toUpperCase()
 
 	// Tamanhos padrão (PP, P, M, G, GG...)
@@ -38,7 +38,7 @@ function getOrder(size) {
 	return 9999 + s.charCodeAt(0)
 }
 
-export const sortSku = values => {
+export const sortSku = <T extends string | number>(values?: T[]): T[] | undefined => {
 	try {
 		return values?.sort((a, b) => getOrder(a) - getOrder(b))
 	} catch (e) {

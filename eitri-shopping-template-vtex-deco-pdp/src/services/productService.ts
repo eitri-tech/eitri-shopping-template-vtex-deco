@@ -1,29 +1,41 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import Eitri from 'eitri-bifrost'
+import type { VtexProduct } from '../types/vtex'
 
-export const getProductById = async productId => {
-	return Vtex.searchGraphql.product({
-		identifier: { field: 'id', value: productId }
-	})
+interface LastSeenEntry {
+	productId?: string
+	date: string
+	[key: string]: unknown
 }
 
-export const getProductBySlug = async slug => {
+// ProductInput.identifier is a list of fallback identifiers, not a single object — the
+// original calls sent a bare object, which doesn't match the GraphQL input type VTEX expects.
+// ProductInput also demands `slug`/`regionId`/`salesChannel` this app never set — same library
+// typing gap as ProductSearchInput/Facets (auto-generated from usage, not what these calls miss).
+export const getProductById = async (productId: string) => {
 	return Vtex.searchGraphql.product({
-		identifier: { field: 'slug', value: slug }
-	})
+		identifier: [{ field: 'id', value: productId }]
+	} as any)
 }
 
-export const getWhoSawAlsoSaw = async productId => {
+export const getProductBySlug = async (slug: string) => {
+	return Vtex.searchGraphql.product({
+		identifier: [{ field: 'slug', value: slug }]
+	} as any)
+}
+
+export const getWhoSawAlsoSaw = async (productId: string) => {
 	return Vtex.searchGraphql.productRecommendations({
 		identifier: { field: 'id', value: productId },
-		type: 'view'
+		type: 'view',
+		groupBy: 'PRODUCT'
 	})
 }
 
-export const markLastViewedProduct = async product => {
+export const markLastViewedProduct = async (product: VtexProduct): Promise<void> => {
 	const key = `last-seen-products`
 
-	const productHistory = await Eitri.sharedStorage.getItemJson(key)
+	const productHistory = (await Eitri.sharedStorage.getItemJson(key)) as LastSeenEntry[] | undefined
 
 	if (productHistory) {
 		const prevContentIndex = productHistory.findIndex(content => content.productId === product.productId)
@@ -42,14 +54,14 @@ export const markLastViewedProduct = async product => {
 	}
 }
 
-export const showTogether = async productId => {
+export const showTogether = async (productId: string) => {
 	return Vtex.catalog.showTogether(productId)
 }
 
-export const autocompleteSuggestions = async value => {
+export const autocompleteSuggestions = async (value: string) => {
 	return Vtex.catalog.autoCompleteSuggestions(value)
 }
 
-export const getProductByEan = async ean => {
-	return Vtex.searchGraphql.product({ identifier: { field: 'ean', value: ean } })
+export const getProductByEan = async (ean: string) => {
+	return Vtex.searchGraphql.product({ identifier: [{ field: 'ean', value: ean }] } as any)
 }

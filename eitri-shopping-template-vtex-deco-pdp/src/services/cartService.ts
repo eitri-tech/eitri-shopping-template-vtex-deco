@@ -1,6 +1,22 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 
-export const getCart = async () => {
+// The SDK's public addItem type only documents { item, salesChannel, quantity, seller } as
+// required, but its real destructuring also accepts { id, itemId, sellers } — which is what this
+// app actually passes (a raw SKU object + quantity, no explicit salesChannel/seller). Widening
+// the accepted shape here instead of reshaping the working call site.
+interface CartAddItemPayload {
+	id?: string
+	item?: unknown
+	itemId?: string
+	salesChannel?: string
+	quantity?: number
+	seller?: string
+	sellers?: unknown
+	[key: string]: unknown
+}
+const addItemToCartSdk = Vtex.cart.addItem as unknown as (payload: CartAddItemPayload) => Promise<unknown>
+
+export const getCart = async (): Promise<unknown> => {
 	try {
 		return await Vtex.cart.getCurrentOrCreateCart()
 	} catch (error) {
@@ -9,15 +25,15 @@ export const getCart = async () => {
 	}
 }
 
-export const addItemToCart = async item => {
+export const addItemToCart = async (item: CartAddItemPayload): Promise<unknown> => {
 	try {
-		return await Vtex.cart.addItem(item)
+		return await addItemToCartSdk(item)
 	} catch (error) {
 		console.error('Erro ao adicionar item ao carrinho', error)
 	}
 }
 
-export const removeCartItem = async index => {
+export const removeCartItem = async (index: number): Promise<unknown> => {
 	try {
 		return await Vtex.cart.removeItem(index)
 	} catch (error) {
@@ -25,10 +41,10 @@ export const removeCartItem = async index => {
 	}
 }
 
-export const saveCartIdOnStorage = async cartId => {
+export const saveCartIdOnStorage = async (cartId: string): Promise<unknown> => {
 	return Vtex.cart.saveCartIdOnStorage(cartId)
 }
 
-export const changeItemQuantity = async (index, newQuantity) => {
+export const changeItemQuantity = async (index: number, newQuantity: number): Promise<unknown> => {
 	return Vtex.cart.changeItemQuantity(index, newQuantity)
 }

@@ -1,6 +1,7 @@
 import Eitri from 'eitri-bifrost'
+import type { VtexCart, VtexProduct } from '../types/vtex'
 
-export const openCart = async cart => {
+export const openCart = async (cart?: VtexCart): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'cart',
@@ -11,7 +12,7 @@ export const openCart = async cart => {
 	}
 }
 
-export const openProduct = async product => {
+export const openProduct = async (product: VtexProduct): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'pdp',
