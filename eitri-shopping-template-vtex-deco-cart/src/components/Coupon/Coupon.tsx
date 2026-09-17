@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react'
 import { View, Text } from 'eitri-luminus'
 import { CustomInput, CustomButton, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 import { useLocalShoppingCart } from '../../providers/LocalCart'
 
-export default function Coupon(props) {
+export default function Coupon() {
 	const { cart, addCoupon, removeCoupon } = useLocalShoppingCart()
 
 	const [coupon, setCoupon] = useState('')
@@ -24,7 +25,7 @@ export default function Coupon(props) {
 			}
 		} else {
 			const errorMessage = cart?.messages || []
-			const couponError = coupon && errorMessage.find(message => message.text.includes(coupon))
+			const couponError = coupon && errorMessage.find(message => message.text?.includes(coupon))
 
 			if (couponError) {
 				if (couponError.code === 'couponNotFound') {
@@ -40,7 +41,7 @@ export default function Coupon(props) {
 		}
 	}, [cart])
 
-	const inputOnChange = value => {
+	const inputOnChange = (value: string) => {
 		setCoupon(value)
 	}
 

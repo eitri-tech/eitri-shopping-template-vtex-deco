@@ -1,11 +1,13 @@
 import { useTranslation } from 'eitri-i18n'
 import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { View, Text } from 'eitri-luminus'
-export default function InstallmentsMsg(props) {
+import type { VtexInstallmentOption } from '../../types/vtex'
+
+export default function InstallmentsMsg() {
 	const { cart } = useLocalShoppingCart()
 	const { t } = useTranslation()
 
-	const findMaxInstallments = installmentOptions => {
+	const findMaxInstallments = (installmentOptions?: VtexInstallmentOption[]): number => {
 		let maxInstallments = 0
 
 		installmentOptions?.forEach(option => {

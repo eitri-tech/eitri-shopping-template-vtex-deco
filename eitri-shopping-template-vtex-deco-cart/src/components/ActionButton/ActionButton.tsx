@@ -5,7 +5,7 @@ import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { navigateToCheckout } from '../../services/navigationService'
 import { hasReachedMinimumOrderValue } from '../../utils/minimumOrderValue'
 
-export default function ActionButton(props) {
+export default function ActionButton() {
 	const { cart } = useLocalShoppingCart()
 	const { t } = useTranslation()
 
@@ -15,7 +15,7 @@ export default function ActionButton(props) {
 		}
 	}
 
-	const isValidToProceed = () => {
+	const isValidToProceed = (): boolean => {
 		if (!cart) return false
 		if (!cart?.items) return false
 		if (cart?.items.length === 0) return false

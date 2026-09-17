@@ -1,6 +1,7 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
+import type { VtexAddress, VtexCart, VtexLogisticsInfo, VtexSla } from '../types/vtex'
 
-export const setLogisticInfo = async payload => {
+export const setLogisticInfo = async (payload: unknown) => {
 	try {
 		const newCart = await Vtex.checkout.setLogisticInfo(payload)
 
@@ -10,7 +11,7 @@ export const setLogisticInfo = async payload => {
 	}
 }
 
-export const setNewAddress = async (cart, zipCode) => {
+export const setNewAddress = async (cart: VtexCart, zipCode: string) => {
 	try {
 		const address = await Vtex.checkout.resolveZipCode(zipCode)
 
@@ -25,7 +26,7 @@ export const setNewAddress = async (cart, zipCode) => {
 	}
 }
 
-const generateLogisticInfoPayload = (addressId, shippingOptions) => {
+const generateLogisticInfoPayload = (addressId: string, shippingOptions?: VtexSla[]) => {
 	return shippingOptions?.map(option => {
 		return {
 			addressId,
@@ -36,7 +37,10 @@ const generateLogisticInfoPayload = (addressId, shippingOptions) => {
 	})
 }
 
-const generateSelectedAddressesPayload = (selectedAddresses, address) => {
+const generateSelectedAddressesPayload = (
+	selectedAddresses: VtexAddress[] | undefined,
+	address: VtexAddress
+): VtexAddress[] => {
 	const { street, neighborhood, city, state, country, geoCoordinates, postalCode } = address
 
 	if (selectedAddresses && selectedAddresses.length > 0) {
@@ -75,7 +79,7 @@ const generateSelectedAddressesPayload = (selectedAddresses, address) => {
 			neighborhood: neighborhood,
 			complement: null,
 			reference: null,
-			geoCoordinates: geoCoordinates.map(coord => coord),
+			geoCoordinates: geoCoordinates?.map(coord => coord),
 			addressQuery: ''
 		},
 		{
@@ -91,13 +95,13 @@ const generateSelectedAddressesPayload = (selectedAddresses, address) => {
 			neighborhood: neighborhood,
 			complement: null,
 			reference: null,
-			geoCoordinates: geoCoordinates.map(coord => coord),
+			geoCoordinates: geoCoordinates?.map(coord => coord),
 			addressQuery: ''
 		}
 	]
 }
 
-export const simulateCart = async (zipCode, cart) => {
+export const simulateCart = async (zipCode: string, cart: VtexCart) => {
 	if (!zipCode) {
 		return
 	}
@@ -120,17 +124,20 @@ export const simulateCart = async (zipCode, cart) => {
 			geoCoordinates
 		}
 
-		return await Vtex.cart.simulateCart(cartSimulationPayload)
+		// simulateCart requires a salesChannel second argument per its real signature; this
+		// function isn't currently called anywhere in the app, so no live value was available to
+		// pass — left undefined rather than fabricating a channel id.
+		return await Vtex.cart.simulateCart(cartSimulationPayload, undefined)
 	} catch (error) {
 		console.error('Error fetching freight', error)
 	}
 }
 
-export const resolveZipCode = async zipCode => {
+export const resolveZipCode = async (zipCode: string) => {
 	return await Vtex.checkout.resolveZipCode(zipCode)
 }
 
-export default async function fetchFreight(zipCode, currentSku) {
+export default async function fetchFreight(zipCode: string, currentSku: unknown) {
 	if (!zipCode) {
 		return
 	}

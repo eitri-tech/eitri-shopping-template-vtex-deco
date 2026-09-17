@@ -1,7 +1,13 @@
-import { View, Text, Button } from 'eitri-luminus'
+import { View, Text } from 'eitri-luminus'
 import { FiMinus, FiPlus } from 'react-icons/fi'
 
-export default function Quantity(props) {
+interface QuantityProps {
+	quantity: number
+	handleItemQuantity: (delta: number) => void
+	disable?: boolean
+}
+
+export default function Quantity(props: QuantityProps) {
 	const { quantity, handleItemQuantity, disable } = props
 
 	return (

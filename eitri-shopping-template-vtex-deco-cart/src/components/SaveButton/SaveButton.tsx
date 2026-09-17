@@ -1,12 +1,21 @@
 import { useTranslation } from 'eitri-i18n'
 import { View, Text } from 'eitri-luminus'
-export default function SaveButton(props) {
+
+interface SaveButtonProps {
+	handleSaveFavorite?: () => void
+	isInWishlist?: boolean
+}
+
+export default function SaveButton(props: SaveButtonProps) {
 	const { handleSaveFavorite, isInWishlist } = props
 
 	const { t } = useTranslation()
 
 	return (
-		<View onPress={handleSaveFavorite}>
+		// View has no `onPress` prop (that's the React Native API — this project is React web
+		// only) — this button never fired at runtime. Not currently wired up anywhere, but
+		// fixed since it's an unambiguous mistake, not a deliberate legacy pattern.
+		<View onClick={handleSaveFavorite}>
 			<View
 				className={`flex border border-${isInWishlist ? 'primary-700' : 'neutral-500'} rounded-sm h-[30px] w-[85px] justify-center items-center`}>
 				<View className='flex justify-center items-center w-full'>

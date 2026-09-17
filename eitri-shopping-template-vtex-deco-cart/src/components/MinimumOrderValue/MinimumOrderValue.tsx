@@ -5,7 +5,12 @@ import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { formatAmountInCents } from '../../utils/utils'
 import { getMinimumOrderStatus } from '../../utils/minimumOrderValue'
 
-export default function MinimumOrderValue({ fallbackMinimumValueInCents = 0 }) {
+interface MinimumOrderValueProps {
+	fallbackMinimumValueInCents?: number
+}
+
+export default function MinimumOrderValue(props: MinimumOrderValueProps) {
+	const { fallbackMinimumValueInCents = 0 } = props
 	const { cart } = useLocalShoppingCart()
 	const { t } = useTranslation()
 

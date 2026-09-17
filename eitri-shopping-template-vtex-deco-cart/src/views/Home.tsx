@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import Eitri from 'eitri-bifrost'
 import { useLocalShoppingCart } from '../providers/LocalCart'
 import { HeaderContentWrapper, HeaderReturn, HeaderText, Loading, TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
@@ -8,11 +9,11 @@ import CartSummary from '../components/CartSummary/CartSummary'
 import CartItemsContent from '../components/CartItemsContent/CartItemsContent'
 import ActionButton from '../components/ActionButton/ActionButton'
 import { startConfigure } from '../services/AppService'
-import { Page } from 'eitri-luminus'
+import { Page, View } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
 import MinimumOrderValue from '../components/MinimumOrderValue/MinimumOrderValue'
 
-export default function Home(props) {
+export default function Home() {
 	const { t } = useTranslation()
 	const { cart, startCart } = useLocalShoppingCart()
 
@@ -37,21 +38,23 @@ export default function Home(props) {
 	}, [cart])
 
 	const startHome = async () => {
-		const startParams = await Eitri.getInitializationInfos()
-		setOpenWithBottomBar(startParams?.tabIndex)
+		const startParams = (await Eitri.getInitializationInfos()) as { tabIndex?: boolean; orderFormId?: string }
+		setOpenWithBottomBar(!!startParams?.tabIndex)
 
 		await startConfigure()
 		const cart = await loadCart()
 
 		setAppIsLoading(false)
 		TrackingService.sendScreenView('Carrinho', 'HomeCart')
-		TrackingService.viewCartEvent(cart)
+		if (cart) {
+			TrackingService.viewCartEvent(cart)
+		}
 	}
 
 	const loadCart = async () => {
-		const startParams = await Eitri.getInitializationInfos()
+		const startParams = (await Eitri.getInitializationInfos()) as { orderFormId?: string }
 		if (startParams?.orderFormId) {
-			await saveCartIdOnStorage(startParams?.orderFormId)
+			await saveCartIdOnStorage(startParams.orderFormId)
 		}
 		return startCart()
 	}

@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import Eitri from 'eitri-bifrost'
-import { View, Text, Image } from 'eitri-luminus'
+import { View, Text, Page } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
 import {
 	HeaderContentWrapper,
@@ -11,8 +12,13 @@ import {
 } from 'eitri-shopping-template-vtex-deco-shared'
 import { IoBagOutline } from 'react-icons/io5'
 import { useLocalShoppingCart } from '../providers/LocalCart'
+import type { RouteProps } from '../types/route'
 
-export default function EmptyCart(props) {
+interface EmptyCartState {
+	openWithBottomBar?: boolean
+}
+
+export default function EmptyCart(props: RouteProps<EmptyCartState>) {
 	const openWithBottomBar = props?.location?.state?.openWithBottomBar
 
 	const { t } = useTranslation()
@@ -25,7 +31,7 @@ export default function EmptyCart(props) {
 	useEffect(() => {
 		Eitri.navigation.setOnResumeListener(async () => {
 			const cart = await startCart()
-			if (cart && cart.items?.length > 0) {
+			if (cart && (cart.items?.length ?? 0) > 0) {
 				Eitri.navigation.navigate({ path: 'Home', replace: true })
 			}
 		})

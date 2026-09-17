@@ -1,4 +1,5 @@
-import { View, Text, Image } from 'eitri-luminus'
+import { useEffect, useState } from 'react'
+import { View, Text, Image, Loading, Toggle } from 'eitri-luminus'
 import Quantity from '../Quantity/Quantity'
 import { HeaderWishList, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import { addToWishlist, checkWishlistItem, removeItemFromWishlist } from '../../services/customerService'
@@ -7,27 +8,40 @@ import { useTranslation } from 'eitri-i18n'
 import { formatAmountInCents } from '../../utils/utils'
 import { IoCloseSharp } from 'react-icons/io5'
 import { openProduct } from '../../services/navigationService'
+import type { VtexCartItem, VtexMessage } from '../../types/vtex'
 
-export default function CartItem(props) {
+interface CartItemProps {
+	item: VtexCartItem
+	onChangeQuantityItem: (newQuantity: number) => Promise<void>
+	message?: VtexMessage | null
+	handleRemoveCartItem: () => void
+	onAddOfferingToCart: (offeringId: string) => void
+	onRemoveOfferingFromCart: (offeringId: string) => void
+}
+
+export default function CartItem(props: CartItemProps) {
 	const { item, onChangeQuantityItem, message, handleRemoveCartItem, onAddOfferingToCart, onRemoveOfferingFromCart } =
 		props
 	const { t } = useTranslation()
 
-	const [wishlistId, setWishlistId] = useState('')
+	const [wishlistId, setWishlistId] = useState<string | boolean>('')
 	const [showModalRemoveItem, setShowModalRemoveItem] = useState(false)
 	const [modalRemoveItemText, setModalRemoveItemText] = useState('')
 	const [loadingItemQuantity, setLoadingItemQuantity] = useState(false)
 
-	const resizedImageUrl = item.imageUrl.replace(/\/(\d+)-\d+-\d+\//, '/$1-200-auto/')
+	// imageUrl can be missing on legacy cart items — fall back to empty rather than crashing
+	// the whole cart on a bare .replace() call.
+	const resizedImageUrl = (item.imageUrl ?? '').replace(/\/(\d+)-\d+-\d+\//, '/$1-200-auto/')
 
 	useEffect(() => {
 		checkWishlist()
 	}, [])
 
 	const checkWishlist = async () => {
+		if (!item.productId) return
 		const { inList, listId } = await checkWishlistItem(item.productId)
 		if (inList) {
-			setWishlistId(listId)
+			setWishlistId(listId ?? '')
 		}
 	}
 
@@ -35,20 +49,20 @@ export default function CartItem(props) {
 		const wishlistIdStatus = wishlistId
 
 		try {
-			if (wishlistId) {
+			if (wishlistId && typeof wishlistId === 'string') {
 				setWishlistId('')
 				await removeItemFromWishlist(wishlistId)
-			} else {
+			} else if (!wishlistId && item.productId) {
 				setWishlistId(true)
-				const result = await addToWishlist(item.productId, item.name, item.id)
-				setWishlistId(result?.data?.addToList)
+				const result = await addToWishlist(item.productId, item.name ?? '', item.id ?? '')
+				setWishlistId(result?.data?.addToList ?? '')
 			}
 		} catch (e) {
 			setWishlistId(wishlistIdStatus)
 		}
 	}
 
-	const handleQuantityOfItemsCart = async quantityToUpdate => {
+	const handleQuantityOfItemsCart = async (quantityToUpdate: number) => {
 		try {
 			setLoadingItemQuantity(true)
 			await onChangeQuantityItem(item.quantity + quantityToUpdate)
@@ -68,7 +82,7 @@ export default function CartItem(props) {
 		setShowModalRemoveItem(false)
 	}
 
-	const handleItemOffer = offeringId => {
+	const handleItemOffer = (offeringId: string) => {
 		if (offerIsBundled(offeringId)) {
 			onRemoveOfferingFromCart(offeringId)
 			return
@@ -76,7 +90,7 @@ export default function CartItem(props) {
 		onAddOfferingToCart(offeringId)
 	}
 
-	const offerIsBundled = offeringId => {
+	const offerIsBundled = (offeringId: string) => {
 		return item?.bundleItems?.some(o => o.id === offeringId)
 	}
 

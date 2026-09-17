@@ -1,10 +1,12 @@
+import { useEffect, useState } from 'react'
 import { View, Text } from 'eitri-luminus'
 import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 import { formatAmountInCents } from '../../utils/utils'
 import { useLocalShoppingCart } from '../../providers/LocalCart'
+import type { VtexTotalizer } from '../../types/vtex'
 
-export default function CartSummary(props) {
+export default function CartSummary() {
 	const { cart } = useLocalShoppingCart()
 
 	const [itemsValue, setItemsValue] = useState(0)
@@ -25,7 +27,10 @@ export default function CartSummary(props) {
 		setTotal(total)
 	}, [cart])
 
-	const getTotalizerById = (totalizers, id) => totalizers.find(item => item.id === id)
+	// cart.totalizers can be missing entirely — without the fallback this throws on any
+	// order form where VTEX hasn't populated totalizers yet.
+	const getTotalizerById = (totalizers: VtexTotalizer[] | undefined, id: string) =>
+		(totalizers ?? []).find(item => item.id === id)
 
 	if (total === 0) return null
 

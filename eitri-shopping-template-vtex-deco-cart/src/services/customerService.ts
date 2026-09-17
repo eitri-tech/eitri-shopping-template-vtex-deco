@@ -1,9 +1,12 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import Eitri from 'eitri-bifrost'
 
-let CheckLoginPromise = null
+interface WishlistCheckResult {
+	inList: boolean
+	listId?: string
+}
 
-export const checkWishlistItem = async productId => {
+export const checkWishlistItem = async (productId: string): Promise<WishlistCheckResult> => {
 	if (!(await isLoggedIn())) {
 		return { inList: false }
 	}
@@ -21,7 +24,7 @@ export const getPostalCodeOnStorage = async () => {
 	return await Vtex.customer.getCustomerData('postalCode')
 }
 
-export const requestLogin = () => {
+export const requestLogin = (): Promise<void> => {
 	return new Promise(async (resolve, reject) => {
 		if (await isLoggedIn()) {
 			resolve()
@@ -42,7 +45,7 @@ export const requestLogin = () => {
 	})
 }
 
-export const isLoggedIn = async () => {
+export const isLoggedIn = async (): Promise<boolean> => {
 	try {
 		return await Vtex.customer.isLoggedIn()
 	} catch (e) {
@@ -51,7 +54,7 @@ export const isLoggedIn = async () => {
 	}
 }
 
-export const productOnWishlist = async productId => {
+export const productOnWishlist = async (productId: string): Promise<WishlistCheckResult> => {
 	if (!(await isLoggedIn())) {
 		return { inList: false }
 	}
@@ -65,16 +68,16 @@ export const productOnWishlist = async productId => {
 	}
 }
 
-export const removeItemFromWishlist = async id => {
+export const removeItemFromWishlist = async (id: string) => {
 	return await Vtex.wishlist.removeItem(id)
 }
 
-export const addToWishlist = async (productId, title, sku) => {
+export const addToWishlist = async (productId: string, title: string, sku: string) => {
 	await requestLogin()
 	return await Vtex.wishlist.addItem(productId, title, sku)
 }
 
-export const savePostalCodeOnStorage = async postalCode => {
+export const savePostalCodeOnStorage = async (postalCode: string) => {
 	return await Vtex.customer.setCustomerData('postalCode', postalCode)
 }
 
