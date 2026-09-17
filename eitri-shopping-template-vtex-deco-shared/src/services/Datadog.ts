@@ -87,12 +87,19 @@ export default class Datadog {
 					version: window.__eitriAppConf?.version,
 					device,
 					method: method || '',
+					// Spread first, explicit fields last: object spread only copies OWN enumerable
+					// properties, so a non-standard error-like object could carry `message`/`name`
+					// on its prototype and drop them from `...error`. Putting the explicit reads
+					// last guarantees they're present regardless. (With the original field order —
+					// explicit fields first, `...error` last — TS's newer duplicate-key check
+					// correctly flags them as dead: for a real Error, `...error` here would just
+					// silently re-overwrite them with the same values anyway.)
 					error: error
 						? {
+								...error,
 								message: error?.message,
 								stack: error?.stack,
-								name: error?.name,
-								...error
+								name: error?.name
 							}
 						: null,
 					...data

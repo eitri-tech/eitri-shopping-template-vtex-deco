@@ -20,6 +20,7 @@ export { default as ProductCardFullImage } from './components/ProductCard/Produc
 export { default as GenericError } from './components/Error/GenericError'
 export { default as cartShippingResolver } from './utils/cartShippingResolver'
 export { default as shippingResolver } from './utils/shippingResolver'
+export type { ShippingResolverResult } from './utils/shippingResolver'
 export { default as productGroupShippingResolver } from './utils/productGroupShippingResolver'
 export { default as TrackingService } from './services/TrackingService'
 export { default as Datadog } from './services/Datadog'

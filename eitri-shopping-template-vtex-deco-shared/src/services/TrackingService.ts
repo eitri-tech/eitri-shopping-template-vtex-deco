@@ -3,6 +3,31 @@ import type { VtexCart, VtexCartItem, VtexProduct } from '../types/vtex'
 
 type GaCategoryMap = Record<string, string | undefined>
 
+/**
+ * `addPaymentInfoEvent` only reads `paymentData`, `totalizers`, `value`, and `items` off the
+ * cart — typing it against the full `VtexCart` forced every caller's cart (each app keeps its
+ * own, intentionally-duplicated `VtexCart` — see AGENTS.md) to structurally match this
+ * package's own `VtexCart` exactly, including fields this function never touches
+ * (shippingData/address). A minimal shape lets any app's cart satisfy it without that coupling.
+ */
+interface PaymentInfoCart {
+	paymentData?: {
+		payments?: Array<{ paymentSystem?: string; [key: string]: unknown }>
+		paymentSystems?: Array<{ stringId?: string; name?: string; [key: string]: unknown }>
+		[key: string]: unknown
+	}
+	totalizers?: Array<{ id?: string; value?: number; [key: string]: unknown }>
+	value?: number
+	items: Array<{
+		productId?: string
+		name?: string
+		productName?: string
+		nameComplete?: string
+		price?: number
+		[key: string]: unknown
+	}>
+}
+
 export default class TrackingService {
 	static _logInTerminal = (...args: unknown[]): void => {
 		const TURNED_ON = false
@@ -112,7 +137,7 @@ export default class TrackingService {
 	 * Registra quando o usuário envia dados de pagamento no checkout.
 	 * Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/events?client_type=gtag#add_payment_info
 	 */
-	static addPaymentInfoEvent = async (cart: VtexCart, paymentType?: string): Promise<void> => {
+	static addPaymentInfoEvent = async (cart: PaymentInfoCart, paymentType?: string): Promise<void> => {
 		try {
 			if (!paymentType) {
 				const paymentId = cart.paymentData?.payments?.[0]?.paymentSystem

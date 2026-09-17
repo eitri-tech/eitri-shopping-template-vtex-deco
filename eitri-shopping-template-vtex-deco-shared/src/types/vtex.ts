@@ -2,7 +2,9 @@ export interface VtexAddress {
 	addressId?: string
 	addressType?: string
 	street?: string
-	number?: string
+	// VTEX returns `null` (not just absent) for addresses with no street number — every consumer
+	// in this codebase already checks for it explicitly (`number === null ? 's/n' : ...`).
+	number?: string | null
 	neighborhood?: string
 	city?: string
 	state?: string
