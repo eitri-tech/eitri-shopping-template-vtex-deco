@@ -15,12 +15,24 @@ export interface VtexAddress {
 }
 
 export interface VtexLogisticsInfo {
+	itemIndex?: number
 	selectedDeliveryChannel?: string
+	deliveryCompany?: string
+	shippingEstimateDate?: string
+	[key: string]: unknown
+}
+
+export interface VtexPackageItem {
+	itemIndex?: number
+	quantity?: number
+	price?: number
 	[key: string]: unknown
 }
 
 export interface VtexPackage {
-	courierStatus?: { finished?: boolean; [key: string]: unknown }
+	trackingUrl?: string
+	items?: VtexPackageItem[]
+	courierStatus?: { finished?: boolean; deliveredDate?: string; [key: string]: unknown }
 	[key: string]: unknown
 }
 
@@ -36,7 +48,18 @@ export interface VtexOrder {
 	shippingData?: { logisticsInfo?: VtexLogisticsInfo[]; address?: VtexAddress; [key: string]: unknown }
 	packageAttachment?: { packages?: VtexPackage[]; [key: string]: unknown }
 	totalizers?: Array<{ id: string; name?: string; value: number }>
-	paymentData?: unknown
+	totals?: Array<{ id?: string; name?: string; value?: number; [key: string]: unknown }>
+	paymentData?: { transactions?: Array<{ payments?: VtexOrderPayment[]; [key: string]: unknown }>; [key: string]: unknown }
+	allowCancellation?: boolean
+	[key: string]: unknown
+}
+
+export interface VtexOrderPayment {
+	paymentSystem?: string
+	paymentSystemName?: string
+	value?: number
+	installments?: number
+	url?: string
 	[key: string]: unknown
 }
 
@@ -69,6 +92,7 @@ export interface VtexFrequency {
 }
 
 export interface VtexSubscriptionItem {
+	id?: string
 	skuId?: string
 	quantity?: number
 	[key: string]: unknown
@@ -89,6 +113,11 @@ export interface VtexSubscription {
 	plan?: { id?: string; frequency?: VtexFrequency; [key: string]: unknown }
 	items?: VtexSubscriptionItem[]
 	nextPurchaseDate?: string
+	purchaseSettings?: {
+		paymentMethod?: { paymentAccountId?: string; paymentSystem?: string; paymentSystemName?: string; [key: string]: unknown }
+		[key: string]: unknown
+	}
+	shippingAddress?: { addressId?: string; addressType?: string; [key: string]: unknown }
 	[key: string]: unknown
 }
 
@@ -169,6 +198,9 @@ export interface VtexCustomerProfile {
 export interface VtexSavedCard {
 	id?: string
 	cardNumber?: string
+	paymentSystem?: string
+	paymentSystemName?: string
+	isExpired?: boolean
 	bin?: string
 	accountId?: string
 	[key: string]: unknown
