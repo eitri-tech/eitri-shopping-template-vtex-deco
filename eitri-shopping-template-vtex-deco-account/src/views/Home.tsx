@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { Page, View, Text, Image } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import { RemoteConfig } from 'eitri-shopping-vtex-shared'
 import { CustomButton, HeaderText, HeaderContentWrapper, BottomInset, Loading } from 'eitri-shopping-template-vtex-deco-shared'
@@ -13,15 +15,22 @@ import LoginCard from '../components/LoginCard/LoginCard'
 import InfoCard from '../components/InfoCard/InfoCard'
 import logoBrazilianEngineering from '../assets/images/BrazilianEngineering-Logo.png'
 import AppVersion from '../components/AppVersion/AppVersion'
+import type { VtexCustomerProfile } from '../types/vtex'
 
-export default function Home(props) {
+interface InitializationInfos {
+	action?: string
+	route?: string
+	[key: string]: unknown
+}
+
+export default function Home() {
 	const PAGE = 'Minha conta'
 
 	const { t } = useTranslation()
 
 	const [isLoading, setIsLoading] = useState(true)
-	const [customerData, setCustomerData] = useState(props.customerData || {})
-	const [isLogged, setIsLogged] = useState(null)
+	const [customerData, setCustomerData] = useState<VtexCustomerProfile>({})
+	const [isLogged, setIsLogged] = useState<boolean | null>(null)
 
 	const subscriptionConfig = RemoteConfig.getContent('appConfigs.pdp.subscription')
 
@@ -36,7 +45,7 @@ export default function Home(props) {
 	const init = async () => {
 		await startConfigure()
 
-		const startParams = await Eitri.getInitializationInfos()
+		const startParams = (await Eitri.getInitializationInfos()) as InitializationInfos | undefined
 
 		if (startParams?.action === 'RequestLogin') {
 			navigate(PAGES.SIGNIN, { closeAppAfterLogin: true }, true)
@@ -51,26 +60,26 @@ export default function Home(props) {
 			}
 		}
 
-		const isLogged = await isLoggedIn()
+		const logged = await isLoggedIn()
 
-		if (isLogged) {
+		if (logged) {
 			await loadMe()
 		} else {
 			doLogout()
 		}
 
-		setIsLogged(isLogged)
+		setIsLogged(logged)
 		setIsLoading(false)
 
 		sendScreenView('Minha conta', 'HomeAccount')
 	}
 
 	const loadMe = async () => {
-		const customerData = await getCustomerData()
-		if (!customerData) {
+		const data = await getCustomerData()
+		if (!data) {
 			return
 		}
-		setCustomerData(customerData)
+		setCustomerData(data)
 	}
 
 	const _doLogout = async () => {
@@ -80,9 +89,9 @@ export default function Home(props) {
 		init()
 	}
 
-	const processDeepLink = startParams => {
+	const processDeepLink = (startParams: InitializationInfos) => {
 		if (startParams?.route) {
-			let { route, ...rest } = startParams
+			const { route, ...rest } = startParams
 			return {
 				path: route,
 				state: rest,
@@ -158,7 +167,7 @@ export default function Home(props) {
 							onClick={() =>
 								navigate(PAGES.CHANGE_PASSWORD, {
 									email: customerData.email,
-									passwordLastUpdate: customerData.passwordLastUpdate ?? null
+									passwordLastUpdate: (customerData.passwordLastUpdate as string | null | undefined) ?? null
 								})
 							}
 						/>

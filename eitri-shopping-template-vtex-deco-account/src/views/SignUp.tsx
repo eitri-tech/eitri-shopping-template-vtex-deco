@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
+import { Page, View, Text } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import {
 	CustomButton,
@@ -10,13 +13,18 @@ import {
 } from 'eitri-shopping-template-vtex-deco-shared'
 import userIcon from '../assets/icons/user.svg'
 import { sendScreenView } from '../services/TrackingService'
-import { getCustomerData, getSavedUser, loginWithEmailAndKey, sendAccessKeyByEmail } from '../services/CustomerService'
+import { getSavedUser, loginWithEmailAndKey, sendAccessKeyByEmail } from '../services/CustomerService'
 import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import Alert from '../components/Alert/Alert'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 
-export default function SignUp(props) {
+interface SavedUser {
+	email?: string
+	[key: string]: unknown
+}
+
+export default function SignUp() {
 	const [email, setEmail] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [showLoginErrorAlert, setShowLoginErrorAlert] = useState(false)
@@ -33,7 +41,7 @@ export default function SignUp(props) {
 
 	useEffect(() => {
 		const loadSavedUser = async () => {
-			const user = await getSavedUser()
+			const user = (await getSavedUser()) as SavedUser | undefined
 			if (user && user.email) {
 				setEmail(user.email)
 			}
@@ -81,7 +89,7 @@ export default function SignUp(props) {
 				setShowLoginErrorAlert(true)
 			}
 		} catch (e) {
-			const status = e?.response?.status || 400
+			const status = (e as { response?: { status?: number } })?.response?.status || 400
 			if (status >= 500) {
 				setAlertMessage(t('signUp.alertMessageServiceError'))
 			} else {
@@ -94,7 +102,9 @@ export default function SignUp(props) {
 	}
 
 	return (
-		<Page title='Cadastro' topInset>
+		<Page
+			title='Cadastro'
+			topInset>
 			<Loading
 				isLoading={loading}
 				fullScreen={true}
@@ -109,14 +119,13 @@ export default function SignUp(props) {
 				<GenericBox>
 					<Text className='text-xl font-bold'>{t('signUp.lbEmailAccess')}</Text>
 
-					{/* Container do formulário com espaçamento vertical consistente */}
 					<View className='mt-4 flex flex-col gap-y-4'>
 						<CustomInput
 							icon={userIcon}
 							value={email}
 							type='email'
 							placeholder='Email'
-							onChange={e => setEmail(e.target.value)}
+							onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
 							showClearInput={false}
 							required={true}
 						/>
@@ -128,7 +137,7 @@ export default function SignUp(props) {
 									placeholder={t('signUp.lbVerifyCode')}
 									inputMode='numeric'
 									value={verificationCode}
-									onChange={e => setVerificationCode(e.target.value)}
+									onChange={(e: ChangeEvent<HTMLInputElement>) => setVerificationCode(e.target.value)}
 									height='45px'
 								/>
 
@@ -155,7 +164,7 @@ export default function SignUp(props) {
 						<CustomButton
 							variant='outlined'
 							label={t('signUp.lbBack')}
-							onPress={() => Eitri.navigation.back()}
+							onPress={() => Eitri.navigation.back(1)}
 						/>
 					</View>
 				</GenericBox>

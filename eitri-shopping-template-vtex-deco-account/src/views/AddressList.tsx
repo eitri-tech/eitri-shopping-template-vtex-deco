@@ -1,34 +1,26 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { View, Text } from 'eitri-luminus'
 import ProtectedView from '../components/ProtectedView/ProtectedView'
-import {
-	HeaderContentWrapper,
-	HeaderReturn,
-	HeaderText,
-	Loading,
-	BottomInset,
-	GenericBox,
-	CustomButton
-} from 'eitri-shopping-template-vtex-deco-shared'
+import { HeaderContentWrapper, HeaderReturn, HeaderText, Loading, BottomInset, GenericBox, CustomButton } from 'eitri-shopping-template-vtex-deco-shared'
 import { sendScreenView } from '../services/TrackingService'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { deleteAddress, getAddresses } from '../services/AddressService'
 import { navigate, PAGES } from '../services/NavigationService'
 import ModalConfirm from '../components/ModalConfirm/ModalConfirm'
 import { useTranslation } from 'eitri-i18n'
+import type { VtexAddress } from '../types/vtex'
 
-// Componente de Card de Endereço
-const AddressCard = ({ address, onEdit, onDelete }) => {
+interface AddressCardProps {
+	address: VtexAddress
+	onEdit: (address: VtexAddress) => void
+	onDelete: (address: VtexAddress) => void
+}
+
+const AddressCard = (props: AddressCardProps) => {
+	const { address, onEdit, onDelete } = props
 	const { t } = useTranslation()
 	return (
 		<GenericBox className='p-4 mb-4'>
-			{/*<View className="flex justify-between items-start mb-3">*/}
-			{/*	<View>*/}
-			{/*		<Text className="text-sm text-gray-500 block">*/}
-			{/*			{address.addressType === 'residential' ? 'Residencial' : 'Comercial'}*/}
-			{/*		</Text>*/}
-			{/*	</View>*/}
-			{/*</View>*/}
-
 			<View className='space-y-2'>
 				<View>
 					<Text className='text-gray-700 block'>
@@ -44,12 +36,18 @@ const AddressCard = ({ address, onEdit, onDelete }) => {
 				</View>
 
 				<View>
-					<Text className='text-gray-600 block'>{t('addressList.postalCode')}{address.postalCode}</Text>
+					<Text className='text-gray-600 block'>
+						{t('addressList.postalCode')}
+						{address.postalCode}
+					</Text>
 				</View>
 
 				{address.receiverName && (
 					<View>
-						<Text className='text-gray-600 block'>{t('addressList.recipient')}{address.receiverName}</Text>
+						<Text className='text-gray-600 block'>
+							{t('addressList.recipient')}
+							{address.receiverName}
+						</Text>
 					</View>
 				)}
 
@@ -71,15 +69,14 @@ const AddressCard = ({ address, onEdit, onDelete }) => {
 	)
 }
 
-// Componente Principal
-export default function AddressList(props) {
+export default function AddressList() {
 	const { t } = useTranslation()
-	const [addresses, setAddresses] = useState([])
+	const [addresses, setAddresses] = useState<VtexAddress[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 
 	const [showModalDelete, setShowModalDelete] = useState(false)
 
-	const removingItem = useRef(null)
+	const removingItem = useRef<VtexAddress | null>(null)
 
 	useEffect(() => {
 		addonUserTappedActiveTabListener()
@@ -99,11 +96,11 @@ export default function AddressList(props) {
 		setIsLoading(false)
 	}
 
-	const handleEdit = address => {
+	const handleEdit = (address: VtexAddress) => {
 		navigate(PAGES.ADDRESS_FORM, { address })
 	}
 
-	const handleDelete = address => {
+	const handleDelete = (address: VtexAddress) => {
 		setShowModalDelete(true)
 		removingItem.current = address
 	}
@@ -111,10 +108,13 @@ export default function AddressList(props) {
 	const confirmDelete = () => {
 		if (removingItem.current) {
 			setShowModalDelete(false)
-			const newAddresses = addresses.filter(address => address.addressId !== removingItem.current.addressId)
-			deleteAddress(removingItem.current.addressId).then(res => {
-				removingItem.current = null
-			})
+			const newAddresses = addresses.filter(address => address.addressId !== removingItem.current?.addressId)
+			const addressId = removingItem.current.addressId
+			if (addressId) {
+				deleteAddress(addressId).then(() => {
+					removingItem.current = null
+				})
+			}
 			setAddresses(newAddresses)
 		}
 	}
@@ -138,7 +138,6 @@ export default function AddressList(props) {
 
 				{!isLoading && (
 					<View className='p-4'>
-						{/* Lista de Endereços */}
 						{addresses.length === 0 ? (
 							<View className='text-center py-12'>
 								<Text className='text-gray-500 text-lg block'>{t('addressList.empty')}</Text>
