@@ -1,6 +1,15 @@
 import React, { forwardRef, useEffect, useImperativeHandle } from 'react'
 
-const Recaptcha = forwardRef((props, ref) => {
+interface RecaptchaProps {
+	onRecaptchaReady?: () => void
+	siteKey?: string
+}
+
+export interface RecaptchaHandle {
+	getRecaptchaToken: () => Promise<string | undefined>
+}
+
+const Recaptcha = forwardRef<RecaptchaHandle, RecaptchaProps>((props, ref) => {
 	const { onRecaptchaReady, siteKey } = props
 
 	useEffect(() => {
@@ -18,16 +27,18 @@ const Recaptcha = forwardRef((props, ref) => {
 		}
 	}
 
-	const waitForElement = selector => {
+	const waitForElement = (selector: string): Promise<Element> => {
 		return new Promise(resolve => {
-			if (document.querySelector(selector)) {
-				return resolve(document.querySelector(selector))
+			const existing = document.querySelector(selector)
+			if (existing) {
+				return resolve(existing)
 			}
 
 			const observer = new MutationObserver(mutations => {
-				if (document.querySelector(selector)) {
+				const found = document.querySelector(selector)
+				if (found) {
 					observer.disconnect()
-					resolve(document.querySelector(selector))
+					resolve(found)
 				}
 			})
 
@@ -46,6 +57,7 @@ const Recaptcha = forwardRef((props, ref) => {
 					return token
 				} catch (e) {
 					console.error(e)
+					return undefined
 				}
 			}
 		}

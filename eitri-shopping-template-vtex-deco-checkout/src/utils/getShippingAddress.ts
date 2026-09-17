@@ -1,11 +1,18 @@
-export const getShippingAddress = cart => {
+import type { VtexAddress, VtexCart } from '../types/vtex'
+
+interface ResolvedAddress extends VtexAddress {
+	formattedAddress: string
+	isPickUp: boolean
+}
+
+export const getShippingAddress = (cart: VtexCart): ResolvedAddress | null => {
 	// Pega o primeiro, todos entregam no mesmo lugar
 	const firstLogisticInfo = cart?.shippingData?.logisticsInfo?.[0]
 
 	if (!firstLogisticInfo) return null
 
 	const isPickup = firstLogisticInfo.selectedDeliveryChannel === 'pickup-in-point'
-	const selectedSla = firstLogisticInfo.slas.find(sla => sla.id === firstLogisticInfo.selectedSla)
+	const selectedSla = (firstLogisticInfo.slas ?? []).find(sla => sla.id === firstLogisticInfo.selectedSla)
 
 	if (isPickup) {
 		const pickupAddress = selectedSla?.pickupStoreInfo?.address

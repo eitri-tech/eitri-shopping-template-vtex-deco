@@ -1,4 +1,4 @@
-export const verifySocialNumber = socialNumberImp => {
+export const verifySocialNumber = (socialNumberImp?: string): boolean => {
 	const socialNumber = socialNumberImp?.replace(/\D/g, '')
 
 	if (!socialNumber || socialNumber?.length !== 11 || socialNumber.match(/(\d)\1{10}/)) return false

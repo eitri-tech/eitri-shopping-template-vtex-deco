@@ -1,11 +1,11 @@
 import Eitri from 'eitri-bifrost'
 import { Vtex } from 'eitri-shopping-vtex-shared'
 
-export const isLoggedIn = async () => {
+export const isLoggedIn = async (): Promise<boolean> => {
 	return Vtex.customer.isLoggedIn()
 }
 
-export const requestLogin = () => {
+export const requestLogin = (): Promise<void> => {
 	return new Promise((resolve, reject) => {
 		Eitri.nativeNavigation.open({
 			slug: 'account',
@@ -21,15 +21,15 @@ export const requestLogin = () => {
 	})
 }
 
-export const closeEitriApp = () => {
+export const closeEitriApp = (): void => {
 	Eitri.navigation.close()
 }
 
-export const goHome = () => {
+export const goHome = (): void => {
 	Eitri.exposedApis.appState.goHome()
 }
 
-export const openAccount = async () => {
+export const openAccount = async (): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'account',
@@ -41,7 +41,7 @@ export const openAccount = async () => {
 	}
 }
 
-export const openCart = async () => {
+export const openCart = async (): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'cart',
@@ -52,10 +52,11 @@ export const openCart = async () => {
 	}
 }
 
-export const navigate = (path, state = {}, replace = false) => {
+export const navigate = (path: string, state: Record<string, unknown> = {}, replace = false): void => {
 	Eitri.navigation.navigate({ path, state, replace })
 }
 
-export const navigateBack = () => {
-	Eitri.navigation.back()
+export const navigateBack = (): void => {
+	// .d.ts declares `steps` as required despite the JSDoc/example showing a zero-arg call.
+	Eitri.navigation.back(1)
 }

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react'
+import type { ReactNode } from 'react'
 import {
 	addItem,
 	addUserData,
@@ -10,19 +11,49 @@ import {
 	updateOpenTextField
 } from '../services/cartService'
 import setFreight, { setLogisticInfo, setNewAddress, setShippingAddress } from '../services/freigthService'
+import type { VtexCart } from '../types/vtex'
 
-const LocalCart = createContext({})
+interface CartContextValue {
+	cart?: VtexCart | null
+	setCart?: (cart: VtexCart | null) => void
+	addPersonalData?: (userData: unknown, orderFormId?: unknown) => Promise<VtexCart>
+	startCart?: () => Promise<VtexCart>
+	setFreight?: (option: unknown) => Promise<VtexCart>
+	setNewAddress?: (address: unknown) => Promise<VtexCart | undefined>
+	addCustomerData?: (userData: unknown, orderFormId?: unknown) => Promise<VtexCart>
+	selectPaymentOption?: (payload: unknown) => Promise<VtexCart>
+	setShippingAddress?: (payload: unknown) => Promise<VtexCart>
+	removeClientData?: (payload?: unknown) => Promise<VtexCart>
+	setLogisticInfo?: (payload: unknown) => Promise<VtexCart>
+	removeCartItem?: (index: number) => Promise<VtexCart>
+	setPaymentOption?: (payload: unknown) => Promise<VtexCart>
+	updateOpenTextField?: (receiver: unknown) => Promise<unknown>
+	generateNewCart?: () => Promise<VtexCart>
+	addItem?: (payload: unknown) => Promise<void>
+	selectedPaymentData?: unknown
+	setSelectedPaymentData?: (data: unknown) => void
+	cartIsLoading?: boolean | null
+	cardInfo?: unknown
+	setCardInfo?: (info: unknown) => void
+}
 
-export default function CartProvider({ children }) {
-	const [cart, setCart] = useState(null)
-	const [cartIsLoading, setCartIsLoading] = useState(null)
-	const [selectedPaymentData, setSelectedPaymentData] = useState()
-	const [cardInfo, setCardInfo] = useState()
+const LocalCart = createContext<CartContextValue>({})
 
-	const executeCartOperation = async (operation, ...args) => {
+interface CartProviderProps {
+	children?: ReactNode
+}
+
+export default function CartProvider(props: CartProviderProps) {
+	const { children } = props
+	const [cart, setCart] = useState<VtexCart | null>(null)
+	const [cartIsLoading, setCartIsLoading] = useState<boolean | null>(null)
+	const [selectedPaymentData, setSelectedPaymentData] = useState<unknown>()
+	const [cardInfo, setCardInfo] = useState<unknown>()
+
+	const executeCartOperation = async <T,>(operation: (...args: any[]) => Promise<T>, ...args: any[]): Promise<T> => {
 		setCartIsLoading(true)
 		const newCart = await operation(...args)
-		setCart(newCart)
+		setCart(newCart as unknown as VtexCart)
 		setCartIsLoading(false)
 		return newCart
 	}
@@ -35,28 +66,28 @@ export default function CartProvider({ children }) {
 		return executeCartOperation(generateNewCart)
 	}
 
-	const _addItem = async payload => {
+	const _addItem = async (payload: unknown) => {
 		return executeCartOperation(addItem, payload)
 	}
 
-	const addPersonalData = async (userData, orderFormId) => {
+	const addPersonalData = async (userData: unknown, orderFormId?: unknown) => {
 		return executeCartOperation(addUserData, userData, orderFormId)
 	}
 
-	const _setFreight = async option => {
+	const _setFreight = async (option: unknown) => {
 		return executeCartOperation(setFreight, option)
 	}
 
-	const _setNewAddress = async address => {
+	const _setNewAddress = async (address: unknown) => {
 		return executeCartOperation(setNewAddress, address)
 	}
 
-	const addCustomerData = async (userData, orderFormId) => {
+	const addCustomerData = async (userData: unknown, orderFormId?: unknown) => {
 		return executeCartOperation(addUserData, userData, orderFormId)
 	}
 
-	const _selectPaymentOption = async payload => {
-		if (cart?.paymentData?.giftCards?.length > 0) {
+	const _selectPaymentOption = async (payload: unknown) => {
+		if ((cart?.paymentData?.giftCards?.length ?? 0) > 0) {
 			await selectPaymentOption({
 				payments: [],
 				giftCards: []
@@ -65,27 +96,27 @@ export default function CartProvider({ children }) {
 		return executeCartOperation(selectPaymentOption, payload)
 	}
 
-	const _setShippingAddress = async payload => {
+	const _setShippingAddress = async (payload: unknown) => {
 		return executeCartOperation(setShippingAddress, payload)
 	}
 
-	const _removeClientData = async payload => {
+	const _removeClientData = async (payload?: unknown) => {
 		return executeCartOperation(removeClientData, payload)
 	}
 
-	const _setLogisticInfo = async payload => {
+	const _setLogisticInfo = async (payload: unknown) => {
 		return executeCartOperation(setLogisticInfo, payload)
 	}
 
-	const _removeCartItem = async index => {
+	const _removeCartItem = async (index: number) => {
 		return executeCartOperation(removeItemFromCart, index)
 	}
 
-	const setPaymentOption = async payload => {
+	const setPaymentOption = async (payload: unknown) => {
 		return executeCartOperation(selectPaymentOption, payload)
 	}
 
-	const _updateOpenTextField = async (receiver) => {
+	const _updateOpenTextField = async (receiver: unknown) => {
 		return executeCartOperation(updateOpenTextField, cart, receiver)
 	}
 

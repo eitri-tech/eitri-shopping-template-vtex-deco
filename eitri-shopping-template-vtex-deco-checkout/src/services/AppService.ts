@@ -1,7 +1,7 @@
 import Eitri from 'eitri-bifrost'
 import { App } from 'eitri-shopping-vtex-shared'
 
-export const startConfigure = async () => {
+export const startConfigure = async (): Promise<void> => {
 	await App.tryAutoConfigure({
 		// providerInfo: {
 		// 	account: 'eitripartnerbr',
@@ -15,6 +15,9 @@ export const startConfigure = async () => {
 	})
 }
 
-export const autoTriggerGAEvents = () => {
-	return App?.configs?.appConfigs?.autoTriggerGAEvents ?? true
+export const autoTriggerGAEvents = (): boolean => {
+	// eitri-shopping-vtex-shared's own .d.ts only declares { verbose, gaVerbose } for App.configs,
+	// tighter than its real runtime shape (which carries the merged appConfigs too).
+	const configs = App?.configs as { appConfigs?: { autoTriggerGAEvents?: boolean } } | undefined
+	return configs?.appConfigs?.autoTriggerGAEvents ?? true
 }

@@ -1,15 +1,28 @@
+import { createContext, useContext, useState } from 'react'
+import type { ReactNode } from 'react'
 import { View } from 'eitri-luminus'
 import { FiTrash2, FiCheck, FiX } from 'react-icons/fi'
 
-const SnackBar = createContext({})
+type SnackBarType = 'success' | 'trash'
 
-export default function SnackBarComponent({ children }) {
+interface SnackBarContextValue {
+	showSnackBar?: (type: SnackBarType, message: ReactNode) => void
+}
+
+const SnackBar = createContext<SnackBarContextValue>({})
+
+interface SnackBarComponentProps {
+	children?: ReactNode
+}
+
+export default function SnackBarComponent(props: SnackBarComponentProps) {
+	const { children } = props
 	const [showSnackbar, setShowSnackbar] = useState(false)
 	const [isVisible, setIsVisible] = useState(false)
-	const [currentType, setCurrentType] = useState(null)
-	const [message, setMessage] = useState(null)
+	const [currentType, setCurrentType] = useState<{ color: string; icon: typeof FiCheck } | null>(null)
+	const [message, setMessage] = useState<ReactNode>(null)
 
-	const TYPES = {
+	const TYPES: Record<SnackBarType, { color: string; icon: typeof FiCheck }> = {
 		success: {
 			color: 'success-500',
 			icon: FiCheck
@@ -20,7 +33,7 @@ export default function SnackBarComponent({ children }) {
 		}
 	}
 
-	const showSnackBar = (type, inputMessage) => {
+	const showSnackBar = (type: SnackBarType, inputMessage: ReactNode) => {
 		const _type = TYPES[type]
 		if (!_type) return
 

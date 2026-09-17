@@ -1,10 +1,31 @@
 import { formatAmountInCents } from './utils'
+import type { VtexCart, VtexPaymentSystem } from '../types/vtex'
 
-export const getPaymentSystem = cart => {
+interface ResolvedInstallment {
+	count?: number
+	value?: number
+	total?: number
+	label: string
+	formattedValue: string
+	[key: string]: unknown
+}
+
+interface ResolvedPaymentSystem extends VtexPaymentSystem {
+	isCurrentPaymentSystem?: boolean
+	installments?: ResolvedInstallment[]
+}
+
+interface PaymentSystemGroup {
+	groupName?: string
+	isCurrentPaymentSystemGroup?: boolean
+	paymentSystems: ResolvedPaymentSystem[]
+}
+
+export const getPaymentSystem = (cart: VtexCart): PaymentSystemGroup[] | undefined => {
 	if (!cart?.paymentData) return
-	const paymentData = JSON.parse(JSON.stringify(cart?.paymentData))
+	const paymentData = JSON.parse(JSON.stringify(cart?.paymentData)) as VtexCart['paymentData']
 
-	return paymentData?.paymentSystems?.reduce((acc, paymentSystem) => {
+	return paymentData?.paymentSystems?.reduce<PaymentSystemGroup[]>((acc, paymentSystem) => {
 		const group = acc?.find(group => group.groupName === paymentSystem.groupName)
 
 		const installments = paymentData.installmentOptions?.find(
@@ -15,10 +36,10 @@ export const getPaymentSystem = cart => {
 			payment => payment.paymentSystem === paymentSystem.stringId
 		)
 
-		const paymentSystemObject = {
+		const paymentSystemObject: ResolvedPaymentSystem = {
 			...paymentSystem,
 			isCurrentPaymentSystem: currentPaymentSystem,
-			installments: installments?.installments.map(installment => ({
+			installments: (installments?.installments ?? []).map(installment => ({
 				...installment,
 				label: `${installment.count}x de ${formatAmountInCents(
 					installment.value
@@ -29,7 +50,8 @@ export const getPaymentSystem = cart => {
 
 		if (group) {
 			group.isCurrentPaymentSystemGroup =
-				paymentSystemObject.isCurrentPaymentSystem || group.paymentSystems.some(ps => ps.isCurrentPaymentSystem)
+				paymentSystemObject.isCurrentPaymentSystem ||
+				group.paymentSystems.some(ps => ps.isCurrentPaymentSystem)
 			group.paymentSystems.push({
 				...paymentSystemObject
 			})

@@ -1,17 +1,20 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
+import Eitri from 'eitri-bifrost'
 
-export const getCustomerData = async () => {
+export const getCustomerData = async (): Promise<unknown | null> => {
 	try {
 		const isLogged = await Vtex.customer.isLoggedIn()
 		if (!isLogged) return null
-		const result = await Vtex.customer.getCustomerProfile()
+		// Vtex.customer.getCustomerProfile's `_token` param is typed required (its underscore
+		// prefix suggests it's actually unused internally) — the existing call never passed one.
+		const result = await Vtex.customer.getCustomerProfile(undefined)
 		return result?.data?.profile
 	} catch (e) {
 		return null
 	}
 }
 
-export const requestLogin = () => {
+export const requestLogin = (): Promise<void> => {
 	return new Promise(async (resolve, reject) => {
 		if (await isLoggedIn()) {
 			resolve()
@@ -33,7 +36,7 @@ export const requestLogin = () => {
 	})
 }
 
-export const isLoggedIn = async () => {
+export const isLoggedIn = async (): Promise<boolean> => {
 	try {
 		return await Vtex.customer.isLoggedIn()
 	} catch (e) {
@@ -42,10 +45,10 @@ export const isLoggedIn = async () => {
 	}
 }
 
-export async function sendAccessKeyByEmail(email) {
+export async function sendAccessKeyByEmail(email: string): Promise<unknown> {
 	return await Vtex.customer.sendAccessKeyByEmail(email)
 }
 
-export async function loginWithEmailAndKey(email, verificationCode) {
+export async function loginWithEmailAndKey(email: string, verificationCode: string): Promise<unknown> {
 	return await Vtex.customer.loginWithEmailAndAccessKey(email, verificationCode)
 }
