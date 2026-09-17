@@ -1,0 +1,33 @@
+eitri-apps:
+- path: ./eitri-shopping-template-vtex-deco-home
+  workspace: eitri-shopping-template-vtex-deco-home
+  alias: home
+  focus: true
+  shared: false
+- path: ./eitri-shopping-template-vtex-deco-account
+  workspace: eitri-shopping-template-vtex-deco-account
+  alias: account
+  focus: false
+  shared: false
+- path: ./eitri-shopping-template-vtex-deco-checkout
+  workspace: eitri-shopping-template-vtex-deco-checkout
+  alias: checkout
+  focus: false
+  shared: false
+- path: ./eitri-shopping-template-vtex-deco-shared
+  workspace: eitri-shopping-template-vtex-deco-shared
+  alias: shared
+  focus: false
+  shared: true
+- path: ./eitri-shopping-template-vtex-deco-pdp
+  workspace: eitri-shopping-template-vtex-deco-pdp
+  alias: pdp
+  focus: false
+  shared: false
+- path: ./eitri-shopping-template-vtex-deco-cart
+  workspace: eitri-shopping-template-vtex-deco-cart
+  alias: cart
+  focus: false
+  shared: false
+application-id: 1701f922-8738-4143-97c6-a7af1d90b81b
+check-js: false

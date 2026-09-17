@@ -1,0 +1,95 @@
+{
+	"home": {
+		"offers": "Ofertas"
+	},
+	"categories": {
+		"title": "Categorias"
+	},
+	"productCatalog": {
+		"title": "Catálogo"
+	},
+	"blogPostShelf": {
+		"seeMore": "Ver mais"
+	},
+	"categoryPageModal": {
+		"title": "Filtros",
+		"clear": "Limpar",
+		"button": "Filtrar"
+	},
+	"pristineView": {
+		"content": "Digite um termo para busca"
+	},
+	"searchResults": {
+		"resultNotFound": "Não foram encontrados resultados para a sua busca"
+	},
+	"headerSearch": {
+		"labelSearch": "Procurar..."
+	},
+	"productCardVertical": {
+		"cart": "Na cesta",
+		"buy": "Comprar"
+	},
+	"productCard": {
+		"snackAdded": "adicionado à cesta com sucesso",
+		"snackRemoved": "produto removido da cesta",
+		"viewCart": "Ver cesta",
+		"buy": "Comprar"
+	},
+	"scheduleCard": {
+		"button": "Confira"
+	},
+	"searchInput": {
+		"content": "Encontre seu produto..."
+	},
+	"shelfOfProducts": {
+		"loading": "Carregando...",
+		"seeMore": "Ver mais"
+	},
+	"lists": {
+		"title": "Ordenar por",
+		"labelRelevance": "Relevância",
+		"labelBestSellers": "Mais vendidos",
+		"labelNewest": "Mais recentes",
+		"labelDiscounts": "Descontos",
+		"labelHighestPrice": "Maior preço",
+		"labelLowestPrice": "Menor preço",
+		"labelAToZ": "De A a Z",
+		"labelZToA": "De Z a A"
+	},
+	"facetsModal": {
+		"from": "De",
+		"to": "à"
+	},
+	"qrCodeScanner": {
+		"productNotFound": "Produto não encontrado"
+	},
+	"searchHistory": {
+		"title": "histórico",
+		"clear": "limpar histórico"
+	},
+	"topSearches": {
+		"title": "mais buscados"
+	},
+	"highlightedShelf": {
+		"days": "dias",
+		"hours": "horas",
+		"minutes": "minutos",
+		"seconds": "segundos",
+		"seeMore": "Veja mais"
+	},
+	"categoryPage": {
+		"seeAll": "Ver tudo em {{title}}"
+	},
+	"searchResultsEmpty": {
+		"title": "Nenhum produto encontrado",
+		"hint": "Tente ajustar sua busca ou explorar outras categorias."
+	},
+	"priceRange": {
+		"min": "Valor Mínimo",
+		"max": "Valor Máximo"
+	},
+	"blogCard": {
+		"publishedByDate": "Publicado por {{author}} em {{date}}",
+		"publishedDate": "Publicado em {{date}}"
+	}
+}

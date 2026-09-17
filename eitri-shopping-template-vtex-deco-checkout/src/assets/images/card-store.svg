@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 856 540" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="856" y2="540" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="70" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0c040"/>
+      <stop offset="100%" stop-color="#c8962a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="856" height="540" rx="40" fill="url(#bg)"/>
+
+  <!-- Subtle pattern circles -->
+  <circle cx="720" cy="100" r="300" fill="white" fill-opacity="0.05"/>
+  <circle cx="120" cy="480" r="240" fill="white" fill-opacity="0.05"/>
+
+  <!-- Chip -->
+  <rect x="60" y="60" width="70" height="54" rx="8" fill="url(#chip)"/>
+  <line x1="60" y1="87" x2="130" y2="87" stroke="#8a6e2f" stroke-width="1.5"/>
+  <line x1="95" y1="60" x2="95" y2="114" stroke="#8a6e2f" stroke-width="1.5"/>
+  <rect x="72" y="70" width="22" height="17" rx="3" fill="none" stroke="#8a6e2f" stroke-width="1.2"/>
+
+  <!-- NFC icon -->
+  <path d="M148 68 Q164 87 148 106" stroke="white" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <path d="M162 60 Q184 87 162 114" stroke="white" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <path d="M176 52 Q204 87 176 122" stroke="white" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+
+  <!-- "CARTÃO DA LOJA" label top-right -->
+  <text x="796" y="52" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="2" fill="white" fill-opacity="0.85">CARTÃO DA LOJA</text>
+
+  <!-- Store bag icon (center-left area) -->
+  <rect x="60" y="220" width="110" height="120" rx="12" fill="white" fill-opacity="0.12"/>
+  <path d="M85 257 Q85 232 115 232 Q145 232 145 257" stroke="white" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <circle cx="97" cy="259" r="5" fill="white" fill-opacity="0.6"/>
+  <circle cx="133" cy="259" r="5" fill="white" fill-opacity="0.6"/>
+
+  <!-- Card number dots -->
+  <circle cx="60"  cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="80"  cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="100" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="120" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+
+  <circle cx="160" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="180" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="200" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="220" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+
+  <circle cx="260" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="280" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="300" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+  <circle cx="320" cy="400" r="6" fill="white" fill-opacity="0.7"/>
+
+  <text x="370" y="408" font-family="Arial, Helvetica, sans-serif" font-size="26" letter-spacing="4" fill="white" fill-opacity="0.9">1234</text>
+
+  <!-- Cardholder name -->
+  <text x="60" y="474" font-family="Arial, Helvetica, sans-serif" font-size="20" letter-spacing="2" fill="white" fill-opacity="0.75">NOME DO TITULAR</text>
+
+  <!-- Valid thru -->
+  <text x="560" y="460" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="white" fill-opacity="0.6">VÁLIDO ATÉ</text>
+  <text x="560" y="480" font-family="Arial, Helvetica, sans-serif" font-size="20" letter-spacing="2" fill="white" fill-opacity="0.9">12/30</text>
+</svg>

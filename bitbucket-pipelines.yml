@@ -1,0 +1,23 @@
+clone:
+  depth: full
+
+pipelines:
+  branches:
+    main:
+      - step:
+          name: Verificar e Publicar Versões
+          image: node:18
+          script:
+            - echo "Executando script..."
+            - npm i -g eitri-cli
+            - node check_and_push.js
+          services:
+            - docker
+
+      - step:
+          name: Sincronizar com GitHub
+          script:
+            - echo "Iniciando sincronização com o repositório GitHub..."
+            - git remote add github git@github.com:eitri-tech/eitri-shopping-template.git
+            - git push github --force
+            - echo "Sincronização com GitHub finalizada com sucesso!"

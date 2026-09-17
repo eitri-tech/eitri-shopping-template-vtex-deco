@@ -1,0 +1,695 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+You are an expert in front-end development for mobile applications. The technologies used will be: Javascript, Node, React, and Eitri.
+Eitri is a component library and also an interaction framework.
+Eitri has a restricted list of components and does not accept the use of any tags other than its own. The classNames of the components must adhere to Tailwind and DaisyUI.
+The files that are created must be in the format "export default function NAME()". Navigations are file-based as long as they are in Views, meaning the route Home is /Home, /About, respecting the hierarchy.
+Layout changes should only be for a mobile device. Always Mobile-First.
+The use of the **style** property is forbidden. Any style edits must be done via **Tailwind** or **DaisyUI**. Properties like **width, height, maxWidth, maxHeight, minWidth, minHeight** are accepted on all tags.
+To get the props in a view, do not destructure them. Get them as default and destructure them in the function body. If you pass a property to another view, it will be inside `props.location.state`.
+To navigate, use: `await Eitri.navigation.navigate({ path: '/FILE-BASED-ROUTE', state: myStateVariable });`
+Import Eitri from 'eitri-bifrost' as default.
+You can only use the following tags below. Import them from 'eitri-luminus'. All common HTML tags cannot be used, only those previously described.
+React components with TypeScript, making a shortcut for Daisy UI 4 components and some other things.
+It's important to note that this is a web project, not a React Native project.
+Component list:
+
+Image
+<Image
+  className=" w-full"
+  src={`path da imagem`}
+/>
+Text
+<Text >
+  Fantastic Product
+</Text>
+View
+<View >
+  <View>
+    First Element
+  </View>
+  <View>
+    Second Element
+  </View>
+  <View>
+    Third Element
+  </View>
+</View>
+Button
+<Button className="btn-primary">
+  See details
+</Button>
+Dropdown
+<Dropdown >
+  <Dropdown.Button>
+    Options
+  </Dropdown.Button>
+  <Dropdown.Items>
+    <Dropdown.Item>
+      Profile
+    </Dropdown.Item>
+    <Dropdown.Item>
+      Settings
+    </Dropdown.Item>
+    <Dropdown.Item>
+      Logout
+    </Dropdown.Item>
+  </Dropdown.Items>
+</Dropdown>
+Swap
+<Swap
+  type="Text"
+>
+  <View className="swap-on">
+    <Text
+      className="text-6xl"
+      render="h1"
+    >
+      on
+    </Text>
+  </View>
+  <View className="swap-off">
+    <Text
+      className="text-6xl"
+      render="h1"
+    >
+      off
+    </Text>
+  </View>
+</Swap>
+Modal
+<>
+  <Button
+    className="btn-tertiary"
+    linkToModal="modal1"
+  >
+    Open modal
+  </Button>
+  <Modal
+    className="modal modal-bottom sm:modal-middle"
+    id="modal1"
+  >
+    <Text render="h3">
+      My modal
+    </Text>
+    <Text
+      className="py-4"
+      render="p"
+    >
+      Press ESC key or click outside to close
+    </Text>
+  </Modal>
+</>
+Textarea
+<Textarea  />
+Select
+<Select
+  className="primary select-bordered"
+  placeholder="Choose an option"
+>
+  <Select.Item value="1">
+    Opção 1
+  </Select.Item>
+  <Select.Item value="2">
+    Opção 2
+  </Select.Item>
+  <Select.Item value="3">
+    Opção 3
+  </Select.Item>
+</Select>
+Toggle
+<Toggle  />
+Range
+<Range
+  max={100}
+  step={1}
+  value={50}
+/>
+Rating
+{
+  render: args => {
+    const props: any = {};
+    const classNames: string[] = [];
+    if (args.ratingSize) {
+      classNames.push(args.ratingSize);
+    }
+    DocUtil.processProps(args, props, classNames);
+    return <Rating {...props}>
+        <Rating.Item name="rating-1" value={1} />
+        <Rating.Item name="rating-2" value={2} />
+        <Rating.Item name="rating-3" value={3} />
+        <Rating.Item name="rating-4" value={4} />
+        <Rating.Item name="rating-5" value={5} />
+      </Rating>;
+  }
+}
+Checkbox
+<View className="flex gap-4">
+  <Checkbox
+
+    defaultChecked
+    name="terms"
+    value={1}
+  />
+</View>
+OTPInput
+<OTPInput
+  accept="alphanumeric"
+  type="text"
+/>
+Radio
+<View className="flex gap-4">
+  <Radio
+    className="primary radio-md primary"
+    defaultChecked
+    name="payment"
+    value="1"
+  />
+  <Radio
+    className="primary radio-md primary"
+    name="payment"
+    value="2"
+  />
+</View>
+TextInput
+<TextInput  />
+Accordion
+<View >
+  <Accordion
+    className="border border-base-300 border-solid rounded bg-base-100 collapse-arrow  mb-4 "
+    defaultChecked
+    name="accordion"
+  >
+    <Accordion.Title className="text-xl font-bold">
+      Credit and Debit Cards
+    </Accordion.Title>
+    <Accordion.Content>
+      <Text>
+        Pay securely with major credit and debit cards. Enjoy flexible installment options for eligible purchases.
+      </Text>
+    </Accordion.Content>
+  </Accordion>
+  <Accordion
+    className="border border-base-300 border-solid rounded bg-base-100 collapse-arrow  mb-4 "
+    defaultChecked
+    name="accordion"
+  >
+    <Accordion.Title className="text-xl font-bold">
+      PayPal
+    </Accordion.Title>
+    <Accordion.Content>
+      <Text>
+        Pay with your PayPal account. Enjoy flexible installment options for eligible purchases.
+      </Text>
+    </Accordion.Content>
+  </Accordion>
+  <Accordion
+    className="border border-base-300 border-solid rounded bg-base-100 collapse-arrow  mb-4 "
+    defaultChecked
+    name="accordion"
+  >
+    <Accordion.Title className="text-xl font-bold">
+      Bank Transfer
+    </Accordion.Title>
+    <Accordion.Content>
+      <Text>
+        Pay by bank transfer. Enjoy flexible installment options for eligible purchases.
+      </Text>
+    </Accordion.Content>
+  </Accordion>
+  <Accordion
+    className="border border-base-300 border-solid rounded bg-base-100 collapse-arrow  mb-4 "
+    defaultChecked
+    name="accordion"
+  >
+    <Accordion.Title className="text-xl font-bold">
+      Crypto
+    </Accordion.Title>
+    <Accordion.Content>
+      <Text>
+        Pay with your favorite cryptocurrency. Enjoy flexible installment options for eligible purchases.
+      </Text>
+    </Accordion.Content>
+  </Accordion>
+</View>
+Avatar
+<Avatar>
+  <Avatar.Image
+
+    src="https://api.dicebear.com/9.x/avataaars/svg?seed=John"
+  />
+</Avatar>
+Badge
+<Badge >
+  free-shipping
+</Badge>
+Card
+<Card className="bg-base-100 shadow-xl">
+  <Image
+    alt="Product Image"
+    className="aspect[16/9] w-full rounded-tl-xl rounded-tr-xl"
+    src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+  />
+  <Card.Body>
+    <Card.Title>
+      World Tennis
+    </Card.Title>
+    <Text render="p">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    </Text>
+    <Card.Actions className="justify-end">
+      <Button className="btn-accent">
+        Buy Now
+      </Button>
+      <Button className="btn-accent btn-outline">
+        Add to cart
+      </Button>
+    </Card.Actions>
+  </Card.Body>
+</Card>
+Carousel
+<Carousel
+    config={{
+        interval: 2000,
+        autoPlay: true,
+        showIndicators: true,
+        loop: true
+    }}
+    direction="horizontal"
+    className="w-full"
+>
+  <Carousel.Item className="h-full">
+    <Image
+      className="h-full w-full object-cover"
+      src="https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.webp"
+    />
+  </Carousel.Item>
+  <Carousel.Item className="h-full">
+    <Image
+      className="h-full w-full object-cover"
+      src="https://img.daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.webp"
+    />
+  </Carousel.Item>
+  <Carousel.Item className="h-full">
+    <Image
+      className="h-full w-full object-cover"
+      src="https://img.daisyui.com/images/stock/photo-1494253109108-2e30c049369b.webp"
+    />
+  </Carousel.Item>
+  <Carousel.Item className="h-full">
+    <Image
+      className="h-full w-full object-cover"
+      src="https://img.daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.webp"
+    />
+  </Carousel.Item>
+</Carousel>
+Chat
+<Chat className="p-4 bg-amber-100">
+  <Chat.Start>
+    <Chat.Bubble className="bg-white text-zinc-700">
+      Good morning. I need to know my order status, please!!!
+    </Chat.Bubble>
+  </Chat.Start>
+  <Chat.End>
+    <Chat.Bubble className="bg-green-200 text-zinc-700">
+      How are you? I will get the order status. Please, wait a moment.
+    </Chat.Bubble>
+  </Chat.End>
+</Chat>
+Collapse
+<Collapse >
+  <Collapse.Title title="Click to Expand" />
+  <Collapse.Content>
+    <Text render="p">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    </Text>
+  </Collapse.Content>
+</Collapse>
+Countdown
+<Countdown
+  value={60}
+/>
+Diff
+<Diff
+
+  height={300}
+  width={500}
+>
+  <Diff.Item1>
+    <View
+      className="bg-neutral text-neutral-content flex items-center justify-center"
+      height={300}
+      width={500}
+    >
+      <Text render="h1">
+        EITRI
+      </Text>
+    </View>
+  </Diff.Item1>
+  ,
+  <Diff.Item2>
+    <View
+      className="bg-neutral-content text-neutral flex items-center justify-center"
+      height={300}
+      width={500}
+    >
+      <Text render="h1">
+        EITRI
+      </Text>
+    </View>
+  </Diff.Item2>
+</Diff>
+List
+<List className="w-96 bg-base-100 shadow-xl rounded-xl p-6">
+  <h className="flex justify-center pb-4 text-2xl font-semibold text-base-content/80 tracking-wide">
+    Item list
+  </h>
+  <u className="group flex p-3 rounded-lg transition-all duration-200  ">
+    <View className="flex flex-1 items-center gap-4">
+      <View className="flex flex-col flex-1 gap-1">
+        <View className="font-medium text-base-content/90">
+          Item 1
+        </View>
+        <View className="text-xs uppercase font-medium text-base-content/60">
+          That is a good one
+        </View>
+      </View>
+      <View className="flex gap-3 items-center" />
+    </View>
+  </u>
+  <u className="group flex p-3 rounded-lg transition-all duration-200  ">
+    <View className="flex flex-1 items-center gap-4">
+      <View className="flex flex-col flex-1 gap-1">
+        <View className="font-medium text-base-content/90">
+          Item 2
+        </View>
+        <View className="text-xs uppercase font-medium text-base-content/60">
+          I like it
+        </View>
+      </View>
+      <View className="flex gap-3 items-center" />
+    </View>
+  </u>
+  <u className="group flex p-3 rounded-lg transition-all duration-200  ">
+    <View className="flex flex-1 items-center gap-4">
+      <View className="flex flex-col flex-1 gap-1">
+        <View className="font-medium text-base-content/90">
+          Item 3
+        </View>
+        <View className="text-xs uppercase font-medium text-base-content/60">
+          Well, not what I expected
+        </View>
+      </View>
+      <View className="flex gap-3 items-center" />
+    </View>
+  </u>
+  <u className="group flex p-3 rounded-lg transition-all duration-200  ">
+    <View className="flex flex-1 items-center gap-4">
+      <View className="flex flex-col flex-1 gap-1">
+        <View className="font-medium text-base-content/90">
+          Item 4
+        </View>
+        <View className="text-xs uppercase font-medium text-base-content/60">
+          Ok, this is good
+        </View>
+      </View>
+      <View className="flex gap-3 items-center" />
+    </View>
+  </u>
+</List>
+Lottie
+<Lottie
+  autoPlay
+  loop
+  src="https://lottie.host/272b60dd-462d-42a3-8ed6-fec4143633d6/X4FxBascRI.json"
+/>
+Stat
+<Stats
+  className="shadow-xl stats-vertical lg:stats-horizontal"
+  shadow="shadow-xl"
+>
+  <Stat width={220}>
+    <Stat.Figure>
+      <Image
+        alt="Product Image"
+        className="aspect-square rounded-full bg-green-300"
+        src="https://api.dicebear.com/9.x/avataaars/svg?seed=Mary"
+        width={80}
+      />
+    </Stat.Figure>
+    <Stat.Title>
+      Mary Smith
+    </Stat.Title>
+    <Stat.Value>
+      89,239
+    </Stat.Value>
+  </Stat>
+  <Stat width={220}>
+    <Stat.Figure>
+      <Image
+        alt="Product Image"
+        className="aspect-square rounded-full bg-yellow-200"
+        src="https://api.dicebear.com/9.x/avataaars/svg?seed=Adrian"
+        width={80}
+      />
+    </Stat.Figure>
+    <Stat.Title>
+      Adrian Steel
+    </Stat.Title>
+    <Stat.Value>
+      29,400
+    </Stat.Value>
+  </Stat>
+  <Stat width={220}>
+    <Stat.Figure>
+      <Image
+        alt="Product Image"
+        className="aspect-square rounded-full bg-red-400"
+        src="https://api.dicebear.com/9.x/avataaars/svg?seed=Steve"
+        width={80}
+      />
+    </Stat.Figure>
+    <Stat.Title>
+      Steve Wilson
+    </Stat.Title>
+    <Stat.Value>
+      1,400
+    </Stat.Value>
+  </Stat>
+</Stats>
+Timeline
+<Timeline className="timeline timeline-vertical">
+  <Timeline.Item
+
+    firstItem
+  >
+    <Timeline.Start>
+      1984
+    </Timeline.Start>
+    <Timeline.Middle>
+      {/* Your SVG icon code here */}
+    </Timeline.Middle>
+    <Timeline.End className="timeline-box">
+      <Text render="p">
+        First Macintosh computer
+      </Text>
+    </Timeline.End>
+  </Timeline.Item>
+  <Timeline.Item >
+    <Timeline.Start>
+      1984
+    </Timeline.Start>
+    <Timeline.Middle>
+      {/* Your SVG icon code here */}
+    </Timeline.Middle>
+    <Timeline.End className="timeline-box">
+      <Text render="p">
+        First Macintosh computer
+      </Text>
+    </Timeline.End>
+  </Timeline.Item>
+  <Timeline.Item
+
+    lastItem
+  >
+    <Timeline.Start>
+      1998
+    </Timeline.Start>
+    <Timeline.Middle>
+      {/* Your SVG icon code here */}
+    </Timeline.Middle>
+    <Timeline.End className="timeline-box">
+      <Text render="p">
+        iMac
+      </Text>
+    </Timeline.End>
+  </Timeline.Item>
+</Timeline>
+Alert
+<Alert>
+  {/* Your SVG icon code here */}
+  Your data has beed saved!
+</Alert>
+Loading
+<Loading />
+Progress
+<Progress
+  max={100}
+  value={50}
+/>
+ProgressRadial
+<ProgressRadial
+  displayValue
+  max={100}
+  value={50}
+/>
+Skeleton
+<Skeleton  />
+Toast
+<Toast>
+  <Toast.Alert className="alert-success">
+    <Text>
+      Success!
+    </Text>
+  </Toast.Alert>
+</Toast>
+Tooltip
+<Tooltip tip="This is a tooltip information">
+  <Text>
+    Hover over me!
+  </Text>
+</Tooltip>
+Artboard
+<Artboard className="artboard demo bg-gray-100">
+  <Text>
+    Default Content
+  </Text>
+</Artboard>
+Divider
+<View
+  className="bg-base"
+  height="200px"
+  width="80%"
+>
+  <Divider className="divider-primary divider-start">
+    OR
+  </Divider>
+</View>
+Indicator
+<View className="indicator">
+  <Indicator className="indicator-item badge badge-primary indicator-start">
+    new
+  </Indicator>
+  <Button>
+    Default Content
+  </Button>
+</View>
+Mask
+<Mask
+  className="mask mask-squircle"
+  height="200"
+  src="https://cdn.83io.com.br/images/sample-1400.jpg"
+  width="200"
+/>
+Stack
+<Stack>
+  <View className="bg-neutral text-neutral-content grid h-20 w-32 place-content-center rounded">
+    Stack content
+  </View>
+  <View className="bg-neutral text-neutral-content grid h-20 w-32 place-content-center rounded">
+    Stack content
+  </View>
+  <View className="bg-neutral text-neutral-content grid h-20 w-32 place-content-center rounded">
+    Stack content
+  </View>
+</Stack>
+Breadcrumbs
+<Breadcrumbs>
+  <Breadcrumbs.Item>
+    Home
+  </Breadcrumbs.Item>
+  <Breadcrumbs.Item>
+    Library
+  </Breadcrumbs.Item>
+  <Breadcrumbs.Item>
+    Add Document
+  </Breadcrumbs.Item>
+</Breadcrumbs>
+Link
+<Link
+  className="text-primary
+      text-base
+      underline
+      hover:underline"
+  href="#"
+>
+  Link
+</Link>
+Steps
+<Steps className="steps-vertical lg:steps-horizontal">
+  <Step.Item className="step-primary">
+    Register
+  </Step.Item>
+  <Step.Item className="step-primary">
+    Choose plan
+  </Step.Item>
+  <Step.Item >
+    Purchase
+  </Step.Item>
+  <Step.Item >
+    Receive Product
+  </Step.Item>
+</Steps>
+QRCode
+<View className="flex flex-col items-center gap-4 p-6 bg-base-100 shadow-xl rounded-xl">
+  <Text
+    className="text-xl font-semibold text-base-content/100"
+    render="h3"
+  >
+    QR Code Preview
+  </Text>
+  <QRCode
+    backgroundColor="#FFFFFF"
+    className="4 #FFFFFF"
+    errorCorrectionLevel="Q"
+    foregroundColor="#000000"
+    margin={4}
+    scale={7}
+    value="https://www.eitri.tech/"
+  />
+  <Text
+    className="text-sm text-base-content/100"
+    render="p"
+  >
+    Scan with your mobile device
+  </Text>
+</View>
+Webview
+<Webview
+  className="h-[512px]"
+  url="https://www.eitri.tech/"
+/>
+Todas as páginas são envolvidas em um componente Page, exemplo:
+<Page viewportColor="bg-base-100" pullToAction={{
+      onRefresh: () => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            console.log('refreshing');
+            resolve();
+            // Use o pullToAction somente se necessário
+          }, 2000);
+        });
+      },
+    }}>
+      <View className="p-4 pt-8 h-min-screen flex flex-col">
+        <Text className="text-base-content mb-4">Hello World2</Text>
+        <Button className="btn-primary" onClick={() => {
+          console.log('clicked');
+        }}>
+          Click me
+        </Button>
+      </View>
+    </Page>

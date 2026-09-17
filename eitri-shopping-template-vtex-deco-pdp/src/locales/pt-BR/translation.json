@@ -1,0 +1,89 @@
+{
+	"home": {
+		"title": "Produto"
+	},
+	"description": {
+		"txtDescription": "Descrição",
+		"labelSeeLess": "Ver menos",
+		"labelSeeMore": "Ver mais"
+	},
+	"information": {
+		"txtInformation": "Informações"
+	},
+	"supplier": {
+		"txtSupplier": "Fornecedor"
+	},
+	"freight": {
+		"labelZipCode": "CEP",
+		"labelCalculate": "Calcular",
+		"txtCalculate": "Frete",
+		"errorUnavailable": "Desculpe, esse produto não está disponível para o seu CEP. Que tal tentar outro CEP?"
+	},
+	"mainDescription": {
+		"txtUntil": "em até",
+		"txtOf": "de",
+		"installment": "em até {{installment}}x de {{value}} sem juros"
+	},
+	"modalComponent": {
+		"txtProductAdded": "Produto adicionado",
+		"txtQuantity": "Quantidade:",
+		"txtGoToCart": "Ir para cesta",
+		"txtAddToCart": "Adicionar à cesta",
+		"txtBuyTogether": "Aproveite e compre junto"
+	},
+	"product": {
+		"labelAddToCart": "Adicionar à cesta",
+		"labelGoToCart": "Ir para a cesta",
+		"errorNoProduct": "Produto Indisponível"
+	},
+	"productBasicTemplate": {
+		"txtWhoSaw": "Quem viu esta, viu também:"
+	},
+	"productCardVertical": {
+		"cart": "ver cesta",
+		"buy": "comprar"
+	},
+	"review": {
+		"txtOpnion": "Cliente não escreveu uma avaliação, apenas deu a nota do produto.",
+		"seeMoreReviews": "Ver mais avaliações"
+	},
+	"skuSelector": {
+		"txtSelect": "Selecione o"
+	},
+	"tagsComponent": {
+		"labelOffer": "Oferta"
+	},
+	"actionButton": {
+		"snackAdded": "adicionado à cesta com sucesso",
+		"labelBuy": "Comprar"
+	},
+	"buyTogether": {
+		"txtTitle": "eeei, aproveite e leve também!"
+	},
+	"productCard": {
+		"snackAdded": "adicionado à cesta com sucesso",
+		"snackRemoved": "produto removido da cesta",
+		"viewCart": "Ver cesta",
+		"buy": "Comprar"
+	},
+	"searchInput": {
+		"placeholder": "Pesquisar..."
+	},
+	"topSearches": {
+		"title": "mais buscados"
+	},
+	"searchHistory": {
+		"title": "histórico",
+		"clear": "limpar histórico"
+	},
+	"qrCodeScanner": {
+		"title": "Escanear código de barras",
+		"description": "Centralize o código para escanear",
+		"torch": "Lanterna",
+		"productNotFound": "Produto não encontrado"
+	},
+	"rating": {
+		"txtCount": "{{count}} avaliações",
+		"txtComposition": "Composição da nota"
+	}
+}

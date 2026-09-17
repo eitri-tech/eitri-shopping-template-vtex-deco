@@ -1,0 +1,80 @@
+{
+	"home": {
+		"title": "Cesta"
+	},
+	"cart": {
+		"labelGiftWrapping": "Embalagem de presente",
+		"labelInstalmentUntil": "Parcelamento em até"
+	},
+	"cartItem": {
+		"txtAdd": "Adicionar",
+		"txtMessageUnavailable": "Este produto não está disponível!",
+		"txtRemoveCart": "Deseja excluir o produto da cesta?",
+		"txtRemoveCartItem": "Deseja remover {{name}} da cesta?",
+		"cannotBeDelivered": "Este item não pode ser entregue",
+		"notAvailable": "Este item não está disponível"
+	},
+	"cartSummary": {
+		"txtSubtotal": "Subtotal",
+		"txtDiscount": "Desconto",
+		"txtDelivery": "Entrega",
+		"txtTotal": "Total",
+		"labelFinish": "Finalizar Compra"
+	},
+	"minimumOrderValue": {
+		"missing": "Adicione {{value}} para atingir o valor mínimo",
+		"reached": "Valor mínimo da compra atingido"
+	},
+	"coupon": {
+		"txtAppliedCoupon": "Cupom aplicado!",
+		"txtInvalidCoupon": "Cupom inválido",
+		"txtExpiredCoupon": "Cupom Expirado",
+		"txtCoupon": "Cupom de desconto",
+		"txtAdd": "Adicionar",
+		"labelInsertCode": "Insira o código"
+	},
+	"emptyCart": {
+		"txtEmptyCart": "Sua cesta está vazia",
+		"txtMessageList": "Adicione produtos no sua cesta e eles serão listados aqui.",
+		"labelButton": "Comprar Agora"
+	},
+	"freight": {
+		"errorCep": "Digite um CEP válido",
+		"errorCalcFreight": "Não foi possível calcular o frete",
+		"errorEditFreight": "Não foi possível modificar o frete",
+		"txtDelivery": "Entrega",
+		"txtCalculate": "Calcular",
+		"labelZipCode": "CEP",
+		"txtUnknow": "Não sei meu cep",
+		"tabDelivery": "Opções de Entrega",
+		"tabPickup": "Opções de Retirada",
+		"noDeliveryOptions": "Nenhuma opção de entrega disponível",
+		"noPickupOptions": "Nenhuma opção de retirada disponível",
+		"unavailableWithZip": "Produto(s) não disponível(eis) para o CEP {{postalCode}}:",
+		"unavailableGeneral": "Produto(s) indisponível(eis) para entrega:",
+		"unavailableProduct": "Produto indisponível",
+		"txtChangeZip": "Informe outro CEP para verificar a disponibilidade.",
+		"labelCalculate": "Calcular"
+	},
+	"modalOfferingGender": {
+		"labelReceiverGift": "Para quem vai ser o presente?",
+		"labelSelectGender": "Selecione o gênero",
+		"txtBoy": "Menino",
+		"txtGirl": "Menina",
+		"txtConfirm": "Confirmar",
+		"txtCancel": "Cancelar"
+	},
+	"saveButton": {
+		"save": "Salvar",
+		"saved": "Salvo"
+	},
+	"cartTemplate": {
+		"labelContinue": "Continuar comprando"
+	},
+	"modal": {
+		"confirm": {
+			"delete": "Excluir",
+			"cancel": "Cancelar"
+		}
+	}
+}

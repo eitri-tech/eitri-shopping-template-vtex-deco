@@ -1,0 +1,215 @@
+{
+	"home": {
+		"title": "Finalizar Pedido"
+	},
+	"orderCompleted": {
+		"title": "Pedido Confirmado",
+		"titleHeader": "Pedido concluído",
+		"txtCongratulation": "Parabéns!",
+		"txtOrderSuccessful": "Pedido realizado com sucesso.",
+		"txtOrderNumber": "Nº do pedido:",
+		"txtOrderFollow": "Você receberá um email com todos os detalhes. Acompanhe também seu pedido na opção 'Meus pedidos'.",
+		"txtReady": "Pronto, compra feita!",
+		"txtEmailConfirmation": "Enviamos uma confirmação com os detalhes do seu pedido para seu email",
+		"txtOrderCode": "Seu código de pedido é",
+		"labelSeeOrders": "Ver meus pedidos",
+		"labelBack": "Voltar ao início"
+	},
+	"paymentData": {
+		"title": "Pagamento",
+		"txtTotalPayment": "Total a pagar",
+		"labelButton": "Continuar",
+		"txtTitle": "Escolha como pagar"
+	},
+	"checkoutReview": {
+		"txtLoading": "Estamos preparando a sua compra",
+		"txtTitle": "Revise e confirme",
+		"txtDelete": "Excluir",
+		"txtError": "Houve um erro ao fechar pedido"
+	},
+	"freightSelector": {
+		"txtTitle": "Como deseja receber seu produto?",
+		"txtDeliverAt": "Receber em {{street}}, {{number}} {{complement}}",
+		"txtContinue": "Continuar",
+		"txtChangeAddress": "Alterar endereço de entrega"
+	},
+	"freightGroupSelector": {
+		"txtTitle": "Escolha como quer receber esses produtos",
+		"txtPickup": "Retire na loja {{name}}",
+		"txtDelivery": "Receba em casa"
+	},
+	"pickupSelector": {
+		"txtHeader": "Retirada",
+		"txtTitle": "Em qual loja deseja retirar seu produto?",
+		"txtSeeMore": "Ver mais",
+		"txtSeeLess": "Ver menos"
+	},
+	"installments": {
+		"txtHeader": "Parcelamento",
+		"txtWithInterest": "com juros",
+		"txtNoInterest": "sem juros"
+	},
+	"addCardForm": {
+		"txtHeader": "Novo cartão",
+		"txtBrandsAccepted": "Bandeiras aceitas:",
+		"labelContinue": "Continuar",
+		"errorCardNumber": "Verifique o número digitado",
+		"errorDueDate": "Data inválida"
+	},
+	"otpLogin": {
+		"txtMessage": "Por questões de segurança, nos informe o código enviado para seu email {{email}}",
+		"placeholderCode": "Código enviado para o email",
+		"errorInvalidCode": "Código inválido",
+		"labelContinue": "Continuar"
+	},
+	"personalData": {
+		"frmName": "Nome",
+		"placeholderName": "Digite seu nome",
+		"frmLastName": "Sobrenome",
+		"placeholderLastName": "Digite seu sobrenome",
+		"frmTaxpayerId": "CPF",
+		"placeholderTaxpayerId": "Digite seu CPF",
+		"frmPhone": "Telefone",
+		"placeholderPhone": "Digite seu telefone",
+		"frmCorporateName": "Razão Social",
+		"placeholderCorporateName": "Digite sua razão social",
+		"frmFantasyName": "Nome Fantasia",
+		"placeholderFantasyName": "Digite seu nome fantasia",
+		"frmCorporateDocument": "CNPJ",
+		"placeholderCorporateDocument": "Digite seu CNPJ",
+		"frmCorporatePhone": "Telefone",
+		"placeholderCorporatePhone": "Digite seu telefone",
+		"frmStateInscription": "Inscrição Estadual",
+		"placeholderStateInscription": "Digite sua inscrição estadual",
+		"title": "Dados pessoais",
+		"frmEmail": "Email",
+		"placeholderEmail": "Digite seu email",
+		"labelPerson": "Sou pessoa física",
+		"labelCorporate": "Sou pessoa jurídica",
+		"errorInvalidDoc": "O CPF digitado é inválido",
+		"labelButton": "Continuar"
+	},
+	"pixOrder": {
+		"txtTimeRemaining": "Tempo restante",
+		"labelCopyCode": "Copiar código",
+		"labelShare": "Compartilhar",
+		"labelShowQRCode": "Mostrar QR Code",
+		"labelHideQRCode": "Ocultar QR Code",
+		"txtHeader": "Pagamento PIX",
+		"txtPixApproved": "Com o PIX, sua compra é aprovada na hora",
+		"txtOrderValue": "Valor da compra:",
+		"txtPixCode": "Código PIX",
+		"txtHowToPay": "Como pagar com PIX",
+		"txtHowStep1": "Acesse seu Internet Banking",
+		"txtHowStep2": "Escolha o pagamento via PIX",
+		"txtHowStep3": "Cole o código acima",
+		"txtProcessing": "O pagamento será processado automaticamente após a confirmação",
+		"snackCopied": "código pix copiado com sucesso!"
+	},
+	"finishCart": {
+		"errorOrder": "Houve um erro ao processar o seu pedido. Por favor revise os produtos e dados de pagamento antes de tentar novamente",
+		"title": "Checkout",
+		"errorItems": "Alguns itens dda sua cesta não estão mais disponíveis.",
+		"txtProduct": "Produto",
+		"txtProducts": "Produtos",
+		"txtTotal": "Total",
+		"txtItems": "Itens da cesta",
+		"txtNoItems": "Nenhum item na cesta",
+		"txtSubtotal": "Subtotal",
+		"labelButton": "Finalizar Compra"
+	},
+	"emptyCart": {
+		"title": "Finalizar Pedido",
+		"txtEmptyCart": "Sua cesta está vazia",
+		"txtAddItem": "Adicione produtos na sua cesta",
+		"labelBack": "Voltar"
+	},
+	"addNewShippingAddress": {
+		"title": "Entrega",
+		"errorAddress": "Endereço inválido, por favor verifique os dados",
+		"errorDefault": "Ocorreu um erro inesperado, tente novamente",
+		"txtCalculate": "Calcule o frete e prazo",
+		"txtPickupAddress": "Endereço para retirada",
+		"txtEdit": "Editar",
+		"txtZipCode": "Insira seu CEP",
+		"frmNumber": "Número",
+		"frmComplement": "Complemento",
+		"frmReference": "Referência",
+		"frmReceiveName": "Quem irá receber o pedido?",
+		"frmStreet": "Rua / Avenida",
+		"frmNeighborhood": "Bairro",
+		"frmCity": "Cidade",
+		"frmState": "Estado",
+		"labelButton": "Continuar",
+		"ok": "OK",
+		"loading": "Aguarde...",
+		"errorPostalCode": "Informe o CEP",
+		"errorStreet": "Informe a rua/avenida",
+		"errorNeighborhood": "Informe o bairro",
+		"errorCity": "Informe a cidade",
+		"errorState": "Informe o estado",
+		"errorReceiverName": "Informe quem irá receber",
+		"errorNumber": "Informe o número"
+	},
+	"simpleCard": {
+		"txtEdit": "ALTERAR"
+	},
+	"deliveryData": {
+		"txtWithdrawal": "RETIRADA",
+		"txtDelivery": "ENTREGA",
+		"txtNoNumber": "sem número",
+		"txtAlert": "Suas informações de endereço estão incompletas. Por favor clique aqui para atualizá-las.",
+		"txtStoreAddress": "Endereço da Loja",
+		"txtDeliveryAddress": "Endereço de Entrega",
+		"txtPostalCode": "CEP: {{code}}"
+	},
+	"selectedPaymentData": {
+		"txtPayment": "PAGAMENTO",
+		"txtFillCard": "Preencha os dados do cartão"
+	},
+	"userData": {
+		"txtPersonData": "DADOS PESSOAIS",
+		"txtMessageLeave": "Não é você? Sair"
+	},
+	"shippingMethods": {
+		"txtSelectDelivery": "Como deseja se receber seu produto?"
+	},
+	"giftCardInput": {
+		"txtHideGiftCard": "Ocultar Cartão-Presente",
+		"txtAddGiftCard": "Adicinar Cartão-Presente",
+		"labelGiftCard": "Cartão Presente",
+		"labelButtonOk": "OK",
+		"labelButtonRemove": "Remover"
+	},
+	"creditCard": {
+		"title": "Cartão de Crédito",
+		"labelCardNumber": "Número do cartão",
+		"labelName": "Nome do titular",
+		"labelValidity": "Validade",
+		"labelCvv": "CVV",
+		"labelBrand": "Bandeira",
+		"labelInstallment": "Parcelamento",
+		"labelBillingAddress": "Endereço de cobrança:",
+		"infoBillingAddress": "Seu endereço de fatura é o mesmo da entrega",
+		"labelZipCode": "CEP",
+		"labelAddress": "Rua/ Avenida",
+		"labelNumber": "Número",
+		"labelComplement": "Complemento",
+		"labelNeighborhood": "Bairro",
+		"labelCity": "Cidade",
+		"labelState": "Estado"
+	},
+	"addressSelector": {
+		"title": "Endereços de Entrega",
+		"subtitle": "Selecione um endereço para entrega",
+		"noAddresses": "Nenhum endereço cadastrado",
+		"addFirstAddress": "Adicionar Primeiro Endereço",
+		"addNewAddress": "Adicionar Novo Endereço",
+		"default": "Padrão",
+		"noReceiver": "Nome não informado",
+		"loading": "Carregando endereços...",
+		"selectedAddress": "Endereço Selecionado",
+		"otherAddresses": "Outros Endereços",
+		"edit": "Editar"
+	}
+}
