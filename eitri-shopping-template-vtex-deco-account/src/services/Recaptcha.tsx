@@ -1,6 +1,17 @@
-import React, { forwardRef, useEffect, useImperativeHandle } from 'react'
+import { forwardRef, useEffect, useImperativeHandle } from 'react'
 
-const Recaptcha = forwardRef((props, ref) => {
+interface RecaptchaProps {
+	onRecaptchaReady?: () => void
+	siteKey?: string
+}
+
+export interface RecaptchaHandle {
+	getRecaptchaToken: () => Promise<string | undefined>
+}
+
+// Google's reCAPTCHA script binds to a real DOM node by id/data-attributes — a Luminus
+// component wouldn't expose the attributes it needs, so a raw <button> is kept intentionally.
+const Recaptcha = forwardRef<RecaptchaHandle, RecaptchaProps>((props, ref) => {
 	const { onRecaptchaReady, siteKey } = props
 
 	useEffect(() => {
@@ -18,7 +29,7 @@ const Recaptcha = forwardRef((props, ref) => {
 		}
 	}
 
-	const waitForElement = selector => {
+	const waitForElement = (selector: string): Promise<Element | null> => {
 		return new Promise(resolve => {
 			if (document.querySelector(selector)) {
 				return resolve(document.querySelector(selector))

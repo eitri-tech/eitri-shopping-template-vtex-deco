@@ -1,4 +1,5 @@
 import Eitri from 'eitri-bifrost'
+import type { VtexProduct } from '../types/vtex'
 
 export const PAGES = {
 	HOME: '/Home',
@@ -21,7 +22,7 @@ export const PAGES = {
 	ADD_CARD_FORM: '/AddCardForm'
 }
 
-export const openProduct = async product => {
+export const openProduct = async (product: VtexProduct): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'pdp',
@@ -32,11 +33,11 @@ export const openProduct = async product => {
 	}
 }
 
-export const navigate = (page, state = {}, replace = false) => {
+export const navigate = (page: string, state: Record<string, unknown> = {}, replace = false) => {
 	return Eitri.navigation.navigate({ path: page, state, replace })
 }
 
-export const openCart = async () => {
+export const openCart = async (): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'cart'

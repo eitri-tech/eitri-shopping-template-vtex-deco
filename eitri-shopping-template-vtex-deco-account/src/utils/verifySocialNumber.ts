@@ -1,4 +1,4 @@
-export const verifySocialNumber = socialNumber => {
+export const verifySocialNumber = (socialNumber?: string): boolean => {
 	if (!socialNumber || socialNumber?.length !== 11 || socialNumber.match(/(\d)\1{10}/)) return false
 
 	let sum = 0
