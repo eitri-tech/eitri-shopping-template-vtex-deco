@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
 import userIcon from '../assets/images/user.svg'
 import lockIcon from '../assets/icons/lock.svg'
 import Eitri from 'eitri-bifrost'
+import { Page, View, Text } from 'eitri-luminus'
 import {
 	Loading,
 	HeaderContentWrapper,
@@ -25,8 +28,26 @@ import { useTranslation } from 'eitri-i18n'
 import { getLoginProviders } from '../services/StoreService'
 import SocialLogin from '../components/SocialLogin/SocialLogin'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
+import type { RouteProps } from '../types/route'
 
-export default function SignIn(props) {
+interface OAuthProvider {
+	providerName?: string
+	[key: string]: unknown
+}
+
+interface LoginProviders {
+	passwordAuthentication?: boolean
+	accessKeyAuthentication?: boolean
+	oAuthProviders?: OAuthProvider[]
+	[key: string]: unknown
+}
+
+interface SignInState {
+	redirectTo?: string
+	closeAppAfterLogin?: boolean
+}
+
+export default function SignIn(props: RouteProps<SignInState>) {
 	const { t } = useTranslation()
 
 	const redirectTo = props?.location?.state?.redirectTo
@@ -46,7 +67,7 @@ export default function SignIn(props) {
 	const [emailCodeSent, setEmailCodeSent] = useState(false)
 	const [timeOutToResentEmail, setTimeOutToResentEmail] = useState(0)
 	const [loadingSendingCode, setLoadingSendingCode] = useState(false)
-	const [loginProviders, setLoginProviders] = useState()
+	const [loginProviders, setLoginProviders] = useState<LoginProviders | undefined>()
 	const [loadingLoginProviders, setLoadingLoginProviders] = useState(false)
 	const [canUseSocialLogin, setCanUseSocialLogin] = useState(false)
 
@@ -63,7 +84,7 @@ export default function SignIn(props) {
 					setUsername(email)
 				}
 			})
-			.catch()
+			.catch(() => {})
 	}, [])
 
 	useEffect(() => {
@@ -77,11 +98,11 @@ export default function SignIn(props) {
 	const loadLoginProviders = async () => {
 		try {
 			setLoadingLoginProviders(true)
-			const providers = await getLoginProviders()
+			const providers = (await getLoginProviders()) as LoginProviders | undefined
 			if (!providers?.passwordAuthentication && providers?.accessKeyAuthentication) {
 				setLoginMode(LOGIN_WITH_EMAIL_AND_ACCESS_KEY)
 			}
-			const { applicationData } = await Eitri.getConfigs()
+			const { applicationData } = (await Eitri.getConfigs()) as { applicationData?: { platform?: string } }
 			if (applicationData?.platform === 'android') {
 				setCanUseSocialLogin(true)
 			}
@@ -97,7 +118,7 @@ export default function SignIn(props) {
 		navigate(PAGES.PASSWORD_RESET, { email: username })
 	}
 
-	const setLoginMethod = method => {
+	const setLoginMethod = (method: string) => {
 		setLoginMode(method)
 	}
 
@@ -122,13 +143,13 @@ export default function SignIn(props) {
 		}
 	}
 
-	const onLoggedIn = () => {
+	const onLoggedIn = async () => {
 		if (redirectTo) {
 			navigate('/' + redirectTo)
 		} else if (closeAppAfterLogin) {
 			Eitri.close()
 		} else {
-			Eitri.navigation.back()
+			Eitri.navigation.back(1)
 		}
 	}
 
@@ -185,7 +206,9 @@ export default function SignIn(props) {
 	const resendCode = timeOutToResentEmail > 0
 
 	return (
-		<Page title='Login' topInset>
+		<Page
+			title='Login'
+			topInset>
 			<HeaderContentWrapper>
 				<HeaderReturn />
 				<HeaderText text={t('signIn.headerText')} />
@@ -210,7 +233,7 @@ export default function SignIn(props) {
 									value={username}
 									placeholder={t('signIn.formName')}
 									inputMode='email'
-									onChange={e => setUsername(e?.target?.value)}
+									onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e?.target?.value)}
 								/>
 							</View>
 
@@ -220,7 +243,7 @@ export default function SignIn(props) {
 									icon={lockIcon}
 									value={password}
 									type='password'
-									onChange={e => setPassword(e.target.value)}
+									onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
 								/>
 							</View>
 
@@ -265,7 +288,7 @@ export default function SignIn(props) {
 								value={username}
 								inputMode='email'
 								placeholder={t('signIn.formEmail')}
-								onChange={e => {
+								onChange={(e: ChangeEvent<HTMLInputElement>) => {
 									setUsername(e.target.value)
 								}}
 							/>
@@ -278,7 +301,7 @@ export default function SignIn(props) {
 											placeholder={t('signIn.formCodeVerification')}
 											inputMode='numeric'
 											value={verificationCode}
-											onChange={e => setVerificationCode(e.target.value)}
+											onChange={(e: ChangeEvent<HTMLInputElement>) => setVerificationCode(e.target.value)}
 											height='45px'
 										/>
 									</View>
@@ -319,7 +342,7 @@ export default function SignIn(props) {
 						</View>
 					)}
 
-					{Eitri.canIUse('23') &&
+					{Eitri.canIUse(23) &&
 						canUseSocialLogin &&
 						loginProviders?.oAuthProviders &&
 						loginProviders?.oAuthProviders?.length > 0 && (

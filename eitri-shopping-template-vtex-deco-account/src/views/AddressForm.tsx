@@ -1,24 +1,48 @@
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
 import Eitri from 'eitri-bifrost'
-import { Page, View } from 'eitri-luminus'
-import { useState } from 'react'
-import {
-	HeaderContentWrapper,
-	HeaderReturn,
-	BottomInset,
-	CustomInput,
-	CustomButton,
-	Loading,
-	GenericBox
-} from 'eitri-shopping-template-vtex-deco-shared'
+import { Page, View, Text } from 'eitri-luminus'
+import { HeaderContentWrapper, HeaderReturn, BottomInset, CustomInput, CustomButton, Loading, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { sendScreenView } from '../services/TrackingService'
 import { createAddress, resolvePostalCode, updateAddress } from '../services/AddressService'
 import { useTranslation } from 'eitri-i18n'
+import type { RouteProps } from '../types/route'
+import type { VtexAddress } from '../types/vtex'
 
-function PostalCodeInput({ value, onChange, isLoading }) {
+interface AddressFormValues {
+	postalCode: string
+	street: string
+	neighborhood: string
+	receiverName: string
+	state: string
+	country: string
+	geoCoordinates: number[]
+	number: string
+	complement: string
+	reference: string
+	addressType: string
+	addressId?: string
+	// Never given an initial value in the original state literal — filled in only after
+	// `submitZipCode` resolves the postal code. Kept optional to preserve that behavior.
+	city?: string
+	[key: string]: unknown
+}
+
+type AddressErrors = Record<string, string>
+type AddressTouched = Record<string, boolean>
+
+interface PostalCodeInputProps {
+	value?: string
+	onChange: (e: ChangeEvent<HTMLInputElement>) => void
+	isLoading?: boolean
+}
+
+function PostalCodeInput(props: PostalCodeInputProps) {
+	const { value, onChange, isLoading } = props
 	const { t } = useTranslation()
 	return (
-		<View className=''>
+		<View>
 			<CustomInput
 				label={t('addressForm.postalCode')}
 				inputMode='numeric'
@@ -34,7 +58,16 @@ function PostalCodeInput({ value, onChange, isLoading }) {
 	)
 }
 
-function AddressFields({ address, handleAddressChange, touched, errors, onBlur }) {
+interface AddressFieldsProps {
+	address: AddressFormValues
+	handleAddressChange: (key: keyof AddressFormValues, e: ChangeEvent<HTMLInputElement>) => void
+	touched: AddressTouched
+	errors: AddressErrors
+	onBlur: (field: string) => void
+}
+
+function AddressFields(props: AddressFieldsProps) {
+	const { address, handleAddressChange, touched, errors, onBlur } = props
 	const { t } = useTranslation()
 	return (
 		<>
@@ -43,7 +76,7 @@ function AddressFields({ address, handleAddressChange, touched, errors, onBlur }
 					label={t('addressForm.street')}
 					placeholder={''}
 					value={address?.street || ''}
-					onChange={e => handleAddressChange('street', e)}
+					onChange={(e: ChangeEvent<HTMLInputElement>) => handleAddressChange('street', e)}
 					className={'!outline-none w-full' + (errors.street && touched.street ? 'border-red-500' : '')}
 					onBlur={() => onBlur('street')}
 				/>
@@ -55,7 +88,7 @@ function AddressFields({ address, handleAddressChange, touched, errors, onBlur }
 						label={t('addressForm.number')}
 						placeholder={''}
 						value={address?.number || ''}
-						onChange={e => handleAddressChange('number', e)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => handleAddressChange('number', e)}
 						className={errors.number && touched.number ? 'border-red-500' : ''}
 						onBlur={() => onBlur('number')}
 					/>
@@ -66,7 +99,7 @@ function AddressFields({ address, handleAddressChange, touched, errors, onBlur }
 						label={t('addressForm.complement')}
 						placeholder={''}
 						value={address?.complement || ''}
-						onChange={e => handleAddressChange('complement', e)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => handleAddressChange('complement', e)}
 						onBlur={() => onBlur('complement')}
 					/>
 				</View>
@@ -76,7 +109,7 @@ function AddressFields({ address, handleAddressChange, touched, errors, onBlur }
 					label={t('addressForm.neighborhood')}
 					placeholder={''}
 					value={address.neighborhood || ''}
-					onChange={e => handleAddressChange('neighborhood', e)}
+					onChange={(e: ChangeEvent<HTMLInputElement>) => handleAddressChange('neighborhood', e)}
 					className={
 						'w-full !outline-none' + (errors.neighborhood && touched.neighborhood ? 'border-red-500' : '')
 					}
@@ -92,7 +125,7 @@ function AddressFields({ address, handleAddressChange, touched, errors, onBlur }
 						label={t('addressForm.city')}
 						placeholder={''}
 						value={address.city || ''}
-						onChange={e => handleAddressChange('city', e)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => handleAddressChange('city', e)}
 						className={errors.city && touched.city ? 'border-red-500' : ''}
 						onBlur={() => onBlur('city')}
 					/>
@@ -103,7 +136,7 @@ function AddressFields({ address, handleAddressChange, touched, errors, onBlur }
 						label={t('addressForm.state')}
 						placeholder={''}
 						value={address?.state || ''}
-						onChange={e => handleAddressChange('state', e)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => handleAddressChange('state', e)}
 						className={errors.state && touched.state ? 'border-red-500' : ''}
 						onBlur={() => onBlur('state')}
 					/>
@@ -115,7 +148,7 @@ function AddressFields({ address, handleAddressChange, touched, errors, onBlur }
 					label={t('addressForm.recipient')}
 					placeholder={''}
 					value={address.receiverName || ''}
-					onChange={e => handleAddressChange('receiverName', e)}
+					onChange={(e: ChangeEvent<HTMLInputElement>) => handleAddressChange('receiverName', e)}
 					className={errors.receiverName && touched.receiverName ? 'border-red-500' : ''}
 					onBlur={() => onBlur('addressName')}
 				/>
@@ -127,7 +160,7 @@ function AddressFields({ address, handleAddressChange, touched, errors, onBlur }
 	)
 }
 
-function validateAddress(address, t) {
+function validateAddress(address: AddressFormValues, t: (key: string) => string): AddressErrors {
 	return {
 		postalCode: !address.postalCode ? t('addressForm.validatePostalCode') : '',
 		street: !address.street ? t('addressForm.validateStreet') : '',
@@ -139,12 +172,16 @@ function validateAddress(address, t) {
 	}
 }
 
-export default function AddressForm(props) {
+interface AddressFormState {
+	address?: VtexAddress
+}
+
+export default function AddressForm(props: RouteProps<AddressFormState>) {
 	const PAGE_NAME = 'Editar/Cadastrar Endereço'
 	const { t } = useTranslation()
 
 	const [isLoading, setIsLoading] = useState(false)
-	const [address, setAddress] = useState({
+	const [address, setAddress] = useState<AddressFormValues>({
 		postalCode: '',
 		street: '',
 		neighborhood: '',
@@ -158,16 +195,16 @@ export default function AddressForm(props) {
 		addressType: 'residential'
 	})
 
-	const [touched, setTouched] = useState({})
+	const [touched, setTouched] = useState<AddressTouched>({})
 	const errors = validateAddress(address, t)
 
 	useEffect(() => {
 		const addressToEdit = props?.location?.state?.address
 		if (addressToEdit) {
-			setAddress({
-				...address,
+			setAddress(prev => ({
+				...prev,
 				...addressToEdit
-			})
+			}))
 		}
 	}, [])
 
@@ -180,11 +217,11 @@ export default function AddressForm(props) {
 		const postalCodeDigits = address?.postalCode?.replace(/\D/g, '') || ''
 
 		if (postalCodeDigits.length === 8) {
-			submitZipCode(address?.postalCode)
+			submitZipCode()
 		}
 	}, [address?.postalCode])
 
-	const handleAddressChange = (key, e) => {
+	const handleAddressChange = (key: keyof AddressFormValues, e: ChangeEvent<HTMLInputElement>) => {
 		const { value } = e.target
 		setAddress({
 			...address,
@@ -192,7 +229,7 @@ export default function AddressForm(props) {
 		})
 	}
 
-	const onChangePostalCodeInput = async e => {
+	const onChangePostalCodeInput = async (e: ChangeEvent<HTMLInputElement>) => {
 		const { value } = e.target
 		setAddress({ ...address, postalCode: value })
 	}
@@ -232,7 +269,7 @@ export default function AddressForm(props) {
 			} else {
 				await createAddress(address)
 			}
-			Eitri.navigation.back()
+			Eitri.navigation.back(1)
 		} catch (e) {
 			console.error('Error on submit', e)
 			return
@@ -241,7 +278,7 @@ export default function AddressForm(props) {
 		setIsLoading(false)
 	}
 
-	const onBlur = field => {
+	const onBlur = (field: string) => {
 		setTouched(prev => ({ ...prev, [field]: true }))
 	}
 
@@ -265,7 +302,6 @@ export default function AddressForm(props) {
 					<PostalCodeInput
 						value={address?.postalCode}
 						onChange={onChangePostalCodeInput}
-						onSubmit={submitZipCode}
 						isLoading={isLoading}
 					/>
 
