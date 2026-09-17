@@ -1,3 +1,5 @@
+import { View } from 'eitri-luminus'
+
 export default function Boleto() {
 	return (
 		<View>

@@ -3,23 +3,25 @@ import GroupsWrapper from './GroupsWrapper'
 import Card from '../../../components/Icons/MethodIcons/Card'
 import { navigate } from '../../../services/navigationService'
 
-export default function StoreCard(props) {
+interface StoreCardProps {
+	systemGroup?: unknown
+}
+
+export default function StoreCard(props: StoreCardProps) {
 	const { setCardInfo } = useLocalShoppingCart()
 
 	const { systemGroup } = props
 
-	const addNewCard = async () => {
-		setCardInfo(null)
+	const addNewCard = () => {
+		setCardInfo?.(null)
 		navigate('StoreCardForm', { systemGroup })
 	}
 
 	return (
-		<>
-			<GroupsWrapper
-				title='Cartão da loja'
-				showArrow={true}
-				icon={<Card />}
-				onPress={addNewCard}></GroupsWrapper>
-		</>
+		<GroupsWrapper
+			title='Cartão da loja'
+			icon={<Card />}
+			onPress={addNewCard}
+		/>
 	)
 }

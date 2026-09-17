@@ -1,6 +1,12 @@
-import { Loading, View } from 'eitri-luminus'
+import { Loading, View, Text } from 'eitri-luminus'
 
-export default function LoadingComponent(props) {
+interface LoadingComponentProps {
+	isLoading?: boolean
+	fullScreen?: boolean
+	text?: string
+}
+
+export default function LoadingComponent(props: LoadingComponentProps) {
 	const { isLoading, fullScreen, text } = props
 
 	if (typeof isLoading === 'boolean' && !isLoading) return null
@@ -11,7 +17,7 @@ export default function LoadingComponent(props) {
 				<Loading className='loading-lg' />
 				{text && (
 					<View className='mt-2 max-w-[200px] text-center'>
-						<Text className=''>{text}</Text>
+						<Text>{text}</Text>
 					</View>
 				)}
 			</View>
