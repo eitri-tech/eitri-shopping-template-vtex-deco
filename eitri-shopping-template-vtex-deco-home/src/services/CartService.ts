@@ -1,15 +1,23 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import { TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
+import type { VtexCart } from '../types/vtex'
 
-export const getCart = async () => {
+interface AddItemParams {
+	item: unknown
+	salesChannel: string
+	quantity: number
+	seller: string
+}
+
+export const getCart = async (): Promise<VtexCart | undefined> => {
 	try {
-		return await Vtex.cart.getCurrentOrCreateCart()
+		return (await Vtex.cart.getCurrentOrCreateCart()) as VtexCart
 	} catch (error) {
 		console.log('Erro ao buscar carrinho', error)
 	}
 }
 
-export const addItemToCart = async skuItem => {
+export const addItemToCart = async (skuItem: AddItemParams): Promise<void> => {
 	try {
 		return await Vtex.cart.addItem(skuItem)
 	} catch (error) {
@@ -17,7 +25,7 @@ export const addItemToCart = async skuItem => {
 	}
 }
 
-export const removeCartItem = async index => {
+export const removeCartItem = async (index: number) => {
 	try {
 		return await Vtex.cart.removeItem(index)
 	} catch (error) {
@@ -25,7 +33,7 @@ export const removeCartItem = async index => {
 	}
 }
 
-export const updateItemOnCart = async (index, quantity) => {
+export const updateItemOnCart = async (index: number, quantity: number) => {
 	try {
 		return await Vtex.cart.changeItemQuantity(index, quantity)
 	} catch (error) {

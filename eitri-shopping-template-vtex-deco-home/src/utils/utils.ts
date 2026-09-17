@@ -1,11 +1,11 @@
 import { App } from 'eitri-shopping-vtex-shared'
 import Eitri from 'eitri-bifrost'
 
-export const formatPrice = (price, _locale, _currency) => {
+export const formatPrice = (price?: number, _locale?: string, _currency?: string): string => {
 	if (!price) return ''
 
-	const locale = _locale || App?.configs?.storePreferences?.locale || 'pt-BR'
-	const currency = _currency || App?.configs?.storePreferences?.currencyCode || 'BRL'
+	const locale = _locale || (App as any)?.configs?.storePreferences?.locale || 'pt-BR'
+	const currency = _currency || (App as any)?.configs?.storePreferences?.currencyCode || 'BRL'
 
 	return price.toLocaleString(locale, { style: 'currency', currency: currency })
 }

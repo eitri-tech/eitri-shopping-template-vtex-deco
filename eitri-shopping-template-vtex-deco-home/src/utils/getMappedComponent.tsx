@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react'
 import Banner from '../components/CmsComponents/Banner/Banner'
 import ProductShelf from '../components/CmsComponents/ProductShelf/ProductShelf'
 import ProductTiles from '../components/CmsComponents/ProductTiles/ProductTiles'
@@ -12,7 +13,7 @@ import CategoryAccordion from '../components/CmsComponents/CategoryAccordion/Cat
 import RichText from '../components/CmsComponents/RichText/RichText'
 import VtexAdsBanner from '../components/CmsComponents/VtexAdsBanner/VtexAdsBanner'
 
-const componentMap = {
+const componentMap: Record<string, ComponentType<any>> = {
 	MultipleImageBanner: Banner,
 	ProductTiles: ProductTiles,
 	ProductShelf: ProductShelf,
@@ -28,7 +29,14 @@ const componentMap = {
 	VtexAdsBanner: VtexAdsBanner
 }
 
-export const getMappedComponent = (content, reloadKey, rest) => {
+interface CmsContent {
+	name: string
+	id?: string | number
+	data?: unknown
+	[key: string]: unknown
+}
+
+export const getMappedComponent = (content: CmsContent, reloadKey?: unknown, rest?: Record<string, unknown>) => {
 	const Component = componentMap[content.name]
 	if (!Component) {
 		console.error(`Component ${content.name} does not exist in the component map.`)

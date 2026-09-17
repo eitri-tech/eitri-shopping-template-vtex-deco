@@ -1,6 +1,6 @@
 import Eitri from 'eitri-bifrost'
 
-export const getFbRemoteConfig = async key => {
+export const getFbRemoteConfig = async (key: string): Promise<string | boolean | null> => {
 	try {
 		const result = await Eitri.exposedApis.remoteConfig.getString({ key })
 

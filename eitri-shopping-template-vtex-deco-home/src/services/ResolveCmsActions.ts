@@ -2,7 +2,23 @@ import { openProductById, openProductBySlug, resolveNavigation } from './Navigat
 import Eitri from 'eitri-bifrost'
 import { TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
 
-const handleSearchAction = value => {
+interface CmsAction {
+	type?: string
+	value?: string
+	sort?: string
+	title?: string
+	banner?: string
+	facets?: Array<{ key: string; value: string }>
+	[key: string]: unknown
+}
+
+interface SliderData {
+	mktTag?: string
+	action?: CmsAction
+	[key: string]: unknown
+}
+
+const handleSearchAction = (value?: string) => {
 	Eitri.navigation.navigate({
 		path: 'Search',
 		state: {
@@ -10,8 +26,8 @@ const handleSearchAction = value => {
 		}
 	})
 }
-const handleCollectionAction = action => {
-	const facets = [{ key: 'productClusterIds', value: action?.value }, ...(action?.facets || [])]
+const handleCollectionAction = (action: CmsAction) => {
+	const facets = [{ key: 'productClusterIds', value: action?.value ?? '' }, ...(action?.facets || [])]
 
 	Eitri.navigation.navigate({
 		path: 'ProductCatalog',
@@ -25,7 +41,7 @@ const handleCollectionAction = action => {
 		}
 	})
 }
-const handlePageAction = value => {
+const handlePageAction = (value?: string) => {
 	Eitri.navigation.navigate({
 		path: 'LandingPage',
 		state: {
@@ -33,7 +49,7 @@ const handlePageAction = value => {
 		}
 	})
 }
-const handleCategoryAction = action => {
+const handleCategoryAction = (action: CmsAction) => {
 	const _categories = action?.value?.split('/')
 	const categories = _categories?.filter(c => !!c)
 
@@ -56,15 +72,15 @@ const handleCategoryAction = action => {
 		state: { params, title: action?.title, banner: action?.banner }
 	})
 }
-const handleProductAction = value => {
+const handleProductAction = (value: string) => {
 	if (/^\d+$/.test(value)) {
 		openProductById(value)
 	} else {
 		openProductBySlug(value)
 	}
 }
-const openBrand = action => {
-	const facets = [{ key: 'brand', value: action?.value }, ...(action?.facets || [])]
+const openBrand = (action: CmsAction) => {
+	const facets = [{ key: 'brand', value: action?.value ?? '' }, ...(action?.facets || [])]
 
 	Eitri.navigation.navigate({
 		path: 'ProductCatalog',
@@ -72,14 +88,14 @@ const openBrand = action => {
 	})
 }
 
-const openLink = link => {
+const openLink = (link: string) => {
 	Eitri.openBrowser({
 		url: link,
 		inApp: true
 	})
 }
 
-const openFacets = action => {
+const openFacets = (action: CmsAction) => {
 	const facets = action?.facets || []
 
 	Eitri.navigation.navigate({
@@ -88,7 +104,7 @@ const openFacets = action => {
 	})
 }
 
-export const processActions = sliderData => {
+export const processActions = (sliderData: SliderData): void => {
 	if (sliderData.mktTag) {
 		TrackingService.selectPromotionEvent({
 			creative_name: sliderData.mktTag
@@ -112,20 +128,20 @@ export const processActions = sliderData => {
 			handleCategoryAction(action)
 			break
 		case 'product':
-			handleProductAction(action.value)
+			if (action.value) handleProductAction(action.value)
 			break
 		case 'path':
-			resolveNavigation(action.value)
+			if (action.value) resolveNavigation(action.value)
 			break
 		case 'brand':
 			openBrand(action)
 			break
 		case 'link':
-			openLink(action.value)
+			if (action.value) openLink(action.value)
 			break
 		case 'facets':
 			openFacets(action)
 		default:
-			console.log(`Unknown action type: ${action.type}`)
+			console.log(`Unknown action type: ${action?.type}`)
 	}
 }

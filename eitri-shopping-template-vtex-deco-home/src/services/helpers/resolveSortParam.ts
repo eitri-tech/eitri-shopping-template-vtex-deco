@@ -1,4 +1,4 @@
-export const resolveSortParam = (sort, useGraphQlMode) => {
+export const resolveSortParam = (sort?: string, useGraphQlMode?: boolean): string => {
 	if (useGraphQlMode) {
 		if (sort?.startsWith('OrderBy')) return sort
 		switch (sort) {
@@ -22,7 +22,10 @@ export const resolveSortParam = (sort, useGraphQlMode) => {
 				return getDefaultSortParam(useGraphQlMode)
 		}
 	}
-	if (sort?.indexOf(':') > -1) return sort
+	// `sort` is guaranteed defined here (the guard above can only pass when sort.indexOf(':')
+	// produced a real match), but that isn't visible to TS through optional chaining — `?? ''`
+	// documents the guarantee without a cast.
+	if ((sort?.indexOf(':') ?? -1) > -1) return sort ?? ''
 	switch (sort) {
 		case 'OrderByTopSaleDESC':
 			return 'orders:desc'
@@ -45,7 +48,7 @@ export const resolveSortParam = (sort, useGraphQlMode) => {
 	}
 }
 
-export const getDefaultSortParam = useGraphQlMode => {
+export const getDefaultSortParam = (useGraphQlMode?: boolean): string => {
 	if (useGraphQlMode) return 'OrderByScoreDESC'
 	return 'score:desc'
 }

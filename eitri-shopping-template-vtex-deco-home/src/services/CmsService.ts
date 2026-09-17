@@ -1,8 +1,9 @@
-import { Vtex, App } from 'eitri-shopping-vtex-shared'
+import { Vtex } from 'eitri-shopping-vtex-shared'
 import { getFbRemoteConfig } from './RemoteConfigService'
 import Eitri from 'eitri-bifrost'
+import type { CmsPageContent, CmsSection } from '../types/vtex'
 
-export const getCmsContent = async (contentType, pageName) => {
+export const getCmsContent = async (contentType: string, pageName?: string): Promise<CmsPageContent | null> => {
 	try {
 		if (!pageName) return null
 
@@ -35,10 +36,14 @@ export const getCmsContent = async (contentType, pageName) => {
 	return null
 }
 
-export const loadVtexCmsPage = async (faststore, contentType, pageName) => {
+export const loadVtexCmsPage = async (
+	faststore: unknown,
+	contentType: string,
+	pageName: string
+): Promise<CmsPageContent | null> => {
 	try {
 		const result = await Vtex.cms.getPagesByContentTypes(faststore, contentType, { 'filters[name]': pageName })
-		let page = result?.data?.[0]
+		let page = result?.data?.[0] as CmsPageContent | undefined
 		if (!page) return null
 
 		const now = new Date()
@@ -52,7 +57,7 @@ export const loadVtexCmsPage = async (faststore, contentType, pageName) => {
 
 			// Se for MultipleImageBanner, filtra banners com mesma lógica
 			if (name === 'MultipleImageBanner' && Array.isArray(images)) {
-				section.data.images = images.filter(img => {
+				section.data!.images = images.filter(img => {
 					return isWithinValidDateRange(img.startDate, img.endDate, now)
 				})
 			}
@@ -66,11 +71,11 @@ export const loadVtexCmsPage = async (faststore, contentType, pageName) => {
 	}
 }
 
-const isWithinValidDateRange = (startDateStr, endDateStr, now) => {
+const isWithinValidDateRange = (startDateStr: string | undefined, endDateStr: string | undefined, now: Date): boolean => {
 	const start = startDateStr ? new Date(startDateStr) : null
 	const end = endDateStr ? new Date(endDateStr) : null
 
-	if ((start && isNaN(start)) || (end && isNaN(end))) return false
+	if ((start && isNaN(start.getTime())) || (end && isNaN(end.getTime()))) return false
 
 	if (start && now < start) return false
 	if (end && now > end) return false
@@ -78,15 +83,21 @@ const isWithinValidDateRange = (startDateStr, endDateStr, now) => {
 	return true
 }
 
-export const loadPageFromCache = async (faststore, contentType, pageName) => {
+export const loadPageFromCache = async (
+	faststore: string,
+	contentType: string,
+	pageName: string
+): Promise<(CmsPageContent & { cachedIn?: string }) | null | undefined> => {
 	try {
 		const cacheKey = `${faststore}_${contentType}_${pageName}`
-		const content = await Eitri.sharedStorage.getItemJson(cacheKey)
+		const content = (await Eitri.sharedStorage.getItemJson(cacheKey)) as
+			| (CmsPageContent & { cachedIn?: string })
+			| undefined
 		if (!content) return
 
-		const inputDate = new Date(content.cachedIn)
+		const inputDate = new Date(content.cachedIn as string)
 		const currentDate = new Date()
-		const differenceInMs = currentDate - inputDate
+		const differenceInMs = currentDate.getTime() - inputDate.getTime()
 		const twentyFourHoursInMs = 86400000
 		if (differenceInMs > twentyFourHoursInMs) {
 			console.log('Cache expirado, buscando novo...')
@@ -99,7 +110,12 @@ export const loadPageFromCache = async (faststore, contentType, pageName) => {
 	}
 }
 
-export const savePageInCache = async (faststore, contentType, pageName, page) => {
+export const savePageInCache = async (
+	faststore: string,
+	contentType: string,
+	pageName: string,
+	page: CmsPageContent
+): Promise<void> => {
 	try {
 		const cacheKey = `${faststore}_${contentType}_${pageName}`
 		Eitri.sharedStorage.setItemJson(cacheKey, { cachedIn: new Date().toISOString(), ...page })
@@ -108,7 +124,7 @@ export const savePageInCache = async (faststore, contentType, pageName, page) =>
 	}
 }
 
-export const filterRemoteConfigContent = async cmsPageContent => {
+export const filterRemoteConfigContent = async (cmsPageContent: CmsPageContent | null): Promise<CmsPageContent | null> => {
 	if (!cmsPageContent) return null
 
 	try {
@@ -117,7 +133,7 @@ export const filterRemoteConfigContent = async cmsPageContent => {
 
 		return {
 			...cmsPageContent,
-			sections: filterSectionsByRemoteConfig(cmsPageContent.sections, remoteConfigMap)
+			sections: filterSectionsByRemoteConfig(cmsPageContent.sections ?? [], remoteConfigMap)
 		}
 	} catch (error) {
 		console.error('Error filtering remote config content:', error)
@@ -125,16 +141,16 @@ export const filterRemoteConfigContent = async cmsPageContent => {
 	}
 }
 
-const extractRemoteConfigKeys = cmsPageContent => {
-	const keys = new Set()
+const extractRemoteConfigKeys = (cmsPageContent: CmsPageContent): string[] => {
+	const keys = new Set<string>()
 
-	cmsPageContent.sections.forEach(section => {
+	;(cmsPageContent.sections ?? []).forEach(section => {
 		if (section.data?.remoteConfigKey) {
 			keys.add(section.data.remoteConfigKey)
 		}
 
 		if (section.name === 'MultipleImageBanner') {
-			section.data.images?.forEach(image => {
+			section.data?.images?.forEach(image => {
 				if (image?.remoteConfigKey) {
 					keys.add(image.remoteConfigKey)
 				}
@@ -145,10 +161,10 @@ const extractRemoteConfigKeys = cmsPageContent => {
 	return Array.from(keys)
 }
 
-const fetchRemoteConfigs = async keys => {
+const fetchRemoteConfigs = async (keys: string[]): Promise<Record<string, unknown>> => {
 	try {
 		const results = await Promise.all(keys.map(getFbRemoteConfig))
-		return results.reduce((acc, result, index) => {
+		return results.reduce<Record<string, unknown>>((acc, result, index) => {
 			acc[keys[index]] = result ?? false
 			return acc
 		}, {})
@@ -158,13 +174,13 @@ const fetchRemoteConfigs = async keys => {
 	}
 }
 
-const filterSectionsByRemoteConfig = (sections, remoteConfigMap) => {
+const filterSectionsByRemoteConfig = (sections: CmsSection[], remoteConfigMap: Record<string, unknown>): CmsSection[] => {
 	return sections.filter(section => {
 		if (section.data?.remoteConfigKey && !remoteConfigMap[section.data.remoteConfigKey]) {
 			return false
 		}
 
-		if (section.name === 'MultipleImageBanner') {
+		if (section.name === 'MultipleImageBanner' && section.data) {
 			section.data.images = section.data.images?.filter(
 				image => !(image?.remoteConfigKey && !remoteConfigMap[image.remoteConfigKey])
 			)

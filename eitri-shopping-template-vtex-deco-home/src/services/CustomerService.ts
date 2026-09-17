@@ -1,8 +1,8 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import Eitri from 'eitri-bifrost'
 
-export const requestLogin = () => {
-	return new Promise(async (resolve, reject) => {
+export const requestLogin = (): Promise<void> => {
+	return new Promise<void>(async (resolve, reject) => {
 		if (await isLoggedIn()) {
 			resolve()
 			return
@@ -22,7 +22,7 @@ export const requestLogin = () => {
 	})
 }
 
-export const isLoggedIn = async () => {
+export const isLoggedIn = async (): Promise<boolean> => {
 	try {
 		return await Vtex.customer.isLoggedIn()
 	} catch (e) {
@@ -31,7 +31,7 @@ export const isLoggedIn = async () => {
 	}
 }
 
-export const productOnWishlist = async productId => {
+export const productOnWishlist = async (productId: string) => {
 	if (!(await isLoggedIn())) {
 		return { inList: false }
 	}
@@ -45,11 +45,11 @@ export const productOnWishlist = async productId => {
 	}
 }
 
-export const removeItemFromWishlist = async id => {
+export const removeItemFromWishlist = async (id: string) => {
 	return await Vtex.wishlist.removeItem(id)
 }
 
-export const addToWishlist = async (productId, title, sku) => {
+export const addToWishlist = async (productId: string, title: string, sku: unknown) => {
 	await requestLogin()
 	return await Vtex.wishlist.addItem(productId, title, sku)
 }

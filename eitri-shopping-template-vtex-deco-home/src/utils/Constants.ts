@@ -1,10 +1,10 @@
-export const PROVIDER = {
+export const PROVIDER: Record<string, string> = {
 	VTEX: 'VTEX',
 	WAKE: 'WAKE',
 	DECO: 'DECO'
 }
 
-export const CMS_PRODUCT_SORT = {
+export const CMS_PRODUCT_SORT: Record<string, string> = {
 	name_asc: 'OrderByNameASC',
 	name_desc: 'OrderByNameDESC',
 	orders_desc: 'OrderByTopSaleDESC',

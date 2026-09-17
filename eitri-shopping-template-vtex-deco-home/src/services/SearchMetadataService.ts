@@ -5,11 +5,11 @@ import Eitri from 'eitri-bifrost'
 const limit = 5
 
 export const getTopSearches = async () => {
-	return Vtex.catalog.topSearches()
+	return Vtex.catalog.topSearches('pt-BR')
 }
 
-export const saveSearchHistory = async term => {
-	const history = (await Eitri.storage.getItemJson('search-history')) || []
+export const saveSearchHistory = async (term?: string): Promise<void> => {
+	const history = ((await Eitri.storage.getItemJson('search-history')) as string[]) || []
 
 	if (!term) return
 
@@ -23,11 +23,14 @@ export const saveSearchHistory = async term => {
 	await Eitri.storage.setItemJson('search-history', history)
 }
 
-export const getSearchHistory = async () => {
-	const history = (await Eitri.storage.getItemJson('search-history')) || []
+export const getSearchHistory = async (): Promise<string[]> => {
+	const history = ((await Eitri.storage.getItemJson('search-history')) as string[]) || []
 	return history.splice(0, limit)
 }
 
-export const deleteHistory = async () => {
-	await Eitri.storage.clear('search-history')
+export const deleteHistory = async (): Promise<void> => {
+	// Eitri.storage.clear() takes an options object and wipes the ENTIRE app storage — passing
+	// a key string here (as the old code did) had no per-key meaning and risked clearing more
+	// than just the search history. removeItem(key) is the correct call for a single key.
+	await Eitri.storage.removeItem('search-history')
 }

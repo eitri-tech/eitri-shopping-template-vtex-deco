@@ -1,6 +1,12 @@
 import Eitri from 'eitri-bifrost'
 
-export const openCart = async () => {
+interface NormalizedSearchData {
+	facets: Array<{ key: string; value: string }>
+	query?: string
+	[key: string]: unknown
+}
+
+export const openCart = async (): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'cart'
@@ -10,14 +16,14 @@ export const openCart = async () => {
 	}
 }
 
-export const openAccount = async action => {
+export const openAccount = async (action?: string): Promise<void> => {
 	Eitri.nativeNavigation.open({
 		slug: 'account',
 		initParams: { action }
 	})
 }
 
-export const openProduct = async product => {
+export const openProduct = async (product: unknown): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'pdp',
@@ -28,7 +34,7 @@ export const openProduct = async product => {
 	}
 }
 
-export const openProductById = async productId => {
+export const openProductById = async (productId: string): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'pdp',
@@ -39,7 +45,7 @@ export const openProductById = async productId => {
 	}
 }
 
-export const openProductBySlug = async slug => {
+export const openProductBySlug = async (slug: string): Promise<void> => {
 	try {
 		Eitri.nativeNavigation.open({
 			slug: 'pdp',
@@ -52,16 +58,16 @@ export const openProductBySlug = async slug => {
 
 const IGNORED_FACET_KEYS = new Set(['fuzzy', 'operator', 'channel', 'locale'])
 
-export const normalizePath = path => {
+export const normalizePath = (path: string): NormalizedSearchData => {
 	const pathComponents = decodeURIComponent(path).split('?')
 	const pathData = pathComponents[0].split('/').filter(Boolean)
 	const queryParams = new URLSearchParams(pathComponents[1])
-	const normalizedData = { facets: [] }
+	const normalizedData: NormalizedSearchData = { facets: [] }
 
 	if (pathData[0] === 's' && queryParams.has('q')) {
-		normalizedData.query = decodeURIComponent(queryParams.get('q').replace(/\+/g, ' '))
+		normalizedData.query = decodeURIComponent((queryParams.get('q') ?? '').replace(/\+/g, ' '))
 	} else if (queryParams.has('map')) {
-		const mapKeys = queryParams.get('map').split(',')
+		const mapKeys = (queryParams.get('map') ?? '').split(',')
 		pathData.forEach((value, index) => {
 			if (mapKeys[index] === 'ft') {
 				normalizedData.query = value
@@ -70,10 +76,10 @@ export const normalizePath = path => {
 			}
 		})
 	} else if (queryParams.has('facets')) {
-		const facetKeys = queryParams.get('facets').split(',')
+		const facetKeys = (queryParams.get('facets') ?? '').split(',')
 		facetKeys.forEach(key => {
 			if (!IGNORED_FACET_KEYS.has(key) && queryParams.has(key)) {
-				normalizedData.facets.push({ key, value: queryParams.get(key) })
+				normalizedData.facets.push({ key, value: queryParams.get(key) ?? '' })
 			}
 		})
 	} else {
@@ -83,9 +89,11 @@ export const normalizePath = path => {
 	}
 
 	const skipKeys = new Set([
-		'map', 'facets', 'page',
+		'map',
+		'facets',
+		'page',
 		...IGNORED_FACET_KEYS,
-		...(queryParams.has('facets') ? queryParams.get('facets').split(',') : [])
+		...(queryParams.has('facets') ? (queryParams.get('facets') ?? '').split(',') : [])
 	])
 	for (const [key, value] of queryParams.entries()) {
 		if (!skipKeys.has(key)) {
@@ -96,7 +104,7 @@ export const normalizePath = path => {
 	return normalizedData
 }
 
-export const resolveNavigation = (path, title) => {
+export const resolveNavigation = (path: string, title?: string): void => {
 	const normalizedPath = normalizePath(path)
 	Eitri.navigation.navigate({ path: 'ProductCatalog', state: { params: normalizedPath, title: title || '' } })
 }

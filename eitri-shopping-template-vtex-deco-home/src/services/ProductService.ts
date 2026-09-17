@@ -2,7 +2,18 @@ import { Vtex } from 'eitri-shopping-vtex-shared'
 import { CMS_PRODUCT_SORT } from '../utils/Constants'
 import { resolveSortParam } from './helpers/resolveSortParam'
 
-export const autocompleteSuggestions = async value => {
+interface SearchParams {
+	facets?: Array<{ key: string; value: string }>
+	query?: string
+	q?: string
+	sort?: string
+	from?: number
+	to?: number
+	count?: number
+	[key: string]: unknown
+}
+
+export const autocompleteSuggestions = async (value: string) => {
 	return await Vtex.catalog.autoCompleteSuggestions(value)
 }
 
@@ -11,11 +22,11 @@ export const autocompleteSuggestions = async value => {
  *  facets: Array<{ key: string, value: string }>
  *  query: string
  *  sort: string
- * }
  *
+ * } *
  * */
 
-export const getProductsService = async (params, page) => {
+export const getProductsService = async (params: SearchParams, page?: number) => {
 	const PAGE_SIZE = 12
 
 	// Validar se params está presente e é um objeto válido
@@ -39,7 +50,7 @@ export const getProductsService = async (params, page) => {
 	// Garantir que selectedFacets seja um array válido ou null
 	const selectedFacets = Array.isArray(params?.facets) ? params.facets : null
 
-	const options = {
+	const options: Record<string, unknown> = {
 		fullText: params?.query || params?.q || '',
 		selectedFacets: selectedFacets,
 		orderBy: resolveSortParam(params?.sort, true),
@@ -58,12 +69,16 @@ export const getProductsService = async (params, page) => {
 		}
 	})
 
-	return await Vtex.searchGraphql.productSearch(options)
+	// eitri-shopping-vtex-shared's ProductSearchInput stub demands many fields (salesChannel,
+	// priceRange, simulationBehavior, operator, fuzzy, searchState...) this app never set and
+	// doesn't even list the `orderBy` field the code actually relies on — a library typing gap
+	// (auto-generated from usage), not something this call is missing.
+	return await Vtex.searchGraphql.productSearch(options as any)
 }
 
-export const getProductsServiceRest = async (params, page) => {
+export const getProductsServiceRest = async (params: SearchParams, page?: number) => {
 	const facetsPath = params?.facets?.map(facet => `${facet.key}/${facet.value}`).join('/')
-	const options = {
+	const options: Record<string, unknown> = {
 		query: params?.query || params?.q || '',
 		page: page ?? 1,
 		sort: resolveSortParam(params.sort)
@@ -74,7 +89,7 @@ export const getProductsServiceRest = async (params, page) => {
 	return await Vtex.catalog.getProductsByFacets(facetsPath, options)
 }
 
-export const getProductsFacetsService = async params => {
+export const getProductsFacetsService = async (params: SearchParams) => {
 	// Validar se params está presente e é um objeto válido
 	if (!params || typeof params !== 'object') {
 		throw new Error('Invalid parameters provided to getProductsFacetsService')
@@ -83,7 +98,7 @@ export const getProductsFacetsService = async params => {
 	// Garantir que selectedFacets seja um array válido ou null
 	const selectedFacets = Array.isArray(params?.facets) ? params.facets : null
 
-	const options = {
+	const options: Record<string, unknown> = {
 		fullText: params?.query || params?.q || '',
 		selectedFacets: selectedFacets,
 		hideUnavailableItems: true
@@ -96,7 +111,10 @@ export const getProductsFacetsService = async params => {
 		}
 	})
 
-	const result = await Vtex.searchGraphql.facets(options)
+	// Same library typing gap as productSearch above — Facets demands many fields
+	// (removeHiddenFacets, behavior, operator, fuzzy, searchState, categoryTreeBehavior...)
+	// this call never set and relies on server-side defaults for.
+	const result = (await Vtex.searchGraphql.facets(options as any)) as { facets?: unknown[] } | undefined
 
 	// Validar e garantir estrutura do resultado
 	if (!result || typeof result !== 'object') {
@@ -111,7 +129,7 @@ export const getProductsFacetsService = async params => {
 	return result
 }
 
-export const getProductsFacetsServiceRest = async params => {
+export const getProductsFacetsServiceRest = async (params: SearchParams) => {
 	const facetsPath = params?.facets?.map(facet => `${facet.key}/${facet.value}`).join('/')
 	const options = {
 		query: params?.query || params?.q || ''
@@ -122,22 +140,35 @@ export const getProductsFacetsServiceRest = async params => {
 	return formatPriceRangeFacet(result)
 }
 
-const formatPriceRangeFacet = facetQueryResult => {
+interface PriceRangeFacetValue {
+	range?: { from?: number; to?: number }
+	name?: string
+	value?: string
+	[key: string]: unknown
+}
+
+interface Facet {
+	type?: string
+	values?: PriceRangeFacetValue[]
+	[key: string]: unknown
+}
+
+const formatPriceRangeFacet = (facetQueryResult: { facets: Facet[] }) => {
 	return facetQueryResult.facets.map(facet => {
 		if (facet.type === 'PRICERANGE') {
 			return {
 				...facet,
-				values: facet.values.map(value => {
+				values: (facet.values ?? []).map(value => {
 					return {
 						...value,
-						name: `De ${value?.range?.from?.toLocaleString('pt-br', {
+						name: `De ${(value?.range?.from ?? 0).toLocaleString('pt-br', {
 							style: 'currency',
 							currency: 'BRL'
-						})} à ${value.range.to.toLocaleString('pt-br', {
+						})} à ${(value?.range?.to ?? 0).toLocaleString('pt-br', {
 							style: 'currency',
 							currency: 'BRL'
 						})}`,
-						value: `${value.range.from}:${value.range.to}`
+						value: `${value?.range?.from}:${value?.range?.to}`
 					}
 				})
 			}
@@ -147,14 +178,18 @@ const formatPriceRangeFacet = facetQueryResult => {
 	})
 }
 
-export const getProductById = async productId => {
+// ProductInput.identifier is a list of fallback identifiers, not a single object — the
+// original calls sent a bare object, which doesn't match the GraphQL input type VTEX expects.
+// ProductInput also demands `slug`/`regionId`/`salesChannel` this app never set — same library
+// typing gap as ProductSearchInput/Facets above (auto-generated from usage).
+export const getProductById = async (productId: string) => {
 	return await Vtex.searchGraphql.product({
-		identifier: { field: 'id', value: productId }
-	})
+		identifier: [{ field: 'id', value: productId }]
+	} as any)
 }
 
-let cachedCategoryTree = null
-export const getCategoryTree = async levels => {
+let cachedCategoryTree: unknown = null
+export const getCategoryTree = async (levels: number) => {
 	if (cachedCategoryTree) {
 		return cachedCategoryTree
 	}
@@ -163,6 +198,6 @@ export const getCategoryTree = async levels => {
 	return res
 }
 
-export const getProductByEan = async ean => {
-	return await Vtex.searchGraphql.product({ identifier: { field: 'ean', value: ean } })
+export const getProductByEan = async (ean: string) => {
+	return await Vtex.searchGraphql.product({ identifier: [{ field: 'ean', value: ean }] } as any)
 }
