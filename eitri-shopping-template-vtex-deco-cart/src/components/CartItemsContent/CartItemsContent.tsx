@@ -23,13 +23,13 @@ export default function CartItemsContent() {
 	}
 
 	const onChangeQuantityItem = async (quantity: number, index: number) => {
-		await changeQuantity(index, quantity)
+		await changeQuantity?.(index, quantity)
 	}
 
 	const handleRemoveCartItem = async (index: number) => {
 		try {
 			setCartItems([...cartItems.slice(0, index), ...cartItems.slice(index + 1)])
-			await removeItem(index)
+			await removeItem?.(index)
 			if (cart) {
 				TrackingService.removeFromCartEvent(cart, index)
 			}
@@ -39,11 +39,11 @@ export default function CartItemsContent() {
 	}
 
 	const onAddOfferingToCart = async (itemIndex: number, offeringId: string) => {
-		await addItemOffer(itemIndex, offeringId)
+		await addItemOffer?.(itemIndex, offeringId)
 	}
 
 	const onRemoveOfferingFromCart = async (itemIndex: number, offeringId: string) => {
-		await removeItemOffer(itemIndex, offeringId)
+		await removeItemOffer?.(itemIndex, offeringId)
 	}
 
 	return (

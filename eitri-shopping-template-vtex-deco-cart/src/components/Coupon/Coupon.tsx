@@ -47,14 +47,14 @@ export default function Coupon() {
 
 	const onPressAddCoupon = () => {
 		setIsLoading(true)
-		addCoupon(coupon)
+		addCoupon?.(coupon)
 		setIsLoading(false)
 	}
 
 	const onPressRemoveCoupon = () => {
 		setCoupon('')
 		setCouponTextAlert('')
-		removeCoupon()
+		removeCoupon?.()
 	}
 
 	if (!cart) return null

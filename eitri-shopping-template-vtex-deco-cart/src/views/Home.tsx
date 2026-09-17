@@ -56,7 +56,7 @@ export default function Home() {
 		if (startParams?.orderFormId) {
 			await saveCartIdOnStorage(startParams.orderFormId)
 		}
-		return startCart()
+		return startCart?.()
 	}
 
 	return (

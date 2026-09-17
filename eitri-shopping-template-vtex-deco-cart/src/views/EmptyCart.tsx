@@ -30,7 +30,7 @@ export default function EmptyCart(props: RouteProps<EmptyCartState>) {
 
 	useEffect(() => {
 		Eitri.navigation.setOnResumeListener(async () => {
-			const cart = await startCart()
+			const cart = await startCart?.()
 			if (cart && (cart.items?.length ?? 0) > 0) {
 				Eitri.navigation.navigate({ path: 'Home', replace: true })
 			}

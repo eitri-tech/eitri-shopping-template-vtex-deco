@@ -18,12 +18,12 @@ export default function Freight() {
 
 	const cartPostalCode = cart?.shippingData?.address?.postalCode
 
-	const handleFreight = async cep => {
+	const handleFreight = async (cep: string) => {
 		if (loading) return
 		setLoading(true)
 		try {
 			const { street, neighborhood, city, state, country, geoCoordinates } = await resolveZipCode(cep)
-			await setLogisticInfo({
+			await setLogisticInfo?.({
 				address: {
 					addressType: 'residential',
 					postalCode: cep,

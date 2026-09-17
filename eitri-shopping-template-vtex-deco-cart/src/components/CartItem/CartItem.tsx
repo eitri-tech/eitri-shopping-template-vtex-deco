@@ -95,6 +95,7 @@ export default function CartItem(props: CartItemProps) {
 	}
 
 	const goToProduct = () => {
+		if (!item.productId) return
 		openProduct(item.productId)
 	}
 
@@ -162,9 +163,9 @@ export default function CartItem(props: CartItemProps) {
 					</View>
 				</View>
 
-				{item?.offerings?.length > 0 && !message && (
+				{(item?.offerings?.length ?? 0) > 0 && !message && (
 					<View className='mt-4 pt-3 border-t border-gray-300'>
-						{item?.offerings.map(offering => (
+						{item?.offerings?.map(offering => (
 							<View
 								key={offering.id}
 								onClick={() => handleItemOffer(offering.id)}
