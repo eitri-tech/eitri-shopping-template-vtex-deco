@@ -7,6 +7,8 @@ module.exports = {
   "eitri-commons": "2.2.1",
   "version": "0.1.0",
   "id": "0b4a877c-b063-4ddc-b546-18e8ae6190f5",
+  'organizationId': '36c61ecd-383b-41a5-8be4-3e4aa4dafe3c',
+  'organization': {},
   "eitri-app-dependencies": {
     "eitri-shopping-template-vtex-deco-shared": {
       "isEitriAppShared": true,
