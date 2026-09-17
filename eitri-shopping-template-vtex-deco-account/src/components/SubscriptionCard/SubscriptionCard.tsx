@@ -1,16 +1,25 @@
+import { View, Text, Image } from 'eitri-luminus'
 import { GenericBox, CustomButton } from 'eitri-shopping-template-vtex-deco-shared'
 import { FiEdit2, FiPackage } from 'react-icons/fi'
 import { useTranslation } from 'eitri-i18n'
 import formatDateMMDDYYYY from '../../utils/utils'
 import { frequencyLabel, subscriptionTitle } from '../../utils/subscription'
 import { navigate, PAGES } from '../../services/NavigationService'
+import type { VtexSubscription } from '../../types/vtex'
 
-export default function SubscriptionCard(props) {
+interface SubscriptionCardProps {
+	subscription: VtexSubscription
+	products?: Record<string, { imageUrl?: string; name?: string }>
+	onRename?: () => void
+}
+
+export default function SubscriptionCard(props: SubscriptionCardProps) {
 	const { subscription, products, onRename } = props
 	const { t } = useTranslation()
 
-	const firstImage = subscription.items.map(item => products?.[item.skuId]?.imageUrl).find(Boolean)
-	const extraItems = subscription.items.length - 1
+	const items = subscription.items ?? []
+	const firstImage = items.map(item => products?.[item.skuId ?? '']?.imageUrl).find(Boolean)
+	const extraItems = items.length - 1
 
 	return (
 		<GenericBox className='flex flex-col gap-4'>
@@ -39,7 +48,7 @@ export default function SubscriptionCard(props) {
 						className='flex flex-row items-start gap-2'
 						onClick={onRename}>
 						<Text className='font-bold text-gray-900 flex-1'>
-							{subscriptionTitle(subscription, products, t)}
+							{subscriptionTitle(subscription, products, t as any)}
 						</Text>
 						<FiEdit2
 							size={14}

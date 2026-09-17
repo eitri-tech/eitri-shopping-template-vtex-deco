@@ -1,4 +1,14 @@
-export default function CCheckbox(props) {
+import { Checkbox, Text, View } from 'eitri-luminus'
+
+interface CCheckboxProps {
+	checked?: boolean
+	onChange: (checked: boolean) => void
+	label?: string
+	align?: 'center' | string
+	justify?: 'center' | string
+}
+
+export default function CCheckbox(props: CCheckboxProps) {
 	const { checked, onChange, label, align, justify } = props
 
 	return (

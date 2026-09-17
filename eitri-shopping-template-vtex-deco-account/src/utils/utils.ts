@@ -1,6 +1,6 @@
 import { App } from 'eitri-shopping-vtex-shared'
 
-export const formatPrice = (price: number, _locale?: string, _currency?: string): string => {
+export const formatPrice = (price?: number, _locale?: string, _currency?: string): string => {
 	if (!price) return ''
 
 	const locale = _locale || (App as any)?.configs?.storePreferences?.locale || 'pt-BR'

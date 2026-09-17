@@ -1,6 +1,14 @@
+import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import { View } from 'eitri-luminus'
 
-export default function InfiniteScroll(props) {
+interface InfiniteScrollProps {
+	children?: ReactNode
+	onScrollEnd?: () => void
+	className?: string
+}
+
+export default function InfiniteScroll(props: InfiniteScrollProps) {
 	const { children, onScrollEnd, className } = props
 
 	const [scrollEnded, setScrollEnded] = useState(false)
@@ -18,7 +26,7 @@ export default function InfiniteScroll(props) {
 	}, [])
 	useEffect(() => {
 		if (scrollEnded) {
-			onScrollEnd()
+			onScrollEnd?.()
 			setScrollEnded(false)
 		}
 	}, [scrollEnded])

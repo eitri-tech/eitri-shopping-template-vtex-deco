@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import Eitri from 'eitri-bifrost'
-import { useState, useEffect } from 'react'
+import { Text, View } from 'eitri-luminus'
 import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import { FiCopy } from 'react-icons/fi'
 import OrderStatusBadge from '../OrderStatusBadge/OrderStatusBadge'
@@ -10,14 +11,19 @@ import { navigate, PAGES } from '../../services/NavigationService'
 import OrderBuyAgain from '../OrderBuyAgain/OrderBuyAgain'
 import { useSnackBar } from '../../providers/SnackBar'
 import { useTranslation } from 'eitri-i18n'
+import type { VtexOrder } from '../../types/vtex'
 
-export default function OrderCard(props) {
+interface OrderCardProps {
+	order?: VtexOrder
+}
+
+export default function OrderCard(props: OrderCardProps) {
 	const { order } = props
 	const { showSnackBar } = useSnackBar()
 	const { t } = useTranslation()
 
 	const [loadingDetails, setLoadingDetails] = useState(false)
-	const [orderDetail, setOrderDetails] = useState(null)
+	const [orderDetail, setOrderDetails] = useState<VtexOrder | null>(null)
 
 	useEffect(() => {
 		loadDetails()
@@ -26,7 +32,7 @@ export default function OrderCard(props) {
 	const loadDetails = async () => {
 		setLoadingDetails(true)
 		try {
-			const result = await getOrderById(order?.orderId)
+			const result = (await getOrderById(order?.orderId ?? '')) as VtexOrder
 			setOrderDetails(result)
 		} catch (e) {
 			console.error('Falha ao carregar detalhes do pedido:', e)
@@ -36,7 +42,7 @@ export default function OrderCard(props) {
 	}
 
 	const handleCopyOrderId = async () => {
-		Eitri.clipboard.setText({ text: order?.orderId })
+		Eitri.clipboard.setText({ text: order?.orderId ?? '' })
 		showSnackBar('success', t('orderCard.copySuccess'))
 	}
 
@@ -44,7 +50,7 @@ export default function OrderCard(props) {
 		if (orderDetail) {
 			navigate(PAGES.ORDER_DETAILS, { order: orderDetail })
 		} else {
-			navigate(PAGES.ORDER_DETAILS, { order: order.orderId })
+			navigate(PAGES.ORDER_DETAILS, { order: order?.orderId })
 		}
 	}
 
@@ -62,7 +68,9 @@ export default function OrderCard(props) {
 							/>
 						</View>
 					</View>
-					<Text className='text-sm text-gray-800'>{formatDateDaysMonthYear(order?.creationDate)}</Text>
+					<Text className='text-sm text-gray-800'>
+						{order?.creationDate ? formatDateDaysMonthYear(order.creationDate) : ''}
+					</Text>
 				</View>
 				{orderDetail && (
 					<OrderStatusBadge
@@ -79,16 +87,13 @@ export default function OrderCard(props) {
 					<Text className='text-xs text-gray-400'>{t('orderCard.loading')}</Text>
 				</View>
 			) : (
-				orderDetail?.items?.length > 0 && (
+				(orderDetail?.items?.length ?? 0) > 0 && (
 					<View className='flex gap-2 py-4 overflow-x-auto'>
-						{orderDetail.items.map(item => (
+						{orderDetail?.items?.map(item => (
 							<View
 								key={item.uniqueId}
 								className='w-[56px] h-[56px] flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 border border-gray-100'>
-								<ImageCard
-									imageUrl={item.imageUrl}
-									className='w-full h-full object-cover'
-								/>
+								<ImageCard imageUrl={item.imageUrl} />
 							</View>
 						))}
 					</View>
@@ -100,7 +105,7 @@ export default function OrderCard(props) {
 				<View className='border-t border-gray-100'>
 					<View className='flex items-center justify-between py-4'>
 						<Text className='text-xs text-gray-800'>
-							{t(order?.totalItems > 1 ? 'orderCard.totalPlural' : 'orderCard.totalSingular', {
+							{t((order?.totalItems ?? 0) > 1 ? 'orderCard.totalPlural' : 'orderCard.totalSingular', {
 								count: order?.totalItems
 							})}
 						</Text>

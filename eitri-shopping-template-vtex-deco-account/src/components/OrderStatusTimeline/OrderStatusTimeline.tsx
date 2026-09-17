@@ -1,8 +1,14 @@
 import { View, Text } from 'eitri-luminus'
 import { getOrderStages } from '../../utils/getFullOrderState'
 import { useTranslation } from 'eitri-i18n'
+import type { VtexOrder } from '../../types/vtex'
 
-export default function OrderStatusTimeline({ order, title }) {
+interface OrderStatusTimelineProps {
+	order: VtexOrder
+	title?: string
+}
+
+export default function OrderStatusTimeline({ order, title }: OrderStatusTimelineProps) {
 	const { t } = useTranslation()
 	const stages = getOrderStages(order)
 	const displayTitle = title ?? t('orderStatusTimeline.title')

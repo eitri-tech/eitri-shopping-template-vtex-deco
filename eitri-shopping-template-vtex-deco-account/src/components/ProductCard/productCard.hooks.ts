@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { addToWishlist, productOnWishlist, removeItemFromWishlist } from '../../services/CustomerService'
+import type { VtexCart, VtexCartItem } from '../../types/vtex'
 
-export const useCartItem = (cart, itemId) => {
-	return useMemo(() => {
+export const useCartItem = (cart?: VtexCart | null, itemId?: string) => {
+	return useMemo<(VtexCartItem & { index: number }) | null>(() => {
 		if (!cart?.items || !itemId) return null
 
 		const index = cart.items.findIndex(cartItem => cartItem.id === itemId)
@@ -12,9 +13,9 @@ export const useCartItem = (cart, itemId) => {
 	}, [cart, itemId])
 }
 
-export const useWishlist = productId => {
+export const useWishlist = (productId?: string) => {
 	const [isOnWishlist, setIsOnWishlist] = useState(false)
-	const [wishListId, setWishListId] = useState(null)
+	const [wishListId, setWishListId] = useState<string | number | null>(null)
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
@@ -27,7 +28,7 @@ export const useWishlist = productId => {
 			try {
 				const { inList, listId } = await productOnWishlist(productId)
 				setIsOnWishlist(inList)
-				if (inList) setWishListId(listId)
+				if (inList) setWishListId(listId ?? null)
 			} catch (error) {
 				console.error('Error checking wishlist:', error)
 			} finally {
@@ -39,14 +40,16 @@ export const useWishlist = productId => {
 	}, [productId])
 
 	const addToList = useCallback(
-		async (itemName, itemId) => {
+		async (itemName?: string, itemId?: string) => {
 			if (!productId) return
 
 			try {
 				setLoading(true)
 				setIsOnWishlist(true)
-				const response = await addToWishlist(productId, itemName, itemId)
-				setWishListId(response?.data?.addToList)
+				const response = (await addToWishlist(productId, itemName ?? '', itemId ?? '')) as {
+					data?: { addToList?: string }
+				}
+				setWishListId(response?.data?.addToList ?? null)
 			} catch (error) {
 				console.error('Error adding to wishlist:', error)
 				setIsOnWishlist(false)
@@ -63,7 +66,7 @@ export const useWishlist = productId => {
 		try {
 			setLoading(true)
 			setIsOnWishlist(false)
-			await removeItemFromWishlist(wishListId)
+			await removeItemFromWishlist(String(wishListId))
 		} catch (error) {
 			console.error('Error removing from wishlist:', error)
 			setIsOnWishlist(true)
@@ -73,7 +76,7 @@ export const useWishlist = productId => {
 	}, [wishListId])
 
 	const toggle = useCallback(
-		async (itemName, itemId) => {
+		async (itemName?: string, itemId?: string) => {
 			if (loading) return
 
 			if (isOnWishlist) {

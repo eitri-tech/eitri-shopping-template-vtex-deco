@@ -5,7 +5,7 @@ import { useTranslation } from 'eitri-i18n'
 
 export default function AppVersion() {
 	const { t } = useTranslation()
-	const [version, setVersion] = useState(null)
+	const [version, setVersion] = useState<string | null>(null)
 
 	useEffect(() => {
 		Eitri.getConfigs()

@@ -1,6 +1,21 @@
+import { Text, View } from 'eitri-luminus'
 import { FiCheck, FiX } from 'react-icons/fi'
 
-export default function OptionPicker(props) {
+interface Option {
+	value: string
+	label?: string
+	description?: string
+}
+
+interface OptionPickerProps {
+	title?: string
+	options?: Option[]
+	value?: string
+	onSelect: (value: string) => void
+	onClose: () => void
+}
+
+export default function OptionPicker(props: OptionPickerProps) {
 	const { title, options, value, onSelect, onClose } = props
 
 	if (!options) return null

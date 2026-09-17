@@ -1,4 +1,10 @@
-export default function ImageCard(props) {
+import { Image, View } from 'eitri-luminus'
+
+interface ImageCardProps {
+	imageUrl?: string
+}
+
+export default function ImageCard(props: ImageCardProps) {
 	const { imageUrl } = props
 
 	return (

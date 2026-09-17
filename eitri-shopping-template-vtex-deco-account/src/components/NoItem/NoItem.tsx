@@ -1,7 +1,13 @@
+import { Text, View } from 'eitri-luminus'
 import { BottomInset } from 'eitri-shopping-template-vtex-deco-shared'
 import { FiPackage } from 'react-icons/fi'
 
-export default function NoItem(props) {
+interface NoItemProps {
+	title?: string
+	subtitle?: string
+}
+
+export default function NoItem(props: NoItemProps) {
 	const { title, subtitle } = props
 
 	return (

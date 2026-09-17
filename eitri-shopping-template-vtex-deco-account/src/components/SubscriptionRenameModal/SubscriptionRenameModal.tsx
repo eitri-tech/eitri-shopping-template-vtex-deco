@@ -1,8 +1,19 @@
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
+import { Text, View } from 'eitri-luminus'
 import { CustomButton, CustomInput } from 'eitri-shopping-template-vtex-deco-shared'
 import { FiX } from 'react-icons/fi'
 import { useTranslation } from 'eitri-i18n'
 
-export default function SubscriptionRenameModal(props) {
+interface SubscriptionRenameModalProps {
+	show?: boolean
+	initialTitle?: string
+	onSave: (title: string) => void
+	onClose?: () => void
+	isSaving?: boolean
+}
+
+export default function SubscriptionRenameModal(props: SubscriptionRenameModalProps) {
 	const { show, initialTitle, onSave, onClose, isSaving } = props
 	const { t } = useTranslation()
 	const [title, setTitle] = useState(initialTitle || '')
@@ -29,7 +40,7 @@ export default function SubscriptionRenameModal(props) {
 				</View>
 				<CustomInput
 					value={title}
-					onChange={e => setTitle(e.target.value)}
+					onChange={(e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
 				/>
 				<View className='flex flex-col gap-2'>
 					<CustomButton

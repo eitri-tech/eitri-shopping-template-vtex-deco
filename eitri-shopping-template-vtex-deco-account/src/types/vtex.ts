@@ -27,7 +27,10 @@ export interface VtexPackage {
 export interface VtexOrder {
 	orderId?: string
 	status?: string
+	statusDescription?: string
 	value?: number
+	totalValue?: number
+	totalItems?: number
 	creationDate?: string
 	items?: VtexOrderItem[]
 	shippingData?: { logisticsInfo?: VtexLogisticsInfo[]; address?: VtexAddress; [key: string]: unknown }
@@ -39,6 +42,7 @@ export interface VtexOrder {
 
 export interface VtexOrderItem {
 	id?: string
+	uniqueId?: string
 	productId?: string
 	skuId?: string
 	name?: string
@@ -46,6 +50,7 @@ export interface VtexOrderItem {
 	price?: number
 	sellingPrice?: number
 	imageUrl?: string
+	seller?: string
 	[key: string]: unknown
 }
 
@@ -79,7 +84,9 @@ export interface VtexSubscription {
 	id?: string
 	title?: string
 	status?: string
-	frequency?: VtexFrequency
+	// Real usage (SubscriptionDetails.jsx, SubscriptionCard.jsx) always reads frequency/id off
+	// `subscription.plan`, never a top-level `frequency` — matches the shape here.
+	plan?: { id?: string; frequency?: VtexFrequency; [key: string]: unknown }
 	items?: VtexSubscriptionItem[]
 	nextPurchaseDate?: string
 	[key: string]: unknown
@@ -91,13 +98,42 @@ export interface VtexAssemblyOption {
 	[key: string]: unknown
 }
 
+export interface VtexInstallment {
+	NumberOfInstallments?: number
+	Value?: number
+	InterestRate?: number
+	[key: string]: unknown
+}
+
+export interface VtexCommertialOffer {
+	Price?: number
+	ListPrice?: number
+	spotPrice?: number
+	AvailableQuantity?: number
+	Installments?: VtexInstallment[]
+	teasers?: Array<{ name?: string; [key: string]: unknown }>
+	[key: string]: unknown
+}
+
+export interface VtexSeller {
+	sellerDefault?: boolean
+	commertialOffer?: VtexCommertialOffer
+	[key: string]: unknown
+}
+
 export interface VtexSku {
 	itemId?: string
 	name?: string
 	nameComplete?: string
 	images?: Array<{ imageUrl?: string; [key: string]: unknown }>
-	sellers?: Array<{ sellerDefault?: boolean; commertialOffer?: { Price?: number; [key: string]: unknown }; [key: string]: unknown }>
+	sellers?: VtexSeller[]
 	variations?: Array<{ name?: string; values?: string[]; [key: string]: unknown }>
+	[key: string]: unknown
+}
+
+export interface VtexProductProperty {
+	name?: string
+	values?: string[]
 	[key: string]: unknown
 }
 
@@ -108,6 +144,8 @@ export interface VtexProduct {
 	brand?: string
 	items?: VtexSku[]
 	itemMetadata?: { items?: Array<{ assemblyOptions?: VtexAssemblyOption[]; [key: string]: unknown }> }
+	productClusters?: Array<{ id?: string | number; [key: string]: unknown }>
+	properties?: VtexProductProperty[]
 	[key: string]: unknown
 }
 

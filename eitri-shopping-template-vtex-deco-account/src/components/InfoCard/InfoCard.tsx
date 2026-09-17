@@ -1,6 +1,12 @@
+import { Text, View } from 'eitri-luminus'
 import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
+import type { VtexCustomerProfile } from '../../types/vtex'
 
-export default function InfoCard(props) {
+interface InfoCardProps {
+	customerData?: VtexCustomerProfile
+}
+
+export default function InfoCard(props: InfoCardProps) {
 	const { customerData } = props
 
 	return (

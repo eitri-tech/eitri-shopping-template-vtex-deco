@@ -1,10 +1,19 @@
+import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import Eitri from 'eitri-bifrost'
 import { isLoggedIn } from '../../services/CustomerService'
 import { useTranslation } from 'eitri-i18n'
 import { Loading } from 'eitri-shopping-template-vtex-deco-shared'
 
-export default function ProtectedView(props) {
-	const { afterLoginRedirectTo, redirectState, labelLoading } = props
+interface ProtectedViewProps {
+	afterLoginRedirectTo?: string
+	redirectState?: Record<string, unknown>
+	labelLoading?: string
+	children?: ReactNode
+}
+
+export default function ProtectedView(props: ProtectedViewProps) {
+	const { afterLoginRedirectTo, redirectState, children } = props
 	const { t } = useTranslation()
 
 	const [isLoading, setIsLoading] = useState(true)
@@ -32,5 +41,5 @@ export default function ProtectedView(props) {
 		return <Loading fullScreen />
 	}
 
-	return <>{props.children}</>
+	return <>{children}</>
 }

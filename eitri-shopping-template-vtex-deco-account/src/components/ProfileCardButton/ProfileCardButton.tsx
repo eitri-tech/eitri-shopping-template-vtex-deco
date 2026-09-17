@@ -1,7 +1,15 @@
+import type { ReactNode } from 'react'
+import { View, Text } from 'eitri-luminus'
 import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import { FiChevronRight } from 'react-icons/fi'
 
-export default function ProfileCardButton(props) {
+interface ProfileCardButtonProps {
+	icon?: ReactNode
+	label?: string
+	onClick?: () => void
+}
+
+export default function ProfileCardButton(props: ProfileCardButtonProps) {
 	const { icon, label, onClick } = props
 
 	return (

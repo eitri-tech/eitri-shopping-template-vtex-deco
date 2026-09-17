@@ -1,8 +1,9 @@
+import { View, Text } from 'eitri-luminus'
 import { navigate, PAGES } from '../../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import { CustomButton, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 
-export default function LoginCard(props) {
+export default function LoginCard() {
 	const { t } = useTranslation()
 
 	return (

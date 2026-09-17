@@ -1,14 +1,24 @@
-// /Users/calindra/Workspace/Eitri/eitri-shopping-template/shopping-vtex-template-account/src/components/SocialLogin/SocialLogin.jsx
+import { Image, Text, View } from 'eitri-luminus'
 import iconFacebook from '../../assets/images/social_facebook.svg'
 import iconGoogle from '../../assets/images/social_google.svg'
 import { useTranslation } from 'eitri-i18n'
 import { loginWithFacebook, loginWithGoogle } from '../../services/CustomerService'
 
-export default function SocialLogin(props) {
+interface OAuthProvider {
+	providerName?: string
+	[key: string]: unknown
+}
+
+interface SocialLoginProps {
+	handleSocialLogin: () => void
+	oAuthProviders?: OAuthProvider[]
+}
+
+export default function SocialLogin(props: SocialLoginProps) {
 	const { handleSocialLogin, oAuthProviders } = props
 	const { t } = useTranslation()
 
-	const onSocialLogin = async executor => {
+	const onSocialLogin = async (executor: () => Promise<unknown>) => {
 		try {
 			console.log('onSocialLogin')
 			await executor()

@@ -1,17 +1,23 @@
+import { Text, View } from 'eitri-luminus'
 import { FiChevronDown } from 'react-icons/fi'
 import { useTranslation } from 'eitri-i18n'
 import { STATUS_VARIANTS } from '../../utils/subscription'
 
-const VARIANT_STYLES = {
+const VARIANT_STYLES: Record<string, { wrapper: string; text: string }> = {
 	success: { wrapper: 'bg-success', text: 'text-success-content' },
 	warning: { wrapper: 'bg-warning', text: 'text-warning-content' },
 	neutral: { wrapper: 'bg-neutral', text: 'text-neutral-content' }
 }
 
-export default function SubscriptionStatusBadge(props) {
+interface SubscriptionStatusBadgeProps {
+	status?: string
+	onClick?: () => void
+}
+
+export default function SubscriptionStatusBadge(props: SubscriptionStatusBadgeProps) {
 	const { status, onClick } = props
 	const { t } = useTranslation()
-	const styles = VARIANT_STYLES[STATUS_VARIANTS[status] || 'neutral']
+	const styles = VARIANT_STYLES[STATUS_VARIANTS[status ?? ''] || 'neutral']
 
 	return (
 		<View

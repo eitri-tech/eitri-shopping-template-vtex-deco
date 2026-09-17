@@ -1,5 +1,24 @@
-// /Users/calindra/Workspace/Eitri/eitri-shopping-template/shopping-vtex-template-account/src/components/Alert/Alert.jsx
-export default function Alert(props) {
+import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
+import { Text, View } from 'eitri-luminus'
+
+type AlertType = 'positive' | 'warning' | 'negative'
+
+interface AlertProps {
+	message?: string
+	type?: AlertType
+	duration?: number
+	onDismiss?: () => void
+	show?: boolean
+}
+
+interface AlertTypeConfig {
+	container: string
+	text: string
+	icon: ReactNode
+}
+
+export default function Alert(props: AlertProps) {
 	const { message, type = 'negative', duration = 5, onDismiss, show } = props
 
 	const [visible, setVisible] = useState(false)
@@ -30,7 +49,7 @@ export default function Alert(props) {
 		return null
 	}
 
-	const alertConfig = {
+	const alertConfig: Record<AlertType, AlertTypeConfig> = {
 		positive: {
 			container: 'bg-green-100 border-green-200',
 			text: 'text-green-800',

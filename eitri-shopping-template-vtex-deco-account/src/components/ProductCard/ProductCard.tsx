@@ -10,22 +10,29 @@ import { useTranslation } from 'eitri-i18n'
 import { useCartItem, useWishlist } from './productCard.hooks'
 import { getProductVideo, formatInstallments, getFormattedListPrice } from './productCard.utils'
 import { useSnackBar } from '../../providers/SnackBar'
+import type { VtexProduct } from '../../types/vtex'
 
 // ========== Componente Principal ==========
 
-export default function ProductCard({ product, className }) {
+interface ProductCardProps {
+	product: VtexProduct
+	className?: string
+}
+
+export default function ProductCard(props: ProductCardProps) {
+	const { product, className } = props
 	const { addItem, cart } = useLocalShoppingCart()
 	const { showSnackBar } = useSnackBar()
 	const { t } = useTranslation()
 
-	const [badges, setBadges] = useState([])
+	const [badges, setBadges] = useState<unknown[]>([])
 	const [loadingCartOp, setLoadingCartOp] = useState(false)
 
 	const item = useMemo(() => {
-		const availableSku = product.items.find(item =>
-			item.sellers.some(seller => seller.commertialOffer?.AvailableQuantity > 0)
+		const availableSku = product.items?.find(item =>
+			item.sellers?.some(seller => (seller.commertialOffer?.AvailableQuantity ?? 0) > 0)
 		)
-		return availableSku || product.items[0]
+		return availableSku || product.items?.[0]
 	}, [product])
 
 	const sellerDefault = useMemo(() => {
@@ -42,17 +49,18 @@ export default function ProductCard({ product, className }) {
 	const wishListIdRef = useRef(wishlist.wishListId)
 
 	const productData = useMemo(() => {
-		if (!isValidProduct) return null
+		if (!isValidProduct || !sellerDefault || !item) return null
 
-		const { Price, ListPrice, spotPrice } = sellerDefault.commertialOffer
+		const { Price, ListPrice, spotPrice } = sellerDefault.commertialOffer ?? {}
+		const bestPrice = Math.min(Price ?? 0, spotPrice ?? Price ?? 0)
 
 		return {
 			name: product.productName,
 			image: item.images?.[0]?.imageUrl || '',
 			video: getProductVideo(product),
-			listPrice: getFormattedListPrice(ListPrice, Math.min(Price, spotPrice)),
-			discountPercentage: Math.round((1 - Math.min(Price, spotPrice) / ListPrice) * 100),
-			price: formatPrice(Math.min(Price, spotPrice)),
+			listPrice: getFormattedListPrice(ListPrice, bestPrice),
+			discountPercentage: ListPrice ? Math.round((1 - bestPrice / ListPrice) * 100) : 0,
+			price: formatPrice(bestPrice),
 			installments: formatInstallments(sellerDefault)
 		}
 	}, [product, item, sellerDefault, isValidProduct])
@@ -70,17 +78,17 @@ export default function ProductCard({ product, className }) {
 		EventBus.subscribe({
 			channel: 'addToWishlist',
 			broadcast: true,
-			callback: data => {
+			callback: (data: any) => {
 				if (data?.productId === product.productId) {
 					wishlist.setIsOnWishlist(true)
-					wishlist.setWishListId(data?.response?.data?.addToList)
+					wishlist.setWishListId(data?.response?.data?.addToList ?? null)
 				}
 			}
 		})
 		EventBus.subscribe({
 			channel: 'removeFromWishlist',
 			broadcast: true,
-			callback: data => {
+			callback: (data: any) => {
 				if (data?.id === wishListIdRef.current && data?.response?.data?.removeFromList) {
 					wishlist.setIsOnWishlist(false)
 					wishlist.setWishListId(-1)
@@ -91,7 +99,8 @@ export default function ProductCard({ product, className }) {
 
 	// ========== badges
 	const loadBadges = async () => {
-		const badges = await getBadgesForProducts(product, item, Vtex, 'badges')
+		if (!item) return
+		const badges = await getBadgesForProducts(product, item, Vtex as any, 'badges')
 		setBadges(badges)
 	}
 
@@ -100,7 +109,7 @@ export default function ProductCard({ product, className }) {
 	const handleAddToCart = useCallback(async () => {
 		if (!item || loadingCartOp) return
 
-		if (product.items.length > 1) {
+		if ((product.items?.length ?? 0) > 1) {
 			openProduct(product)
 			return
 		}
@@ -108,15 +117,15 @@ export default function ProductCard({ product, className }) {
 		await addItemToCart(item)
 	}, [item, loadingCartOp, addItem])
 
-	const addItemToCart = async (item, quantity = 1, goToCart) => {
+	const addItemToCart = async (item: unknown, quantity = 1, goToCart?: boolean) => {
 		try {
 			setLoadingCartOp(true)
-			await addItem({ ...item, quantity: itemQuantity + quantity })
+			await addItem?.({ ...(item as object), quantity: itemQuantity + quantity } as any)
 			TrackingService.addToCartEvent(product)
 			if (goToCart) {
 				openCart()
 			}
-			showSnackBar('success', t('productCard.snackAdded'))
+			showSnackBar?.('success', t('productCard.snackAdded'))
 		} catch (error) {
 			console.error('Error adding to cart:', error)
 		} finally {
@@ -145,7 +154,7 @@ export default function ProductCard({ product, className }) {
 		image: productData.image,
 		video: productData.video,
 		listPrice: productData.listPrice,
-		showListItem: App?.configs?.appConfigs?.productCard?.showListPrice ?? true,
+		showListItem: (App as any)?.configs?.appConfigs?.productCard?.showListPrice ?? true,
 		rating: rating,
 		price: productData.price,
 		discountPercentage: productData.discountPercentage,
@@ -164,5 +173,5 @@ export default function ProductCard({ product, className }) {
 
 	const Implementation = ProductCardFullImage
 
-	return React.createElement(Implementation, params)
+	return React.createElement(Implementation, params as any)
 }
