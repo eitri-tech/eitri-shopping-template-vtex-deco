@@ -68,7 +68,7 @@ export default function Subscriptions() {
 			await updateSubscription(renaming.id, { title })
 			setSubscriptions(prev => prev.map(item => (item.id === renaming.id ? { ...item, title } : item)))
 			setRenaming(null)
-			showSnackBar('success', t('subscriptions.saved'))
+			showSnackBar?.('success', t('subscriptions.saved'))
 		} catch (e) {
 			console.error('updateSubscription title error', e)
 		} finally {

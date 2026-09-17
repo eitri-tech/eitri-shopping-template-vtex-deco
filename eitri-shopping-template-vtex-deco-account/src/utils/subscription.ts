@@ -60,7 +60,7 @@ export const parseFrequencyOptions = (product: VtexProduct, planId?: string): Vt
 
 // The real i18next TFunction's overloads are too specific to satisfy structurally here without
 // importing its types — callers pass the real `t` cast to this loose shape instead.
-interface TranslateFn {
+export interface TranslateFn {
 	(key: string, optionsOrDefault?: unknown): string
 }
 

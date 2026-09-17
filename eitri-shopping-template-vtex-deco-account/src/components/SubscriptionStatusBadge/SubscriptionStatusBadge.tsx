@@ -23,7 +23,7 @@ export default function SubscriptionStatusBadge(props: SubscriptionStatusBadgePr
 		<View
 			className={`w-fit inline-flex items-center gap-1 px-2 py-1 rounded-lg ${styles.wrapper}`}
 			onClick={onClick}>
-			<Text className={`text-xs font-bold ${styles.text}`}>{t(`subscriptions.status.${status}`, status)}</Text>
+			<Text className={`text-xs font-bold ${styles.text}`}>{t(`subscriptions.status.${status}`, status ?? '')}</Text>
 			{onClick && (
 				<FiChevronDown
 					size={14}

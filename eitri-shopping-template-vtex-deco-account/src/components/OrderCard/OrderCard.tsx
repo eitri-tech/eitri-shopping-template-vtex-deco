@@ -43,7 +43,7 @@ export default function OrderCard(props: OrderCardProps) {
 
 	const handleCopyOrderId = async () => {
 		Eitri.clipboard.setText({ text: order?.orderId ?? '' })
-		showSnackBar('success', t('orderCard.copySuccess'))
+		showSnackBar?.('success', t('orderCard.copySuccess'))
 	}
 
 	const openOrderDetails = () => {

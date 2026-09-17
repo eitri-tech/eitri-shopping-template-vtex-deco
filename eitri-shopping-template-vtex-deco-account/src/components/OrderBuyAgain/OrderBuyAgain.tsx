@@ -22,7 +22,7 @@ export default function OrderBuyAgain({ order }: OrderBuyAgainProps) {
 			for (const item of order.items ?? []) {
 				// CartAddItemInput also declares `item`/`salesChannel` as required — this call
 				// never provided them (pre-existing). Cast rather than guess at the right values.
-				await addItem({ id: item.id, quantity: item.quantity, seller: item.seller } as any)
+				await addItem?.({ id: item.id, quantity: item.quantity, seller: item.seller } as any)
 			}
 			Eitri.nativeNavigation.open({ slug: 'cart' })
 		} catch (e) {

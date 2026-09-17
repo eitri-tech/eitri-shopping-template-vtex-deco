@@ -36,6 +36,7 @@ import {
 	parseFrequencyOptions,
 	subscriptionTitle
 } from '../utils/subscription'
+import type { TranslateFn } from '../utils/subscription'
 import { useTranslation } from 'eitri-i18n'
 import type { RouteProps } from '../types/route'
 import type {
@@ -161,7 +162,7 @@ export default function SubscriptionDetails(props: RouteProps<SubscriptionDetail
 		try {
 			await action()
 			await load()
-			showSnackBar('success', t('subscriptions.saved'))
+			showSnackBar?.('success', t('subscriptions.saved'))
 			return true
 		} catch (e) {
 			console.error('subscription save error', e)
@@ -375,7 +376,8 @@ export default function SubscriptionDetails(props: RouteProps<SubscriptionDetail
 								className='flex flex-row items-start gap-2'
 								onClick={() => setShowRename(true)}>
 								<Text className='text-xl font-bold text-gray-900 flex-1'>
-									{subscriptionTitle(subscription, products as Record<string, { name?: string }>, t)}
+									{/* Real i18next TFunction's overloads are too specific to satisfy TranslateFn structurally. */}
+								{subscriptionTitle(subscription, products as Record<string, { name?: string }>, t as unknown as TranslateFn)}
 								</Text>
 								<FiEdit2
 									size={16}
