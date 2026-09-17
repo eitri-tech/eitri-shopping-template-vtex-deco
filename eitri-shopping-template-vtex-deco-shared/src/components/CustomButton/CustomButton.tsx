@@ -7,7 +7,8 @@ interface CustomButtonProps {
 	color?: string
 	backgroundColor?: string
 	variant?: 'outlined' | string
-	label?: string
+	// Rendered as a child node, so any ReactNode works — checkout's AddressTypeTabs passes an icon+text View.
+	label?: ReactNode
 	onPress?: () => void
 	// Called with no arguments below — consumers expecting a MouseEvent won't get one.
 	onClick?: () => void

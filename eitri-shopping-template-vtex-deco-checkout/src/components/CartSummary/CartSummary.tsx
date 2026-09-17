@@ -8,34 +8,19 @@ export default function CartSummary() {
 	const { t } = useTranslation()
 	const { cart } = useLocalShoppingCart()
 
-	// Calculate final total
-	const finalTotal = cart?.totalizers?.reduce((acc, totalizer) => acc + totalizer.value, 0)
+	const totalizers = Array.isArray(cart?.totalizers) ? cart.totalizers : []
+	const finalTotal = totalizers.reduce((acc, totalizer) => acc + (totalizer?.value ?? 0), 0)
 
 	return (
 		<GenericBox className='p-4 w-full flex flex-col'>
-			{/*<View className='flex flex-row justify-start items-center mb-2 gap-2 flex-wrap'>*/}
-			{/*	{cart?.items?.map(item => (*/}
-			{/*		<View*/}
-			{/*			key={item.id}*/}
-			{/*			className='w-12 h-12 p-1 rounded-full overflow-hidden border'>*/}
-			{/*			<Image*/}
-			{/*				src={item.imageUrl}*/}
-			{/*				width='100%'*/}
-			{/*				height='100%'*/}
-			{/*				className='object-cover'*/}
-			{/*			/>*/}
-			{/*		</View>*/}
-			{/*	))}*/}
-			{/*</View>*/}
-
 			{/* Totalizers breakdown */}
 			<View className='flex flex-col gap-1 pb-2'>
-				{cart?.totalizers?.map(totalizer => (
+				{totalizers.map((totalizer, index) => (
 					<View
-						key={totalizer.id}
+						key={totalizer?.id ?? index}
 						className='flex flex-row justify-between items-center'>
-						<Text className='text-neutral-600 text-sm'>{totalizer.name}</Text>
-						<Text className='text-neutral-700 font-medium'>{formatAmountInCents(totalizer.value)}</Text>
+						<Text className='text-neutral-600 text-sm'>{totalizer?.name ?? ''}</Text>
+						<Text className='text-neutral-700 font-medium'>{formatAmountInCents(totalizer?.value)}</Text>
 					</View>
 				))}
 			</View>

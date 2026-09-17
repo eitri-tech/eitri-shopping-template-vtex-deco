@@ -1,7 +1,25 @@
 import { Text, View } from 'eitri-luminus'
 import { CustomButton } from 'eitri-shopping-template-vtex-deco-shared'
 
-export default function AddressTypeTabs({ selectedTab, onTabChange }) {
+export type AddressTab = 'delivery' | 'pickup'
+
+interface AddressTypeTabsProps {
+	selectedTab?: AddressTab
+	onTabChange?: (tab: AddressTab) => void
+}
+
+export default function AddressTypeTabs(props: AddressTypeTabsProps) {
+	const { selectedTab, onTabChange } = props
+
+	const select = (tab: AddressTab) => {
+		if (typeof onTabChange === 'function') onTabChange(tab)
+	}
+
+	const tabClass = (tab: AddressTab) =>
+		`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+			selectedTab === tab ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/70 border border-transparent'
+		}`
+
 	return (
 		<View className='flex flex-row bg-base-200 rounded-lg p-1 mb-4'>
 			<CustomButton
@@ -38,12 +56,8 @@ export default function AddressTypeTabs({ selectedTab, onTabChange }) {
 						<Text>Entrega</Text>
 					</View>
 				}
-				className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-					selectedTab === 'delivery'
-						? 'bg-primary text-primary-content shadow-sm'
-						: 'text-base-content/70 hover:text-base-content border border-transparent'
-				}`}
-				onClick={() => onTabChange('delivery')}
+				className={tabClass('delivery')}
+				onClick={() => select('delivery')}
 				variant={selectedTab === 'delivery' ? undefined : 'outlined'}
 			/>
 			<View className='w-2' />
@@ -70,12 +84,8 @@ export default function AddressTypeTabs({ selectedTab, onTabChange }) {
 						<Text>Retirada</Text>
 					</View>
 				}
-				className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-					selectedTab === 'pickup'
-						? 'bg-primary text-primary-content shadow-sm'
-						: 'text-base-content/70 hover:text-base-content border border-transparent'
-				}`}
-				onClick={() => onTabChange('pickup')}
+				className={tabClass('pickup')}
+				onClick={() => select('pickup')}
 				variant={selectedTab === 'pickup' ? undefined : 'outlined'}
 			/>
 		</View>

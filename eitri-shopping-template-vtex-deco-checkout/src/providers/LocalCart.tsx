@@ -11,7 +11,7 @@ import {
 	updateOpenTextField
 } from '../services/cartService'
 import setFreight, { setLogisticInfo, setNewAddress, setShippingAddress } from '../services/freigthService'
-import type { VtexCart } from '../types/vtex'
+import type { VtexCart, CheckoutSelectedPayment, CheckoutCardInfo } from '../types/vtex'
 
 interface CartContextValue {
 	cart?: VtexCart | null
@@ -30,11 +30,11 @@ interface CartContextValue {
 	updateOpenTextField?: (receiver: unknown) => Promise<unknown>
 	generateNewCart?: () => Promise<VtexCart>
 	addItem?: (payload: unknown) => Promise<void>
-	selectedPaymentData?: unknown
-	setSelectedPaymentData?: (data: unknown) => void
+	selectedPaymentData?: CheckoutSelectedPayment | null
+	setSelectedPaymentData?: (data: CheckoutSelectedPayment | null) => void
 	cartIsLoading?: boolean | null
-	cardInfo?: unknown
-	setCardInfo?: (info: unknown) => void
+	cardInfo?: CheckoutCardInfo | null
+	setCardInfo?: (info: CheckoutCardInfo | null) => void
 }
 
 const LocalCart = createContext<CartContextValue>({})
@@ -47,8 +47,8 @@ export default function CartProvider(props: CartProviderProps) {
 	const { children } = props
 	const [cart, setCart] = useState<VtexCart | null>(null)
 	const [cartIsLoading, setCartIsLoading] = useState<boolean | null>(null)
-	const [selectedPaymentData, setSelectedPaymentData] = useState<unknown>()
-	const [cardInfo, setCardInfo] = useState<unknown>()
+	const [selectedPaymentData, setSelectedPaymentData] = useState<CheckoutSelectedPayment | null>(null)
+	const [cardInfo, setCardInfo] = useState<CheckoutCardInfo | null>(null)
 
 	const executeCartOperation = async <T,>(operation: (...args: any[]) => Promise<T>, ...args: any[]): Promise<T> => {
 		setCartIsLoading(true)

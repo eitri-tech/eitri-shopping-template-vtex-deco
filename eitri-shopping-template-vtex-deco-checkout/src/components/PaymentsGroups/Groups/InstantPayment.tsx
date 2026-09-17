@@ -4,37 +4,44 @@ import GroupsWrapper from './GroupsWrapper'
 import { navigate } from '../../../services/navigationService'
 import { Badge, Text, View } from 'eitri-luminus'
 import { TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
+import type { PaymentGroupProps } from '../../../types/payment'
 
-export default function InstantPayment(props) {
+const VTEX_INSTANT_PAYMENT = '125'
+
+export default function InstantPayment(props: PaymentGroupProps) {
 	const { cart } = useLocalShoppingCart()
-	const { systemGroup, onSelectPaymentMethod } = props
-
-	const VTEX_INSTANT_PAYMENT = '125'
+	const { onSelectPaymentMethod } = props
 
 	const onSelectThisGroup = async () => {
-		await onSelectPaymentMethod([
-			{
-				paymentSystem: VTEX_INSTANT_PAYMENT,
-				installmentsInterestRate: 0,
-				installments: 1,
-				referenceValue: cart.value,
-				value: cart.value,
-				hasDefaultBillingAddress: true
-			}
-		])
-		TrackingService.addPaymentInfoEvent(cart, 'Pix')
-		navigate('CheckoutReview')
+		if (!cart || typeof onSelectPaymentMethod !== 'function') return
+		try {
+			await onSelectPaymentMethod([
+				{
+					paymentSystem: VTEX_INSTANT_PAYMENT,
+					installmentsInterestRate: 0,
+					installments: 1,
+					referenceValue: cart.value,
+					value: cart.value,
+					hasDefaultBillingAddress: true
+				}
+			])
+			TrackingService.addPaymentInfoEvent(cart, 'Pix')
+			navigate('CheckoutReview')
+		} catch (e) {
+			console.error('InstantPayment: select failed', e)
+		}
 	}
 
-	const pixBenefits = cart?.ratesAndBenefitsData?.rateAndBenefitsIdentifiers?.find(b => b.name === '3% OFF Pix')
+	const pixBenefits = (cart?.ratesAndBenefitsData?.rateAndBenefitsIdentifiers ?? []).find(
+		b => b?.name === '3% OFF Pix'
+	)
 
 	return (
 		<GroupsWrapper
 			title='Pix'
 			subtitle='Pagamento instantâneo'
 			icon={<Pix />}
-			onPress={onSelectThisGroup}
-			isChecked={systemGroup.isCurrentPaymentSystemGroup}>
+			onPress={onSelectThisGroup}>
 			<View onClick={onSelectThisGroup}>
 				{pixBenefits && (
 					<View className='flex flex-row items-center gap-2 mb-3'>

@@ -1,8 +1,20 @@
+import type { ReactNode } from 'react'
+import { View, Text, Image } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
 import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 
-export default function SimpleCard(props) {
-	const { isFilled, title, subtitle, onPress, children, icon, mainActionLabel, ...rest } = props
+interface SimpleCardProps {
+	isFilled?: boolean
+	title?: string
+	subtitle?: string
+	onPress?: () => void
+	children?: ReactNode
+	icon?: string
+	mainActionLabel?: string
+}
+
+export default function SimpleCard(props: SimpleCardProps) {
+	const { isFilled, title, onPress, children, icon, mainActionLabel } = props
 
 	const { t } = useTranslation()
 
@@ -12,12 +24,14 @@ export default function SimpleCard(props) {
 				<View
 					onClick={onPress}
 					className='flex items-center justify-center gap-3'>
-					<Image
-						src={icon}
-						width='24px'
-						height='24px'
-					/>
-					<Text className='text-sm font-bold'>{title}</Text>
+					{icon && (
+						<Image
+							src={icon}
+							width='24px'
+							height='24px'
+						/>
+					)}
+					<Text className='text-sm font-bold'>{title ?? ''}</Text>
 				</View>
 				<View className='flex flex-col items-center justify-center'>
 					{isFilled ? (
@@ -49,18 +63,16 @@ export default function SimpleCard(props) {
 			</View>
 
 			{isFilled && (
-				<>
-					<View className='mt-4'>
-						<View>{children}</View>
-						<View
-							onClick={onPress}
-							className='mt-2'>
-							<Text className='uppercase text-xs text-primary-700'>
-								{mainActionLabel || t('simpleCard.txtEdit')}
-							</Text>
-						</View>
+				<View className='mt-4'>
+					<View>{children}</View>
+					<View
+						onClick={onPress}
+						className='mt-2'>
+						<Text className='uppercase text-xs text-primary-700'>
+							{mainActionLabel || t('simpleCard.txtEdit')}
+						</Text>
 					</View>
-				</>
+				</View>
 			)}
 		</GenericBox>
 	)

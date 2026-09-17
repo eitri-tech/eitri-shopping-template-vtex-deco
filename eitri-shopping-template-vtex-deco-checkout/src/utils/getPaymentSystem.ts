@@ -1,8 +1,9 @@
 import { formatAmountInCents } from './utils'
 import type { VtexCart, VtexPaymentSystem } from '../types/vtex'
 
-interface ResolvedInstallment {
+export interface ResolvedInstallment {
 	count?: number
+	interestRate?: number
 	value?: number
 	total?: number
 	label: string
@@ -10,12 +11,13 @@ interface ResolvedInstallment {
 	[key: string]: unknown
 }
 
-interface ResolvedPaymentSystem extends VtexPaymentSystem {
+export interface ResolvedPaymentSystem extends VtexPaymentSystem {
+	bin?: string | null
 	isCurrentPaymentSystem?: boolean
 	installments?: ResolvedInstallment[]
 }
 
-interface PaymentSystemGroup {
+export interface PaymentSystemGroup {
 	groupName?: string
 	isCurrentPaymentSystemGroup?: boolean
 	paymentSystems: ResolvedPaymentSystem[]

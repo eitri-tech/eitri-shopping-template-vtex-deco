@@ -1,3 +1,4 @@
+import { Image } from 'eitri-luminus'
 import VisaSvg from './Networks/Visa.svg'
 import MastercardSvg from './Networks/Mastercard.svg'
 import HipercardSvg from './Networks/Hipercard.svg'
@@ -7,37 +8,29 @@ import AmericanExpressSvg from './Networks/AmericanExpress.svg'
 import GooglePayIcon from './../../../assets/images/GPay_Acceptance_Mark_800.png'
 import storeCard from './../../../assets/images/card-store.svg'
 
-export default function CardIcon(props) {
-	const iconKey = props.iconKey
-	const { width, height, className = '' } = props
+interface CardIconProps {
+	iconKey?: string
+	width?: string | number
+	height?: string | number
+	className?: string
+}
 
-	let icon = null
+const NETWORK_ICONS: Record<string, string> = {
+	Visa: VisaSvg,
+	Mastercard: MastercardSvg,
+	'American Express': AmericanExpressSvg,
+	Hipercard: HipercardSvg,
+	Elo: EloSvg,
+	Diners: DinersSvg
+}
 
-	if (iconKey === 'Visa') {
-		icon = VisaSvg
-	}
-	if (iconKey === 'Mastercard') {
-		icon = MastercardSvg
-	}
-	if (iconKey === 'American Express') {
-		icon = AmericanExpressSvg
-	}
-	if (iconKey === 'Hipercard') {
-		icon = HipercardSvg
-	}
-	if (iconKey === 'Elo') {
-		icon = EloSvg
-	}
-
-	if (iconKey === 'Diners') {
-		icon = DinersSvg
-	}
+export default function CardIcon(props: CardIconProps) {
+	const { iconKey, width, height, className = '' } = props
 
 	if (iconKey === 'WH Google Pay') {
-		icon = GooglePayIcon
 		return (
 			<Image
-				src={icon}
+				src={GooglePayIcon}
 				className={`w-[100px] rounded ${className}`}
 			/>
 		)
@@ -54,6 +47,7 @@ export default function CardIcon(props) {
 		)
 	}
 
+	const icon = iconKey ? NETWORK_ICONS[iconKey] : undefined
 	if (!icon) {
 		return null
 	}

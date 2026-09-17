@@ -1,40 +1,56 @@
+import { useEffect, useState } from 'react'
+import { View, Image, Loading } from 'eitri-luminus'
 import GroupsWrapper from './GroupsWrapper'
 import { useLocalShoppingCart } from '../../../providers/LocalCart'
 import { navigate } from '../../../services/navigationService'
-import GPay from '@/components/Icons/MethodIcons/GPay'
+import GPay from '../../Icons/MethodIcons/GPay'
 import GPayBtn from './../../../assets/images/gp-light-pt.svg'
 import Eitri from 'eitri-bifrost'
-import loadGPaymentData from '@/services/GPayService'
+import loadGPaymentData from '../../../services/GPayService'
+import type { PaymentGroupProps } from '../../../types/payment'
 
-export default function GooglePay(props) {
+const VTEX_GPAY_PAYMENT = '900'
+
+/** Subset of the Google Pay PaymentData response this flow reads. */
+interface GooglePaymentData {
+	paymentMethodData?: {
+		description?: string
+		info?: { cardNetwork?: string; billingAddress?: unknown; [key: string]: unknown }
+		tokenizationData?: { token?: string; [key: string]: unknown }
+		[key: string]: unknown
+	}
+	[key: string]: unknown
+}
+
+export default function GooglePay(props: PaymentGroupProps) {
 	const { systemGroup, onSelectPaymentMethod } = props
 	const { cart, setCardInfo } = useLocalShoppingCart()
 	const [loadingGoogleData, setLoadingGoogleData] = useState(false)
 
 	const [gPayAvailable, setGPayAvailable] = useState(false)
 
-	const VTEX_GPAY_PAYMENT = '900'
-
 	useEffect(() => {
 		if (Eitri.canIUse(31)) {
-			Eitri.googlePay.isAvailable()
-				.then(res => setGPayAvailable(res))
+			Eitri.googlePay
+				.isAvailable()
+				.then(res => setGPayAvailable(!!res))
 				.catch(err => console.error('GooglePay: isAvailable failed', err))
 		}
 	}, [])
 
 	const onSelectThisGroup = async () => {
+		if (!cart || typeof onSelectPaymentMethod !== 'function') return
 		try {
 			setLoadingGoogleData(true)
 
 			const paymentSystem = systemGroup?.paymentSystems?.[0]
 
-			const googlePaymentData = await loadGPaymentData()
+			const googlePaymentData = (await loadGPaymentData()) as GooglePaymentData | undefined
 
 			const cardNetWorkLabel = googlePaymentData?.paymentMethodData?.info?.cardNetwork
 			const paymentSystemWallet = cardNetWorkLabel
-				? cart?.paymentData?.paymentSystems?.find(
-						ps => ps.name?.toLowerCase() === cardNetWorkLabel.toLowerCase()
+				? (cart.paymentData?.paymentSystems ?? []).find(
+						ps => ps?.name?.toLowerCase() === cardNetWorkLabel.toLowerCase()
 					)
 				: undefined
 
@@ -47,11 +63,11 @@ export default function GooglePay(props) {
 					},
 					billingAddress: googlePaymentData?.paymentMethodData?.info?.billingAddress,
 					cardNetwork: paymentSystemWallet?.stringId,
-					token: googlePaymentData?.paymentMethodData?.tokenizationData.token
+					token: googlePaymentData?.paymentMethodData?.tokenizationData?.token
 				}
 			}
 
-			setCardInfo({
+			setCardInfo?.({
 				metadata: JSON.stringify(metadata)
 			})
 
@@ -68,21 +84,20 @@ export default function GooglePay(props) {
 
 			navigate('Installments', { paymentSystem, description: googlePaymentData?.paymentMethodData?.description })
 		} catch (e) {
-			// sendLogError(e, 'onSelectThisGroup', { paymentSystem: 'Google Pay' }, cart)
+			console.error('GooglePay: onSelectThisGroup failed', e)
 		}
 		setLoadingGoogleData(false)
 	}
 
 	if (!gPayAvailable) {
-		return
+		return null
 	}
 
 	return (
 		<GroupsWrapper
 			title='Google Pay'
 			icon={<GPay />}
-			onPress={onSelectThisGroup}
-			isChecked={systemGroup.isCurrentPaymentSystemGroup}>
+			onPress={onSelectThisGroup}>
 			<View onClick={onSelectThisGroup}>
 				<View className='flex flex-row justify-center border border-black rounded-full p-3'>
 					{loadingGoogleData ? <Loading /> : <Image src={GPayBtn} />}
