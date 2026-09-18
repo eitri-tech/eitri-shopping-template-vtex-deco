@@ -9,6 +9,7 @@ import type { RouteProps } from '../types/route'
 interface ExternalProviderPaymentResult {
 	orderId?: string
 	paymentAuthorizationAppCollection?: Array<{ appPayload?: string; [key: string]: unknown }>
+	RedirectResponseCollection?: Array<{ redirectUrl?: string; [key: string]: unknown }>
 	[key: string]: unknown
 }
 
@@ -28,7 +29,8 @@ export default function ExternalProviderOrder(props: RouteProps<ExternalProvider
 			const paymentResult = props.location?.state?.paymentResult
 
 			const paymentAuthorizationApp = paymentResult.paymentAuthorizationAppCollection?.[0]
-			const url = paymentAuthorizationApp?.appPayload
+			const redirectResponse = paymentResult.RedirectResponseCollection?.[0]
+			const url = paymentAuthorizationApp?.appPayload || redirectResponse?.redirectUrl
 
 			if (url) {
 				openProvider(url)

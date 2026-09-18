@@ -8,7 +8,8 @@ import {
 	HeaderText,
 	CustomButton,
 	CustomInput,
-	GenericBox
+	GenericBox,
+	BiometricService
 } from 'eitri-shopping-template-vtex-deco-shared'
 import Alert from '../components/Alert/Alert'
 import { sendPasswordResetCode, setPassword, changePassword } from '../services/CustomerService'
@@ -118,6 +119,16 @@ export default function ChangePassword(props: RouteProps<ChangePasswordState>) {
 		}
 	}
 
+	const syncBiometricCredentials = async updatedPassword => {
+		try {
+			if (await BiometricService.hasSavedCredentials()) {
+				await BiometricService.updateSavedCredentials(email, updatedPassword)
+			}
+		} catch (e) {
+			console.error('Erro ao atualizar a senha salva na biometria', e)
+		}
+	}
+
 	const handleSubmit = async () => {
 		if (!email) return
 		setLoading(true)
@@ -127,6 +138,7 @@ export default function ChangePassword(props: RouteProps<ChangePasswordState>) {
 			} else {
 				await changePassword(email, currentPassword, newPassword)
 			}
+			await syncBiometricCredentials(newPassword)
 			navigate(PAGES.HOME, {}, true)
 		} catch (e) {
 			console.error('ChangePassword error', e)

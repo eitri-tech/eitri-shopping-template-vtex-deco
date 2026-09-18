@@ -1,0 +1,106 @@
+{
+	"home": {
+		"offers": "Offers"
+	},
+	"categories": {
+		"title": "Categories"
+	},
+	"productCatalog": {
+		"title": "Catalog",
+		"productCountSingle": "{{count}} product in {{title}}",
+		"productCountMultiple": "{{count}} products in {{title}}",
+		"resultCountSingle": "{{count}} product",
+		"resultCountMultiple": "{{count}} products"
+	},
+	"blogPostShelf": {
+		"seeMore": "See more"
+	},
+	"categoryPageModal": {
+		"title": "Filters",
+		"clear": "Clear",
+		"button": "Filter"
+	},
+	"pristineView": {
+		"content": "Enter a search term"
+	},
+	"searchResults": {
+		"resultNotFound": "No results were found for your search"
+	},
+	"headerSearch": {
+		"labelSearch": "Search..."
+	},
+	"productCardVertical": {
+		"cart": "In the bag",
+		"buy": "Buy"
+	},
+	"productCard": {
+		"snackAdded": "successfully added to the bag",
+		"snackRemoved": "product removed from the bag",
+		"viewCart": "View bag",
+		"buy": "Buy"
+	},
+	"scheduleCard": {
+		"button": "Check it out"
+	},
+	"searchInput": {
+		"content": "Find your Jewel"
+	},
+	"shelfOfProducts": {
+		"loading": "Loading...",
+		"seeMore": "view all"
+	},
+	"lists": {
+		"title": "Sort by",
+		"controlLabel": "Sort",
+		"labelRelevance": "Relevance",
+		"labelBestSellers": "Best sellers",
+		"labelNewest": "Newest",
+		"labelDiscounts": "Discounts",
+		"labelHighestPrice": "Highest price",
+		"labelLowestPrice": "Lowest price",
+		"labelAToZ": "A to Z",
+		"labelZToA": "Z to A"
+	},
+	"facetsModal": {
+		"from": "From",
+		"to": "to"
+	},
+	"qrCodeScanner": {
+		"productNotFound": "Product not found"
+	},
+	"searchHistory": {
+		"title": "history",
+		"clear": "clear history"
+	},
+	"topSearches": {
+		"title": "top searches"
+	},
+	"highlightedShelf": {
+		"days": "days",
+		"hours": "hours",
+		"minutes": "minutes",
+		"seconds": "seconds",
+		"seeMore": "See more"
+	},
+	"categoryPage": {
+		"seeAll": "View all in {{title}}"
+	},
+	"searchResultsEmpty": {
+		"title": "No products found",
+		"hint": "Try adjusting your search or exploring other categories."
+	},
+	"priceRange": {
+		"min": "Minimum Price",
+		"max": "Maximum Price"
+	},
+	"blogCard": {
+		"publishedByDate": "Published by {{author}} on {{date}}",
+		"publishedDate": "Published on {{date}}"
+	},
+	"welcomeModal": {
+		"description": "Log in to access exclusive benefits and offers.",
+		"login": "Log in",
+		"signUp": "Create account",
+		"continue": "Continue without login"
+	}
+}

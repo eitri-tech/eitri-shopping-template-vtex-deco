@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
 import { getProductById } from '../../services/ProductService'
-import ProductCard from '../ProductCard/ProductCard'
+import WishlistCard from '../WishlistCard/WishlistCard'
 import type { VtexProduct } from '../../types/vtex'
 
 interface WishlistItemProps {
 	productId?: string
-	// Accepted by callers (Wishlist.jsx) but never wired up here — pre-existing, kept as a no-op.
 	onRemoveFromWishlist?: () => void
 }
 
 export default function WishlistItem(props: WishlistItemProps) {
-	const { productId } = props
+	const { productId, onRemoveFromWishlist } = props
 
 	const [product, setProduct] = useState<VtexProduct | null>(null)
 
@@ -28,5 +27,5 @@ export default function WishlistItem(props: WishlistItemProps) {
 		}
 	}
 
-	return <>{product && <ProductCard product={product} />}</>
+	return <>{product && <WishlistCard product={product} onRemoveFromWishlist={onRemoveFromWishlist} />}</>
 }

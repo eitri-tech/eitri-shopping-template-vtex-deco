@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import Eitri from 'eitri-bifrost'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
 import { getCart, addItemToCart, removeCartItem, updateItemOnCart } from '../services/CartService'
 import { EventBusChannels, EventBus } from 'eitri-shopping-vtex-shared'
 import type { VtexCart } from '../types/vtex'
@@ -42,8 +43,9 @@ export default function CartProvider(props: CartProviderProps) {
 
 	const updateTabBadge = async (newCart?: VtexCart) => {
 		try {
+			const tabIndex = await getCartTabBadgeIndex()
 			Eitri.bottomBar.updateTabBadge({
-				index: 2,
+				index: tabIndex,
 				content: newCart?.items?.length
 					? `${newCart?.items?.reduce((acc, item) => acc + (item.quantity ?? 0), 0)}`
 					: undefined
@@ -78,7 +80,12 @@ export default function CartProvider(props: CartProviderProps) {
 	}
 
 	const addItem = async (payload: Parameters<typeof addItemToCart>[0]) => {
-		return executeCartOperation(addItemToCart as (...args: [typeof payload]) => Promise<VtexCart | undefined>, payload)
+		// addItemToCart's real return is void; the cart is re-fetched elsewhere. Cast through
+		// unknown since void and VtexCart|undefined don't structurally overlap.
+		return executeCartOperation(
+			addItemToCart as unknown as (...args: [typeof payload]) => Promise<VtexCart | undefined>,
+			payload
+		)
 	}
 
 	const removeItem = async (itemId: number) => {

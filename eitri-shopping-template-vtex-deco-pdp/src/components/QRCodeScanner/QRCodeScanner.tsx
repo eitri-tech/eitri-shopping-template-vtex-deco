@@ -3,7 +3,7 @@ import Eitri from 'eitri-bifrost'
 import { Text, View } from 'eitri-luminus'
 import { getProductByEan } from '../../services/productService'
 import { openProduct } from '../../services/NavigationService'
-import { MdOutlineQrCodeScanner } from 'react-icons/md'
+import { QrCodeScannerIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 
 let toastTimeoutId: ReturnType<typeof setTimeout> | undefined
@@ -89,7 +89,7 @@ export default function QRCodeScanner() {
 	return (
 		<View>
 			<View onClick={handleScan}>
-				<MdOutlineQrCodeScanner className={'text-header-content'} />
+				<QrCodeScannerIcon className={'text-header-content'} />
 			</View>
 			{isToastVisible && (
 				<View className='fixed bottom-[0px] left-[0px] right-[0px] z-[9999]'>

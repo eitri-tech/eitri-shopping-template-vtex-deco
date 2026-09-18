@@ -80,7 +80,7 @@ export default function OtpLogin(props: OtpLoginProps) {
 			onClick={() => onClose?.()}>
 			<View
 				onClick={(e?: MouseEvent<HTMLElement>) => e?.stopPropagation()}
-				className='bg-white !rounded-t-sm w-screen max-h-[70vh] overflow-y-auto pointer-events-auto p-4'>
+				className='bg-white w-screen max-h-[70vh] overflow-y-auto pointer-events-auto p-4'>
 				<Text className='text-lg font-semibold'>
 					{t('otpLogin.txtMessage', { email: maskEmailSimple(email) })}
 				</Text>

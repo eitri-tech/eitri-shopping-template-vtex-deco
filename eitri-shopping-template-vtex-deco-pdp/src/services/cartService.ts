@@ -15,6 +15,9 @@ interface CartAddItemPayload {
 	[key: string]: unknown
 }
 const addItemToCartSdk = Vtex.cart.addItem as unknown as (payload: CartAddItemPayload) => Promise<unknown>
+// Vtex.cart.addItems declares a required `salesChannel` second arg, but the runtime falls back to the
+// configured channel when it's omitted — matching the existing single-arg call sites.
+const addItemsToCartSdk = Vtex.cart.addItems as unknown as (items: unknown) => Promise<unknown>
 
 export const getCart = async (): Promise<unknown> => {
 	try {
@@ -30,6 +33,15 @@ export const addItemToCart = async (item: CartAddItemPayload): Promise<unknown> 
 		return await addItemToCartSdk(item)
 	} catch (error) {
 		console.error('Erro ao adicionar item ao carrinho', error)
+	}
+}
+
+export const addMultipleItemsToCart = async (items: unknown): Promise<unknown> => {
+	try {
+		return await addItemsToCartSdk(items)
+	} catch (error) {
+		console.error('Erro ao adicionar itens ao carrinho', error)
+		throw error
 	}
 }
 

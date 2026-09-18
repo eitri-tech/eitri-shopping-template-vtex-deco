@@ -85,42 +85,6 @@ export interface VtexOrderSummary {
 	[key: string]: unknown
 }
 
-export interface VtexFrequency {
-	interval?: number
-	periodicity?: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | string
-	[key: string]: unknown
-}
-
-export interface VtexSubscriptionItem {
-	id?: string
-	skuId?: string
-	quantity?: number
-	[key: string]: unknown
-}
-
-export interface VtexSubscriptionCycle {
-	status?: string
-	friendlyMessage?: string
-	[key: string]: unknown
-}
-
-export interface VtexSubscription {
-	id?: string
-	title?: string
-	status?: string
-	// Real usage (SubscriptionDetails.jsx, SubscriptionCard.jsx) always reads frequency/id off
-	// `subscription.plan`, never a top-level `frequency` — matches the shape here.
-	plan?: { id?: string; frequency?: VtexFrequency; [key: string]: unknown }
-	items?: VtexSubscriptionItem[]
-	nextPurchaseDate?: string
-	purchaseSettings?: {
-		paymentMethod?: { paymentAccountId?: string; paymentSystem?: string; paymentSystemName?: string; [key: string]: unknown }
-		[key: string]: unknown
-	}
-	shippingAddress?: { addressId?: string; addressType?: string; [key: string]: unknown }
-	[key: string]: unknown
-}
-
 export interface VtexAssemblyOption {
 	id?: string
 	inputValues?: Array<{ label?: string; domain?: unknown[]; [key: string]: unknown }>

@@ -3,20 +3,26 @@
 		"title": "Produto"
 	},
 	"description": {
-		"txtDescription": "Descrição",
+		"txtDescription": "Sobre o produto",
 		"labelSeeLess": "Ver menos",
 		"labelSeeMore": "Ver mais"
 	},
 	"information": {
-		"txtInformation": "Informações"
+		"txtInformation": "Detalhes técnicos"
 	},
 	"supplier": {
 		"txtSupplier": "Fornecedor"
 	},
 	"freight": {
-		"labelZipCode": "CEP",
+		"labelZipCode": "00000-000",
+		"labelConsult": "Consultar",
 		"labelCalculate": "Calcular",
-		"txtCalculate": "Frete",
+		"txtCalculate": "Consultar Frete",
+		"txtSubtitle": "Consultar o valor e prazos estimados",
+		"txtNoZipCode": "Não sei meu CEP",
+		"txtDelivery": "Receber em casa",
+		"txtPickup": "Retirar em Loja",
+		"labelFastest": "Mais rápida",
 		"errorUnavailable": "Desculpe, esse produto não está disponível para o seu CEP. Que tal tentar outro CEP?"
 	},
 	"mainDescription": {
@@ -27,21 +33,21 @@
 	"modalComponent": {
 		"txtProductAdded": "Produto adicionado",
 		"txtQuantity": "Quantidade:",
-		"txtGoToCart": "Ir para cesta",
-		"txtAddToCart": "Adicionar à cesta",
+		"txtGoToCart": "Ir para sacola",
+		"txtAddToCart": "Adicionar à sacola",
 		"txtBuyTogether": "Aproveite e compre junto"
 	},
 	"product": {
-		"labelAddToCart": "Adicionar à cesta",
-		"labelGoToCart": "Ir para a cesta",
+		"labelAddToCart": "Adicionar à sacola",
+		"labelGoToCart": "Ir para a sacola",
 		"errorNoProduct": "Produto Indisponível"
 	},
 	"productBasicTemplate": {
 		"txtWhoSaw": "Quem viu esta, viu também:"
 	},
 	"productCardVertical": {
-		"cart": "ver cesta",
-		"buy": "comprar"
+		"cart": "ver sacola",
+		"buy": "Adicionar"
 	},
 	"review": {
 		"txtOpnion": "Cliente não escreveu uma avaliação, apenas deu a nota do produto.",
@@ -54,20 +60,28 @@
 		"labelOffer": "Oferta"
 	},
 	"actionButton": {
-		"snackAdded": "adicionado à cesta com sucesso",
-		"labelBuy": "Comprar"
+		"snackAdded": "adicionado à sacola com sucesso",
+		"labelBuy": "Adicionar à Sacola"
 	},
 	"buyTogether": {
-		"txtTitle": "eeei, aproveite e leve também!"
+		"txtTitle": "Compre Junto",
+		"add": "Adicionar",
+		"added": "Adicionado",
+		"total": "Compre junto por: {{value}}",
+		"selectedValue": "Valor das peças selecionadas: {{value}}",
+		"installment": "{{count}}x de {{value}} sem juros",
+		"buy": "Comprar",
+		"buying": "Comprando...",
+		"snackAdded": "Produtos adicionados à sacola"
 	},
 	"productCard": {
-		"snackAdded": "adicionado à cesta com sucesso",
-		"snackRemoved": "produto removido da cesta",
-		"viewCart": "Ver cesta",
-		"buy": "Comprar"
+		"snackAdded": "adicionado à sacola com sucesso",
+		"snackRemoved": "produto removido da sacola",
+		"viewCart": "Ver sacola",
+		"buy": "Adicionar"
 	},
 	"searchInput": {
-		"placeholder": "Pesquisar..."
+		"placeholder": "Encontre sua Joia"
 	},
 	"topSearches": {
 		"title": "mais buscados"
@@ -85,5 +99,18 @@
 	"rating": {
 		"txtCount": "{{count}} avaliações",
 		"txtComposition": "Composição da nota"
+	},
+	"materialSwatches": {
+		"label": "Material",
+		"pedrasLabel": "Pedras"
+	},
+	"serviceLinks": {
+		"returns": "Troca e Devolução",
+		"digitalSeller": "Vendedor Digital",
+		"paymentMethods": "Formas de pagamento"
+	},
+	"addedToCartModal": {
+		"title": "Produto adicionado à sacola!",
+		"goToCart": "Ver sacola"
 	}
 }

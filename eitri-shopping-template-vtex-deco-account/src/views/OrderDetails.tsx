@@ -9,7 +9,9 @@ import {
 	HeaderReturn,
 	HeaderText,
 	Loading,
-	BottomInset
+	BottomInset,
+	CopyIcon,
+	useRetractableBottomBar
 } from 'eitri-shopping-template-vtex-deco-shared'
 import { formatDateDaysMonthYear, formatPriceInCents } from '../utils/utils'
 import OrderStatusBadge from '../components/OrderStatusBadge/OrderStatusBadge'
@@ -20,7 +22,6 @@ import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { sendScreenView } from '../services/TrackingService'
 import OrderStatusTimeline from '../components/OrderStatusTimeline/OrderStatusTimeline'
 import { CANCELED_STATUSES } from '../utils/getFullOrderState'
-import { FiCopy } from 'react-icons/fi'
 import type { RouteProps } from '../types/route'
 import type { VtexOrder, VtexOrderPayment } from '../types/vtex'
 
@@ -64,6 +65,7 @@ export default function OrderDetails(props: RouteProps<OrderDetailsState>) {
 	const [cancelReason, setCancelReason] = useState('')
 
 	const { t } = useTranslation()
+	useRetractableBottomBar()
 
 	useEffect(() => {
 		const state = props?.history?.location?.state ?? props?.location?.state
@@ -187,7 +189,7 @@ export default function OrderDetails(props: RouteProps<OrderDetailsState>) {
 							onClick={() => {
 								if (order.orderId) Eitri.clipboard.setText({ text: order.orderId })
 							}}>
-							<FiCopy
+							<CopyIcon
 								size={12}
 								className='text-gray-400'
 							/>

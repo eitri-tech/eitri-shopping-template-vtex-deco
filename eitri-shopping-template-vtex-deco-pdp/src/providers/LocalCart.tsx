@@ -1,16 +1,25 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
-import { addItemToCart, changeItemQuantity, getCart, removeCartItem } from '../services/cartService'
+import Eitri from 'eitri-bifrost'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
+import {
+	addItemToCart,
+	addMultipleItemsToCart,
+	changeItemQuantity,
+	getCart,
+	removeCartItem
+} from '../services/cartService'
 import type { VtexCart } from '../types/vtex'
 
 interface LocalCartContextValue {
 	setCart: (cart: VtexCart | null) => void
-	startCart: () => Promise<void>
+	startCart: () => Promise<VtexCart | undefined>
 	cart: VtexCart | null
 	cartIsLoading: boolean
-	addItem: (payload: unknown) => Promise<void>
-	removeItem: (itemId: number) => Promise<void>
-	changeItemQuantity: (index: number, newQuantity: number) => Promise<void>
+	addItem: (payload: unknown) => Promise<VtexCart | undefined>
+	addItems: (payload: unknown) => Promise<VtexCart | undefined>
+	removeItem: (itemId: number) => Promise<VtexCart | undefined>
+	changeItemQuantity: (index: number, newQuantity: number) => Promise<VtexCart | undefined>
 }
 
 const LocalCart = createContext<LocalCartContextValue>({} as LocalCartContextValue)
@@ -19,13 +28,34 @@ export default function CartProvider({ children }: { children?: ReactNode }) {
 	const [cart, setCart] = useState<VtexCart | null>(null)
 	const [cartIsLoading, setCartInLoading] = useState(false)
 
-	const executeCartOperation = async (operation: (...args: any[]) => Promise<unknown>, ...args: any[]) => {
-		setCartInLoading(true)
-		const newCart = (await operation(...args)) as VtexCart | undefined
-		if (newCart) {
-			setCart(newCart)
+	const updateTabBadge = async (newCart: VtexCart) => {
+		try {
+			const tabIndex = await getCartTabBadgeIndex()
+			const totalItems = (newCart?.items ?? []).reduce((acc, item) => acc + (item?.quantity ?? 0), 0)
+			Eitri.bottomBar.updateTabBadge({
+				index: tabIndex,
+				content: totalItems > 0 ? `${totalItems}` : undefined
+			})
+		} catch (e) {
+			console.log('Erro ao atualizar tab badge: ', e)
 		}
-		setCartInLoading(false)
+	}
+
+	const executeCartOperation = async (
+		operation: (...args: any[]) => Promise<unknown>,
+		...args: any[]
+	): Promise<VtexCart | undefined> => {
+		setCartInLoading(true)
+		try {
+			const newCart = (await operation(...args)) as VtexCart | undefined
+			if (newCart) {
+				setCart(newCart)
+				updateTabBadge(newCart)
+			}
+			return newCart
+		} finally {
+			setCartInLoading(false)
+		}
 	}
 
 	const startCart = async () => {
@@ -34,6 +64,10 @@ export default function CartProvider({ children }: { children?: ReactNode }) {
 
 	const addItem = async (payload: unknown) => {
 		return executeCartOperation(addItemToCart, payload)
+	}
+
+	const addMultipleItems = async (payload: unknown) => {
+		return executeCartOperation(addMultipleItemsToCart, payload)
 	}
 
 	const removeItem = async (itemId: number) => {
@@ -52,6 +86,7 @@ export default function CartProvider({ children }: { children?: ReactNode }) {
 				cart,
 				cartIsLoading,
 				addItem,
+				addItems: addMultipleItems,
 				removeItem,
 				changeItemQuantity: _changeItemQuantity
 			}}>

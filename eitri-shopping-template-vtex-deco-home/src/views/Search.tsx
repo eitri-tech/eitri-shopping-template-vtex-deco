@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Page } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
-import { HeaderContentWrapper, TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
+import { HeaderContentWrapper, TrackingService, HEADER_VARIANT, useRetractableBottomBar } from 'eitri-shopping-template-vtex-deco-shared'
 import SearchInput from '../components/SearchInput/SearchInput'
 import { useLocalShoppingCart } from '../providers/LocalCart'
 import ProductCatalogContent from '../components/ProductCatalogContent/ProductCatalogContent'
 import { saveSearchHistory } from '../services/SearchMetadataService'
+import { RemoteConfig } from 'eitri-shopping-vtex-shared'
 import type { RouteProps } from '../types/route'
 
 interface SearchState {
 	searchTerm?: string
+	// Screen to go back to instead of the navigation stack (e.g. 'Categories').
+	returnTo?: string
 }
 
 interface SearchQueryParams {
@@ -20,8 +23,14 @@ interface SearchQueryParams {
 
 export default function Search(props: RouteProps<SearchState>) {
 	const incomingSearchTerm = props?.history?.location?.state?.searchTerm || props?.location?.state?.searchTerm
+	const returnTo = props?.history?.location?.state?.returnTo || props?.location?.state?.returnTo
+	const hiddenSortOptionsConfig = RemoteConfig.getContent('appConfigs.home.hiddenCategorySortOptions')
+	const hiddenSortOptions: string[] = Array.isArray(hiddenSortOptionsConfig)
+		? (hiddenSortOptionsConfig as string[])
+		: []
 
 	const { startCart } = useLocalShoppingCart()
+	useRetractableBottomBar()
 
 	const [params, setParams] = useState<SearchQueryParams | null>(null)
 	const [pristine, setPristine] = useState(true)
@@ -57,6 +66,14 @@ export default function Search(props: RouteProps<SearchState>) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
+	const handleBack = () => {
+		if (returnTo) {
+			Eitri.navigation.navigate({ path: `/${returnTo}`, replace: true })
+		} else {
+			Eitri.navigation.back(1)
+		}
+	}
+
 	const handleSearchSubmit = async (term: string) => {
 		if (term) {
 			setPristine(false)
@@ -78,13 +95,14 @@ export default function Search(props: RouteProps<SearchState>) {
 	return (
 		<Page title='Busca'>
 			<HeaderContentWrapper
-				scrollEffect={false}
+				variant={HEADER_VARIANT.SCROLL_SOLID}
 				className='gap-3 w-full justify-between relative'>
 				<SearchInput
 					autoFocus={!incomingSearchTerm}
 					alwaysShowBackButton
 					incomingValue={params?.query}
 					onSubmit={handleSearchSubmit}
+					onBack={handleBack}
 				/>
 			</HeaderContentWrapper>
 
@@ -92,7 +110,9 @@ export default function Search(props: RouteProps<SearchState>) {
 				<ProductCatalogContent
 					bottomInset={'auto'}
 					params={params}
+					title={params?.query}
 					showFilters={true}
+					hiddenSortOptions={hiddenSortOptions}
 				/>
 			)}
 		</Page>

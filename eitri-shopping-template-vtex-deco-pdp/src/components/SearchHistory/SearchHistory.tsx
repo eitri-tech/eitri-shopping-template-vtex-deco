@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Text, View } from 'eitri-luminus'
 import { deleteHistory, getSearchHistory } from '../../services/SearchMetadataService'
-import { FiClock } from 'react-icons/fi'
+import { ClockIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 
 interface SearchHistoryProps {
@@ -48,7 +48,7 @@ export default function SearchHistory(props: SearchHistoryProps) {
 						className='flex items-center justify-between'
 						onClick={() => onSubmit(term)}>
 						<View className='flex items-center gap-2'>
-							<FiClock
+							<ClockIcon
 								className={'text-primary'}
 								size={20}
 							/>

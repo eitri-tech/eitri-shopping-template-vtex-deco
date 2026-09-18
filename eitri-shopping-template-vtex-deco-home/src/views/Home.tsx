@@ -2,13 +2,22 @@ import { useState, useEffect } from 'react'
 import { Page, View } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import { useLocalShoppingCart } from '../providers/LocalCart'
-import { getCmsContent } from '../services/CmsService'
+import { useSnackBar } from '../providers/SnackBar'
 import { startConfigure } from '../services/AppService'
 import HomeSkeleton from '../components/HomeSkeleton/HomeSkeleton'
-import CmsContentRender from '../components/CmsContentRender/CmsContentRender'
 import MainHeader from '../components/Header/MainHeader'
-import { BottomInset, TrackingService, Loading } from 'eitri-shopping-template-vtex-deco-shared'
-import { useQuery } from '@tanstack/react-query'
+import {
+	BottomInset,
+	TrackingService,
+	Loading,
+	DecoCMSContentRender,
+	useBiometricLogin,
+	BiometricReauthModal,
+	useRetractableBottomBar,
+	refreshContactKeyIfStale
+} from 'eitri-shopping-template-vtex-deco-shared'
+import { doLogin, isLoggedIn } from '../services/CustomerService'
+import { handleReservedPathDeeplink } from '../utils/deeplinkFallback'
 
 // Eitri.getInitializationInfos()'s .d.ts declares the return type as the bare `Object` (no
 // members) — a library typing gap, not a real "any shape" API. This models the field this app
@@ -26,26 +35,27 @@ interface DeepLinkRoute {
 
 export default function Home() {
 	const { startCart } = useLocalShoppingCart()
+	useRetractableBottomBar()
 	const [enableCmsQuery, setEnableCmsQuery] = useState(false)
+	const [cmsReady, setCmsReady] = useState(false)
 	const [initialLoading, setInitialLoading] = useState(true)
+
+	const { attemptBiometricLogin, showReauthModal, reauthEmail, handleReauthConfirm, dismissReauthModal } =
+		useBiometricLogin({
+			doLogin,
+			isLoggedIn,
+			onSuccess: () => startCart()
+		})
 
 	useEffect(() => {
 		startHome()
 		requestNotificationPermission()
 		Eitri.navigation.addOnResumeListener(() => {
 			startCart?.()
+			refreshContactKeyIfStale()
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
-
-	const { data: cmsContent } = useQuery({
-		queryKey: ['cms', 'home'],
-		queryFn: async () => {
-			const result = await getCmsContent('home', 'home')
-			return result?.sections ?? []
-		},
-		enabled: enableCmsQuery
-	})
 
 	const requestNotificationPermission = async () => {
 		try {
@@ -64,24 +74,40 @@ export default function Home() {
 			setInitialLoading(false)
 		}
 
-		startConfigure()
-			.then(resolveRedirectAndCartAndCms)
-			.catch(e => {
-				console.error('Erro startConfigure: ', e)
-			})
+		try {
+			await startConfigure()
+		} catch (e) {
+			console.error('Erro startConfigure: ', e)
+		}
+
+		await resolveRedirectAndCartAndCms()
 	}
 
 	const resolveRedirectAndCartAndCms = async () => {
 		const startParams = (await Eitri.getInitializationInfos()) as InitializationInfos | undefined
 		if (startParams) {
-			const openRoute = processDeepLink(startParams)
-			if (openRoute) {
-				Eitri.navigation.navigate(openRoute)
-				return
+			// Link do site sem tela nativa equivalente (rota de API, checkout web,
+			// carrinho compartilhado): vai pro destino certo em vez de cair no chute de
+			// categoria do resolver, que renderiza uma PLP vazia.
+			const handled = await handleReservedPathDeeplink(startParams)
+
+			if (!handled) {
+				const openRoute = processDeepLink(startParams)
+				if (openRoute) {
+					Eitri.navigation.navigate(openRoute)
+					return
+				}
 			}
 		}
 		setEnableCmsQuery(true)
 		startCart?.()
+		await attemptBiometricLogin()
+		// Fire-and-forget: promove a contact key de e-mail para codigo de cliente
+		// quando o codigo passar a existir. E aqui, e nao so na aba Perfil, porque
+		// esta e a tela em que a maioria das aberturas do app cai. Tem guarda de
+		// sessao e janela de 1h, entao e no-op na maioria das aberturas, e nunca
+		// bloqueia a renderizacao.
+		refreshContactKeyIfStale()
 		TrackingService.sendScreenView('Página inicial', 'Home')
 		TrackingService.insiderVisitHomepage()
 	}
@@ -102,15 +128,32 @@ export default function Home() {
 	}
 
 	return (
-		<Page
-			title='Página inicial'
-			topInset>
-			<MainHeader />
+		<Page title='Página inicial'>
+			{cmsReady && <MainHeader />}
 			<View>
-				<HomeSkeleton show={!cmsContent} />
-				<CmsContentRender cmsContent={cmsContent} />
+				{/* Só renderiza o CMS depois que a VTEX foi configurada (startConfigure).
+				    Sem esse gate as seções que buscam produtos (ProductShelf/BannerWithShelf)
+				    disparam Vtex.searchGraphql.productSearch antes do App.tryAutoConfigure
+				    resolver e voltam vazias. */}
+				{enableCmsQuery && (
+					<DecoCMSContentRender
+						page='Home'
+						useLocalShoppingCart={useLocalShoppingCart}
+						useSnackBar={useSnackBar}
+						onReady={() => setCmsReady(true)}
+					/>
+				)}
+				<BottomInset />
 				<BottomInset />
 			</View>
+			<HomeSkeleton show={!cmsReady} />
+
+			<BiometricReauthModal
+				show={showReauthModal}
+				email={reauthEmail}
+				onConfirm={handleReauthConfirm}
+				onDismiss={dismissReauthModal}
+			/>
 		</Page>
 	)
 }

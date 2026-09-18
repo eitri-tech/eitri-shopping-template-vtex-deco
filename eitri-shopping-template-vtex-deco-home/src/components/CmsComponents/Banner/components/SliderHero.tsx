@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { View, Image } from 'eitri-luminus'
-import { Slider } from 'eitri-shopping-template-vtex-deco-shared'
+import { Slider, SliderPagination } from 'eitri-shopping-template-vtex-deco-shared'
 import SectionTitle from '../../../SectionTitle/SectionTitle'
 import type { BannerData, BannerImage } from '../Banner'
 
@@ -18,6 +18,10 @@ export default function SliderHero(props: SliderHeroProps) {
 
 	const [currentSlide, setCurrentSlide] = useState(0)
 	const imagesList = data.images ?? []
+
+	// CMS stores the timeout in seconds; the Slider expects ms.
+	const parsedTimeout = Number((data as { autoPlayTimeout?: unknown })?.autoPlayTimeout ?? 0)
+	const autoPlayTimeout = parsedTimeout > 0 ? parsedTimeout * 1000 : 5000
 
 	let proportionalHeight: string | number = 'auto'
 
@@ -41,7 +45,7 @@ export default function SliderHero(props: SliderHeroProps) {
 					}
 				}}
 				autoPlay={data?.autoPlay ?? true}
-				autoPlayTimeout={2000}>
+				autoPlayTimeout={autoPlayTimeout}>
 				{imagesList.map(image => {
 					const imageUrl = image.imageUrl || image.externalImageUrl
 					return (
@@ -65,18 +69,11 @@ export default function SliderHero(props: SliderHeroProps) {
 				})}
 			</Slider>
 
-			{imagesList.length > 1 && (
-				<View className='absolute bottom-[12px] w-full flex justify-center gap-[12px] mt-2'>
-					{imagesList.map((_, index) => (
-						<View
-							key={index}
-							className={`${currentSlide === index ? 'w-[36px]' : 'w-[12px]'} h-[6px] rounded-lg ${
-								currentSlide === index ? 'bg-primary' : 'bg-base-300'
-							} transition-[width,background-color] duration-300 ease-in-out"`}
-						/>
-					))}
-				</View>
-			)}
+			<SliderPagination
+				count={imagesList.length}
+				activeIndex={currentSlide}
+				className='absolute bottom-[12px] w-full'
+			/>
 		</View>
 	)
 }

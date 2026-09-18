@@ -31,7 +31,7 @@ export default function CardIcon(props: CardIconProps) {
 		return (
 			<Image
 				src={GooglePayIcon}
-				className={`w-[100px] rounded ${className}`}
+				className={`w-[100px] ${className}`}
 			/>
 		)
 	}
@@ -42,7 +42,7 @@ export default function CardIcon(props: CardIconProps) {
 				src={storeCard}
 				width={width}
 				height={height}
-				className={`aspect-[856/540] rounded ${className}`}
+				className={`aspect-[856/540] ${className}`}
 			/>
 		)
 	}
@@ -57,7 +57,7 @@ export default function CardIcon(props: CardIconProps) {
 			src={icon}
 			width={width}
 			height={height}
-			className={`aspect-[39/25] rounded ${className}`}
+			className={`aspect-[39/25] ${className}`}
 		/>
 	)
 }

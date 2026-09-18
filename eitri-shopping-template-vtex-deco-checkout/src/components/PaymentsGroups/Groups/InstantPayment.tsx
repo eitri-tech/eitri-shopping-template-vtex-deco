@@ -33,7 +33,7 @@ export default function InstantPayment(props: PaymentGroupProps) {
 	}
 
 	const pixBenefits = (cart?.ratesAndBenefitsData?.rateAndBenefitsIdentifiers ?? []).find(
-		b => b?.name === '3% OFF Pix'
+		b => b?.matchedParameters?.paymentMethodId === VTEX_INSTANT_PAYMENT
 	)
 
 	return (
@@ -45,10 +45,10 @@ export default function InstantPayment(props: PaymentGroupProps) {
 			<View onClick={onSelectThisGroup}>
 				{pixBenefits && (
 					<View className='flex flex-row items-center gap-2 mb-3'>
-						<Badge className='badge-success badge-lg font-bold text-white shadow-md text-sm'>3% OFF</Badge>
+						<View className='bg-[#FFD050] rounded-lg px-3 py-1 text-sm font-bold'><Text className='text-sm font-bold'>{pixBenefits.description}</Text></View>
 					</View>
 				)}
-				<View className='mt-2 bg-neutral-100 p-4 rounded'>
+				<View className='mt-2 bg-neutral-100 p-4'>
 					<Text className='text-sm text-neutral-500'>
 						{'O código Pix será exibido na próxima etapa, após a revisão do seu pedido.'}
 					</Text>

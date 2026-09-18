@@ -4,15 +4,28 @@
 		"labelLeave": "Sair",
 		"labelMyFavorites": "Meus favoritos",
 		"labelEditFavorites": "Adicione ou edite seus favoritos",
-		"labelMyAccount": "Minha conta",
+		"labelMyAccount": "Minha Conta",
 		"labelConfig": "Informações pessoais e configurações",
 		"labelMyOrders": "Meus pedidos",
-		"labelMySubscriptions": "Minhas assinaturas",
 		"labelHistoryOders": "Confira todo o histórico dos seus pedidos",
+		"labelAddresses": "Endereços",
 		"lbPersonalData": "Dados pessoais",
 		"lbOrders": "Pedidos",
 		"labelChangePassword": "Autenticação",
-		"labelSavedCards": "Cartões"
+		"labelSavedCards": "Cartões",
+		"labelEntrar": "Entrar",
+		"labelCadastrar": "Cadastrar",
+		"labelLoginDesc": "Faça login ou crie sua conta para aproveitar vantagens únicas.",
+		"labelPromoText": "Já é cliente? Descubra seu Bônus agora!",
+		"labelBonus": "Bônus Monte Carlo",
+		"labelNotifications": "Notificações",
+		"labelLocation": "Localização",
+		"labelPersonalData": "Dados pessoais",
+		"labelMyBonus": "Meu Bônus",
+		"labelAvailableBalance": "Saldo Disponível",
+		"greeting": "Olá, {{name}}!",
+		"labelTermsConditions": "Termos e condições",
+		"labelPrivacyPolicy": "Política de privacidade"
 	},
 	"passwordReset": {
 		"emailRecoveryTitle": "Digite seu e-mail para recuperar a senha",
@@ -49,13 +62,16 @@
 		"verifyAgain": "Verifique as informaçoes e tente novamente",
 		"headerText": "Entrar",
 		"welcome": "Bem vindo de volta!",
+		"emailPasswordSubtitle": "Insira seu email e senha abaixo",
 		"formName": "E-mail",
 		"formPass": "Senha",
 		"formEmail": "Email",
-		"labelButton": "Login",
+		"labelButton": "Entrar",
 		"labelAccessWithCode": "Login com código de acesso",
 		"forgotPass": "Esqueceu a senha?",
 		"noRegister": "Não tenho cadastro",
+		"noAccountYet": "Ainda não possui conta?",
+		"registerNow": "Cadastre-se agora",
 		"formCodeVerification": "Código de verificação",
 		"textSendCode": "Enviar código",
 		"textResendCode": "Reenviar código",
@@ -91,6 +107,57 @@
 	"terms": {
 		"title": "Termos"
 	},
+	"helpSection": {
+		"title": "Precisa de ajuda?",
+		"whatsapp": "Fale conosco pelo Whatsapp",
+		"faq": "Perguntas frequentes"
+	},
+	"authSelect": {
+		"title": "Acesse sua conta",
+		"subtitle": "Entre de forma rápida e segura usando uma das opções abaixo:",
+		"googleButton": "Entrar com o Google",
+		"emailButton": "Entrar com E-mail e senha",
+		"noAccount": "Ainda não possui conta?",
+		"registerButton": "Cadastre-se",
+		"loginError": "Não foi possível entrar com a rede social. Tente novamente."
+	},
+	"bonusScreen": {
+		"title": "Meu Bônus",
+		"greeting": "Olá, {{name}}!",
+		"availableBalance": "Saldo disponível",
+		"placeholder": "Informações de bônus em breve",
+		"expiringToday": "{{amount}} expiram hoje",
+		"expiringTomorrow": "{{amount}} expiram amanhã",
+		"expiringTitle": "{{amount}} expiram em {{days}} dias",
+		"expiringSubtitle": "Aproveite em sua próxima compra antes de {{date}}.",
+		"statementTitle": "Extrato",
+		"statementSubtitle": "Últimas movimentações",
+		"filterAll": "Tudo",
+		"filterPending": "Pendente",
+		"filterExpiring": "A expirar",
+		"movementReceived": "Bônus recebido",
+		"movementRedeemed": "Bônus resgatado",
+		"movementSpecial": "Bônus especial",
+		"badgeExpiring": "A expirar",
+		"badgeExpired": "Expirado",
+		"badgePending": "Pendente",
+		"emptyStatement": "Nenhuma movimentação encontrada.",
+		"faqTitle": "Perguntas Frequentes",
+		"faqSubtitle": "Tire suas dúvidas sobre o Bônus Monte Carlo",
+		"emptyTitle": "Você ainda não possui saldo disponível",
+		"emptyDescription": "Compre agora e ganhe automaticamente um bônus exclusivo para usar no próximo pedido.",
+		"emptyPrimaryCta": "Conferir as novidades",
+		"emptySecondaryCta": "Como funciona",
+		"missingCpfTitle": "Cadastre seu CPF para ver seu bônus",
+		"missingCpfDescription": "O programa de bônus Monte Carlo funciona vinculado ao seu CPF. Cadastre o seu para acompanhar seu saldo e resgatar seus benefícios.",
+		"missingCpfCta": "Cadastrar CPF",
+		"errorTitle": "Meu Bônus não disponível no momento",
+		"errorDescription": "Não foi possível carregar seu saldo. Tente novamente mais tarde.",
+		"errorRetryCta": "Tentar novamente",
+		"helpTitle": "Precisa de ajuda?",
+		"helpWhatsapp": "Fale conosco pelo Whatsapp",
+		"helpFaq": "Perguntas frequentes"
+	},
 	"signUp": {
 		"alertMessageSendEmailError": "Erro ao enviar email",
 		"alertMessageAcceptTerms": "Necessário aceitar os termos",
@@ -103,7 +170,8 @@
 		"lbVerifyCode": "Código de verificação",
 		"lbResendCode": "Reenviar código",
 		"lbLogin": "Login",
-		"lbBack": "Voltar"
+		"lbBack": "Voltar",
+		"alreadyHaveAccount": "Já possui conta? Entrar"
 	},
 	"editProfile": {
 		"title": "Editar perfil",
@@ -175,66 +243,6 @@
 		"packageDelivery": "Entrega",
 		"orderProducts": "produtos do pedido"
 	},
-	"subscriptions": {
-		"title": "Minhas Assinaturas",
-		"detailsTitle": "Assinatura",
-		"defaultTitle": "Assinatura com {{count}} produtos",
-		"emptyTitle": "Você não possui assinaturas",
-		"emptySubtitle": "Quando você assinar um produto, ele será listado aqui.",
-		"nextOrder": "Próximo pedido em {{date}}",
-		"nextCharge": "Próxima cobrança: {{date}}",
-		"viewDetails": "Ver detalhes",
-		"renameTitle": "Escolha um nome para a sua assinatura",
-		"save": "Salvar",
-		"cancel": "Cancelar",
-		"saved": "Assinatura atualizada!",
-		"history": "Histórico",
-		"historyEmpty": "Nenhum ciclo registrado ainda.",
-		"changeStatus": "Alterar status",
-		"confirmCancel": "Confirma o cancelamento da assinatura?",
-		"products": "Produtos assinados",
-		"units": "{{count}} un",
-		"preferences": "Preferências",
-		"frequency": "Frequência",
-		"paymentMethod": "Meio de pagamento",
-		"shippingAddress": "Endereço de entrega",
-		"cardNotFound": "Cartão não encontrado",
-		"addressNotFound": "Endereço não encontrado",
-		"summary": "Resumo",
-		"filter": {
-			"ACTIVE": "Ativas",
-			"PAUSED": "Pausadas",
-			"CANCELED": "Canceladas"
-		},
-		"status": {
-			"ACTIVE": "Assinatura ativa",
-			"PAUSED": "Assinatura pausada",
-			"CANCELED": "Assinatura cancelada",
-			"EXPIRED": "Assinatura expirada"
-		},
-		"cycleStatus": {
-			"SUCCESS": "Pedido gerado com sucesso",
-			"SUCCESS_WITH_PARTIAL_ORDER": "Pedido gerado parcialmente",
-			"SUCCESS_WITH_NO_ORDER": "Ciclo concluído sem pedido",
-			"SKIPED": "Ciclo pulado",
-			"IN_PROCESS": "Em processamento",
-			"TRIGGERED": "Em processamento",
-			"RE_TRIGGERED": "Em processamento",
-			"SCHEDULE_UPDATED": "Agendamento atualizado",
-			"PAYMENT_ERROR": "Erro no pagamento",
-			"ORDER_ERROR": "Erro ao gerar o pedido",
-			"FAILURE": "Falha no ciclo",
-			"EXPIRED": "Ciclo expirado",
-			"DEFAULT": "Ciclo processado"
-		},
-		"totals": {
-			"Items": "Itens",
-			"Discounts": "Descontos",
-			"Shipping": "Frete",
-			"Tax": "Taxas",
-			"Total": "Total"
-		}
-	},
 	"orderList": {
 		"title": "Meus Pedidos",
 		"emptyTitle": "Você não possui nenhum pedido",
@@ -251,8 +259,10 @@
 	},
 	"wishlist": {
 		"title": "Meus favoritos",
-		"emptyTitle": "Você não possui nenhum item salvo",
-		"emptySubtitle": "Quando você salvar um produto, ele será listado aqui."
+		"emptyTitle": "Meus favoritos",
+		"emptySubtitle": "Adicione suas joias preferidas e crie a sua lista de favoritos",
+		"discoverButton": "Conferir as novidades",
+		"productsCount": "{{count}} produto(s)"
 	},
 	"addressForm": {
 		"postalCode": "CEP",
@@ -300,9 +310,9 @@
 		"label": "versão {{version}}"
 	},
 	"productCard": {
-		"snackAdded": "adicionado à cesta com sucesso",
-		"removedFromCart": "produto removido da cesta",
-		"viewCart": "Ver cesta",
+		"snackAdded": "adicionado à sacola com sucesso",
+		"removedFromCart": "produto removido da sacola",
+		"viewCart": "Ver sacola",
 		"buy": "Comprar"
 	},
 	"savedCards": {
@@ -327,6 +337,19 @@
 		"errorAddCard": "Não foi possível adicionar o cartão. Verifique os dados e tente novamente.",
 		"selectAddress": "Selecione o endereço de cobrança",
 		"enterManually": "Inserir manualmente"
+	},
+	"signInVariant": {
+		"headerText": "Acesse sua conta",
+		"bonusTitle": "Bônus Monte Carlo",
+		"bonusDescription": "Faça login para consultar seu saldo disponível e aproveitar seus benefícios exclusivos.",
+		"subtitle": "Entre de forma rápida e segura usando uma das opções abaixo:",
+		"emailCodeButton": "Receber código por E-mail",
+		"googleButton": "Entrar com o Google",
+		"emailPasswordButton": "Entrar com E-mail e senha",
+		"appleButton": "Entrar com Apple",
+		"noAccountYet": "Ainda não possui conta?",
+		"registerNow": "Cadastre-se agora",
+		"socialLoginError": "Não foi possível entrar. Tente novamente."
 	},
 	"changePassword": {
 		"headerText": "Senha",

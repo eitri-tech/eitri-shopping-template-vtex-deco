@@ -5,6 +5,7 @@ import { HeaderContentWrapper, HeaderReturn, HeaderText, Loading, TrackingServic
 import { saveCartIdOnStorage } from '../services/cartService'
 import Freight from '../components/Freight/Freight'
 import Coupon from '../components/Coupon/Coupon'
+import SellerCode from '../components/SellerCode/SellerCode'
 import CartSummary from '../components/CartSummary/CartSummary'
 import CartItemsContent from '../components/CartItemsContent/CartItemsContent'
 import ActionButton from '../components/ActionButton/ActionButton'
@@ -18,7 +19,7 @@ export default function Home() {
 	const { cart, startCart } = useLocalShoppingCart()
 
 	const [appIsLoading, setAppIsLoading] = useState(true)
-	const [openWithBottomBar, setOpenWithBottomBar] = useState(false)
+	const [openWithBottomBar, setOpenWithBottomBar] = useState<boolean | null>(null)
 
 	useEffect(() => {
 		startHome()
@@ -28,18 +29,19 @@ export default function Home() {
 	}, [])
 
 	useEffect(() => {
-		if (cart && cart.items.length === 0) {
+		if (!appIsLoading && openWithBottomBar !== null && cart?.items?.length === 0) {
 			Eitri.navigation.navigate({
 				path: 'EmptyCart',
 				state: { openWithBottomBar },
 				replace: true
 			})
 		}
-	}, [cart])
+	}, [cart, appIsLoading, openWithBottomBar])
 
 	const startHome = async () => {
-		const startParams = (await Eitri.getInitializationInfos()) as { tabIndex?: boolean; orderFormId?: string }
-		setOpenWithBottomBar(!!startParams?.tabIndex)
+		const startParams = (await Eitri.getInitializationInfos()) as { tabIndex?: number | string; orderFormId?: string }
+		// tabIndex 2 is the "Sacola" bottom tab (see app-config.yaml bottom-tab-view-simulation)
+		setOpenWithBottomBar(String(startParams?.tabIndex) === '2')
 
 		await startConfigure()
 		const cart = await loadCart()
@@ -81,6 +83,8 @@ export default function Home() {
 						<Freight />
 
 						<Coupon />
+
+						<SellerCode />
 
 						<CartSummary />
 					</View>

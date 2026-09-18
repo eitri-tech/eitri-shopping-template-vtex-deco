@@ -1,1 +1,6 @@
-{}
+{
+	"addedToCartModal": {
+		"title": "Produto adicionado à sacola!",
+		"goToCart": "Ver sacola"
+	}
+}

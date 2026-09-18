@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from 'react'
 import type { ComponentType, ReactNode } from 'react'
 import { View } from 'eitri-luminus'
-import { FiTrash2, FiCheck, FiX } from 'react-icons/fi'
+import { TrashIcon, CheckIcon, CloseIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 type SnackBarType = 'success' | 'trash'
 
@@ -25,11 +25,11 @@ export default function SnackBarComponent({ children }: { children?: ReactNode }
 	const TYPES: Record<SnackBarType, SnackBarTypeConfig> = {
 		success: {
 			color: 'success-500',
-			icon: FiCheck
+			icon: CheckIcon
 		},
 		trash: {
 			color: 'urgent-500',
-			icon: FiTrash2
+			icon: TrashIcon
 		}
 	}
 
@@ -88,7 +88,7 @@ export default function SnackBarComponent({ children }: { children?: ReactNode }
 						className={'h-full text-white rounded-r-lg w-full flex items-center justify-between gap-2 p-4'}>
 						<View>{message}</View>
 						<View onClick={handleClose}>
-							<FiX size={12} />
+							<CloseIcon size={12} />
 						</View>
 					</View>
 				</View>

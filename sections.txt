@@ -1,0 +1,4 @@
+# Sections JSON URLs
+# Replace with the client store's actual URLs after deployment.
+
+https://release.eitri.calindra.com.br/build/organizations/28750caa-9840-4ca7-8334-ef7a1d97f521/applications/53fee33a-50d3-4360-947f-45539e0c5634/eitri-apps/eitri-shopping-template-vtex-deco-home/0.1.0/public/cms/sections.json

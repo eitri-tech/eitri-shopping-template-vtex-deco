@@ -1,5 +1,6 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 
 export const getLoginProviders = async () => {
-	return await Vtex.store.getLoginProviders()
+	const res =  await Vtex.store.getLoginProviders()
+	return res
 }

@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
-import type { MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from 'react'
-import { View, Text } from 'eitri-luminus'
+import type { ChangeEvent, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from 'react'
+import { View } from 'eitri-luminus'
 import type { View as ViewType } from 'eitri-luminus'
+import { CustomInput } from 'eitri-shopping-template-vtex-deco-shared'
 import { formatPrice } from '../../../utils/utils'
 import { useTranslation } from 'eitri-i18n'
 
@@ -14,13 +15,18 @@ interface PriceRangeProps {
 	step?: number
 }
 
+type Thumb = 'min' | 'max'
+
 export default function PriceRange(props: PriceRangeProps) {
 	const { initialMin = 20, initialMax = 80, onChange, rangeMin = 0, rangeMax = 100, step = 1 } = props
 
 	const { t } = useTranslation()
 	const [minValue, setMinValue] = useState(initialMin)
 	const [maxValue, setMaxValue] = useState(initialMax)
-	const [isDragging, setIsDragging] = useState<'min' | 'max' | null>(null)
+	const [isDragging, setIsDragging] = useState<Thumb | null>(null)
+	const [focusedField, setFocusedField] = useState<Thumb | null>(null)
+	const [minText, setMinText] = useState(String(initialMin))
+	const [maxText, setMaxText] = useState(String(initialMax))
 
 	const sliderRef = useRef<ViewType>(null)
 	const minThumbRef = useRef<ViewType>(null)
@@ -39,6 +45,37 @@ export default function PriceRange(props: PriceRangeProps) {
 		}
 	}, [minValue, maxValue, onChange])
 
+	// Keep the input buffers synced with the slider while not being edited
+	useEffect(() => {
+		if (focusedField !== 'min') setMinText(String(minValue))
+	}, [minValue, focusedField])
+
+	useEffect(() => {
+		if (focusedField !== 'max') setMaxText(String(maxValue))
+	}, [maxValue, focusedField])
+
+	const sanitizeDigits = (raw?: string) => (raw || '').replace(/\D/g, '')
+
+	const commitMin = () => {
+		setFocusedField(null)
+		const parsed = parseInt(sanitizeDigits(minText), 10)
+		if (Number.isNaN(parsed)) {
+			setMinText(String(minValue))
+			return
+		}
+		setMinValue(Math.max(rangeMin, Math.min(parsed, maxValue - step)))
+	}
+
+	const commitMax = () => {
+		setFocusedField(null)
+		const parsed = parseInt(sanitizeDigits(maxText), 10)
+		if (Number.isNaN(parsed)) {
+			setMaxText(String(maxValue))
+			return
+		}
+		setMaxValue(Math.min(rangeMax, Math.max(parsed, minValue + step)))
+	}
+
 	const getValueFromPosition = useCallback(
 		(clientX: number) => {
 			if (!sliderRef.current) return 0
@@ -52,7 +89,7 @@ export default function PriceRange(props: PriceRangeProps) {
 		[rangeMin, rangeMax, step]
 	)
 
-	const handleMouseDown = (thumb: 'min' | 'max') => (e: ReactMouseEvent) => {
+	const handleMouseDown = (thumb: Thumb) => (e: ReactMouseEvent) => {
 		e.preventDefault()
 		e.stopPropagation()
 		setIsDragging(thumb)
@@ -77,7 +114,7 @@ export default function PriceRange(props: PriceRangeProps) {
 		document.addEventListener('mouseup', handleMouseUp)
 	}
 
-	const handleTouchStart = (thumb: 'min' | 'max') => (e: ReactTouchEvent) => {
+	const handleTouchStart = (thumb: Thumb) => (e: ReactTouchEvent) => {
 		e.preventDefault()
 		e.stopPropagation()
 		setIsDragging(thumb)
@@ -129,7 +166,7 @@ export default function PriceRange(props: PriceRangeProps) {
 							ref={minThumbRef}
 							id='min-thumb'
 							className={`absolute w-6 h-6 bg-white border-4 border-primary rounded-full cursor-grab transform -translate-y-1/2 top-1/2 transition-transform ${
-								isDragging === 'min' ? 'scale-110 cursor-grabbing shadow-lg' : 'hover:scale-105'
+								isDragging === 'min' ? 'scale-110 cursor-grabbing shadow-lg' : ''
 							}`}
 							style={{ left: `${minPercentage}%`, transform: 'translateX(-50%) translateY(-50%)' }}
 							onMouseDown={handleMouseDown('min')}
@@ -141,7 +178,7 @@ export default function PriceRange(props: PriceRangeProps) {
 							ref={maxThumbRef}
 							id='max-thumb'
 							className={`absolute w-6 h-6 bg-white border-4 border-primary rounded-full cursor-grab transform -translate-y-1/2 top-1/2 transition-transform ${
-								isDragging === 'max' ? 'scale-110 cursor-grabbing shadow-lg' : 'hover:scale-105'
+								isDragging === 'max' ? 'scale-110 cursor-grabbing shadow-lg' : ''
 							}`}
 							style={{ left: `${maxPercentage}%`, transform: 'translateX(-50%) translateY(-50%)' }}
 							onMouseDown={handleMouseDown('max')}
@@ -159,14 +196,32 @@ export default function PriceRange(props: PriceRangeProps) {
 			</View>
 
 			{/* Input fields */}
-			<View className='flex justify-between w-full'>
-				<View>
-					<Text className='block text-sm font-medium text-gray-700 mb-1'>{t('priceRange.min')}</Text>
-					<Text className='block text-sm font-medium text-gray-700'>{formatPrice(minValue)}</Text>
+			<View className='flex justify-between w-full gap-4'>
+				<View className='flex-1'>
+					<CustomInput
+						label={t('priceRange.min')}
+						value={focusedField === 'min' ? minText : formatPrice(minValue)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => setMinText(sanitizeDigits(e.target.value))}
+						onFocus={() => {
+							setFocusedField('min')
+							setMinText(String(minValue))
+						}}
+						onBlur={commitMin}
+						inputMode='numeric'
+					/>
 				</View>
-				<View>
-					<Text className='block text-sm font-medium text-gray-700 mb-1'>{t('priceRange.max')}</Text>
-					<Text className='block text-sm font-medium text-gray-700'>{formatPrice(maxValue)}</Text>
+				<View className='flex-1'>
+					<CustomInput
+						label={t('priceRange.max')}
+						value={focusedField === 'max' ? maxText : formatPrice(maxValue)}
+						onChange={(e: ChangeEvent<HTMLInputElement>) => setMaxText(sanitizeDigits(e.target.value))}
+						onFocus={() => {
+							setFocusedField('max')
+							setMaxText(String(maxValue))
+						}}
+						onBlur={commitMax}
+						inputMode='numeric'
+					/>
 				</View>
 			</View>
 		</View>

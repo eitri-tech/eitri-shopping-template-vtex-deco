@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import Eitri from 'eitri-bifrost'
 import { Text, View } from 'eitri-luminus'
-import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiCopy } from 'react-icons/fi'
+import { GenericBox, CopyIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import OrderStatusBadge from '../OrderStatusBadge/OrderStatusBadge'
 import { formatDateDaysMonthYear, formatPriceInCents } from '../../utils/utils'
 import { getOrderById } from '../../services/CustomerService'
@@ -62,7 +61,7 @@ export default function OrderCard(props: OrderCardProps) {
 					<View className='flex items-center gap-1.5'>
 						<Text className='text font-bold'>#{order?.orderId}</Text>
 						<View onClick={handleCopyOrderId}>
-							<FiCopy
+							<CopyIcon
 								className='text-gray-700'
 								size={12}
 							/>

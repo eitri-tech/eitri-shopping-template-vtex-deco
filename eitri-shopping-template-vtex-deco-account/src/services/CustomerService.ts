@@ -1,4 +1,4 @@
-import { Vtex } from 'eitri-shopping-vtex-shared'
+import { RemoteConfig, Vtex } from 'eitri-shopping-vtex-shared'
 import type { VtexCustomerProfile, VtexSavedCard } from '../types/vtex'
 
 export const doLogin = async (email: string, password: string, rememberMe?: boolean) => {
@@ -25,8 +25,12 @@ export const removeClientData = async () => {
 }
 
 export const isLoggedIn = async (): Promise<boolean> => {
-	const session = await Vtex.session.getSession()
-	return session?.namespaces?.profile?.isAuthenticated?.value === 'true'
+	try {
+		return await Vtex.customer.isLoggedIn()
+	} catch (error) {
+		const session = await Vtex.session.getSession()
+		return session?.namespaces?.profile?.isAuthenticated?.value === 'true'
+	}
 }
 
 export const getSavedUser = async () => {
@@ -93,12 +97,17 @@ export const removeFromWishlist = async (wishListItemId: string) => {
 	return await Vtex.wishlist.removeItem(wishListItemId)
 }
 
-export async function loginWithGoogle() {
-	return await Vtex.customer.loginWithGoogle()
+export function loginWithGoogle() {
+	const useNativeOAuth = RemoteConfig.getContent('appConfigs.account.googleLoginNativeOAuth') === true
+	return useNativeOAuth ? Vtex.customer.vtexOAuth('Google') : Vtex.customer.loginWithGoogle()
 }
 
 export async function loginWithFacebook() {
-	return await Vtex.customer.loginWithFacebook()
+	return await Vtex.customer.vtexOAuth('Facebook')
+}
+
+export async function loginWithApple() {
+	return await Vtex.customer.vtexOAuth('Apple')
 }
 
 export const listOrders = async (page: number) => {

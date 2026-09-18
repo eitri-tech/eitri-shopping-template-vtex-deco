@@ -9,6 +9,8 @@ interface CmsAction {
 	title?: string
 	banner?: string
 	facets?: Array<{ key: string; value: string }>
+	// Breadcrumb trail (root → leaf) shown by ProductCatalog.
+	categoryNames?: string[]
 	[key: string]: unknown
 }
 
@@ -18,13 +20,33 @@ interface SliderData {
 	[key: string]: unknown
 }
 
-const handleSearchAction = (value?: string) => {
-	Eitri.navigation.navigate({
-		path: 'Search',
-		state: {
-			searchTerm: value
-		}
-	})
+// A search with facets is really a filtered catalog, so it opens ProductCatalog instead of Search.
+const handleSearchAction = (action: CmsAction | string) => {
+	const value = typeof action === 'string' ? action : action?.value
+	const facets = typeof action === 'object' ? action?.facets : undefined
+	const sort = typeof action === 'object' ? action?.sort : undefined
+	const title = typeof action === 'object' ? action?.title : undefined
+
+	if (facets?.length) {
+		Eitri.navigation.navigate({
+			path: 'ProductCatalog',
+			state: {
+				params: {
+					facets,
+					query: value,
+					sort: sort || ''
+				},
+				title: title || ''
+			}
+		})
+	} else {
+		Eitri.navigation.navigate({
+			path: 'Search',
+			state: {
+				searchTerm: value
+			}
+		})
+	}
 }
 const handleCollectionAction = (action: CmsAction) => {
 	const facets = [{ key: 'productClusterIds', value: action?.value ?? '' }, ...(action?.facets || [])]
@@ -69,7 +91,12 @@ const handleCategoryAction = (action: CmsAction) => {
 	}
 	Eitri.navigation.navigate({
 		path: 'ProductCatalog',
-		state: { params, title: action?.title, banner: action?.banner }
+		state: {
+			params,
+			title: action?.title,
+			categoryNames: action?.categoryNames,
+			banner: action?.banner
+		}
 	})
 }
 const handleProductAction = (value: string) => {
@@ -111,12 +138,12 @@ export const processActions = (sliderData: SliderData): void => {
 		})
 	}
 
-	console.log('sliderData', sliderData)
+	// console.log('sliderData', sliderData)
 
 	const action = sliderData?.action
 	switch (action?.type) {
 		case 'search':
-			handleSearchAction(action.value)
+			handleSearchAction(action)
 			break
 		case 'collection':
 			handleCollectionAction(action)
@@ -141,6 +168,7 @@ export const processActions = (sliderData: SliderData): void => {
 			break
 		case 'facets':
 			openFacets(action)
+			break;
 		default:
 			console.log(`Unknown action type: ${action?.type}`)
 	}

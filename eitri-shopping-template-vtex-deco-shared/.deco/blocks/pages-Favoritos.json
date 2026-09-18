@@ -1,0 +1,19 @@
+{
+  "__resolveType": "website/pages/Page.tsx",
+  "name": "Favoritos",
+  "path": "/favoritos",
+  "sections": [
+    {
+      "title": "Meus favoritos",
+      "productsCount": "{{count}} produto(s)",
+      "__resolveType": "site/sections/AppPages/FavoritosHeader.tsx"
+    },
+    {
+      "columns": 2,
+      "emptyTitle": "Meus favoritos",
+      "emptySubtitle": "Adicione suas joias preferidas e crie a sua lista de favoritos",
+      "discoverButton": "Conferir as novidades",
+      "__resolveType": "site/sections/WishlistGrid.tsx"
+    }
+  ]
+}

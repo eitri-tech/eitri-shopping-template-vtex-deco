@@ -12,6 +12,14 @@ import CategoryListVtex from '../components/CmsComponents/CategoryListVtex/Categ
 import CategoryAccordion from '../components/CmsComponents/CategoryAccordion/CategoryAccordion'
 import RichText from '../components/CmsComponents/RichText/RichText'
 import VtexAdsBanner from '../components/CmsComponents/VtexAdsBanner/VtexAdsBanner'
+import Experiences from '../components/CmsComponents/Experiences/Experiences'
+import CategoryGallery from '../components/CmsComponents/CategoryGallery/CategoryGallery'
+import OverHeader from '../components/CmsComponents/OverHeader/OverHeader'
+import NewsLetter from '../components/CmsComponents/NewsLetter/NewsLetter'
+import NavigateByCategories from '../components/CmsComponents/NavigateByCategories/NavigateByCategories'
+import BannerWithShelf from '../components/CmsComponents/BannerWithShelf/BannerWithShelf'
+import VideoHero from '../components/CmsComponents/VideoHero/VideoHero'
+import WelcomeModal from '../components/CmsComponents/WelcomeModal/WelcomeModal'
 
 const componentMap: Record<string, ComponentType<any>> = {
 	MultipleImageBanner: Banner,
@@ -26,7 +34,15 @@ const componentMap: Record<string, ComponentType<any>> = {
 	CategoryListVtex: CategoryListVtex,
 	CategoryAccordion: CategoryAccordion,
 	RichText: RichText,
-	VtexAdsBanner: VtexAdsBanner
+	VtexAdsBanner: VtexAdsBanner,
+	Experiences: Experiences,
+	CategoryGallery: CategoryGallery,
+	OverHeader: OverHeader,
+	NewsLetter: NewsLetter,
+	NavigateByCategories: NavigateByCategories,
+	BannerWithShelf: BannerWithShelf,
+	VideoHero: VideoHero,
+	WelcomeModal: WelcomeModal
 }
 
 interface CmsContent {

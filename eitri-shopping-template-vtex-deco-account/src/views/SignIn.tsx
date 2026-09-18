@@ -12,10 +12,14 @@ import {
 	CustomInput,
 	HeaderReturn,
 	GenericBox,
-	TrackingService
+	TrackingService,
+	BiometricService,
+	useBiometricLogin,
+	BiometricReauthModal
 } from 'eitri-shopping-template-vtex-deco-shared'
 import {
 	doLogin,
+	isLoggedIn,
 	loadUserEmailFromStorage,
 	loginWithEmailAndKey,
 	saveUserEmailOnStorage,
@@ -28,6 +32,8 @@ import { useTranslation } from 'eitri-i18n'
 import { getLoginProviders } from '../services/StoreService'
 import SocialLogin from '../components/SocialLogin/SocialLogin'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
+import HelpSection from '../components/HelpSection/HelpSection'
+import BiometricSaveModal from '../components/BiometricSaveModal/BiometricSaveModal'
 import type { RouteProps } from '../types/route'
 
 interface OAuthProvider {
@@ -44,13 +50,16 @@ interface LoginProviders {
 
 interface SignInState {
 	redirectTo?: string
+	redirectState?: Record<string, unknown>
 	closeAppAfterLogin?: boolean
+	loginMode?: string
 }
 
 export default function SignIn(props: RouteProps<SignInState>) {
 	const { t } = useTranslation()
 
 	const redirectTo = props?.location?.state?.redirectTo
+	const redirectState = props?.location?.state?.redirectState
 	const closeAppAfterLogin = props?.location?.state?.closeAppAfterLogin
 
 	const LOGIN_WITH_EMAIL_AND_PASSWORD = 'emailAndPassword'
@@ -62,7 +71,11 @@ export default function SignIn(props: RouteProps<SignInState>) {
 	const [loading, setLoading] = useState(false)
 	const [showLoginErrorAlert, setShowLoginErrorAlert] = useState(false)
 	const [alertMessage, setAlertMessage] = useState('')
-	const [loginMode, setLoginMode] = useState(LOGIN_WITH_EMAIL_AND_PASSWORD)
+	const initialLoginMode =
+		props?.location?.state?.loginMode === LOGIN_WITH_EMAIL_AND_ACCESS_KEY
+			? LOGIN_WITH_EMAIL_AND_ACCESS_KEY
+			: LOGIN_WITH_EMAIL_AND_PASSWORD
+	const [loginMode, setLoginMode] = useState(initialLoginMode)
 	const [verificationCode, setVerificationCode] = useState('')
 	const [emailCodeSent, setEmailCodeSent] = useState(false)
 	const [timeOutToResentEmail, setTimeOutToResentEmail] = useState(0)
@@ -70,12 +83,41 @@ export default function SignIn(props: RouteProps<SignInState>) {
 	const [loginProviders, setLoginProviders] = useState<LoginProviders | undefined>()
 	const [loadingLoginProviders, setLoadingLoginProviders] = useState(false)
 	const [canUseSocialLogin, setCanUseSocialLogin] = useState(false)
+	const [showBiometricSaveModal, setShowBiometricSaveModal] = useState(false)
+
+	const { attemptBiometricLogin, showReauthModal, reauthEmail, handleReauthConfirm, dismissReauthModal } =
+		useBiometricLogin({
+			doLogin,
+			isLoggedIn: async () => false,
+			onSuccess: () => onLoggedIn()
+		})
 
 	useEffect(() => {
+		initialize()
+		Eitri.navigation.setOnResumeListener(redirectLoggedUser)
+	}, [])
+
+	const initialize = async () => {
+		if (await redirectLoggedUser()) return
+
 		loadLoginProviders()
+		attemptBiometricLogin()
 		addonUserTappedActiveTabListener()
 		sendScreenView('Login', 'SignIn')
-	}, [])
+	}
+
+	const redirectLoggedUser = async () => {
+		try {
+			if (!(await isLoggedIn())) return false
+
+			setLoading(true)
+			await onLoggedIn()
+			return true
+		} catch (error) {
+			console.error('Erro ao verificar sessão antes de exibir o login', error)
+			return false
+		}
+	}
 
 	useEffect(() => {
 		loadUserEmailFromStorage()
@@ -145,11 +187,12 @@ export default function SignIn(props: RouteProps<SignInState>) {
 
 	const onLoggedIn = async () => {
 		if (redirectTo) {
-			navigate('/' + redirectTo)
+			const path = redirectTo.startsWith('/') ? redirectTo : `/${redirectTo}`
+			return navigate(path, redirectState, true)
 		} else if (closeAppAfterLogin) {
-			Eitri.close()
+			return Eitri.close()
 		} else {
-			Eitri.navigation.back(1)
+			return Eitri.navigation.navigate({ path: PAGES.HOME, reset: true })
 		}
 	}
 
@@ -158,8 +201,15 @@ export default function SignIn(props: RouteProps<SignInState>) {
 		try {
 			const loggedIn = await doLogin(username, password)
 			if (loggedIn === 'Success') {
-				await onLoggedIn()
 				TrackingService.loginEvent('password')
+				const canOfferBiometricSave =
+					(await BiometricService.isBiometricAvailable()) && !(await BiometricService.hasSavedCredentials())
+				if (canOfferBiometricSave) {
+					setLoading(false)
+					setShowBiometricSaveModal(true)
+					return
+				}
+				await onLoggedIn()
 				return
 			}
 			setAlertMessage(t('signIn.verifyAgain'))
@@ -172,6 +222,19 @@ export default function SignIn(props: RouteProps<SignInState>) {
 		}
 
 		setLoading(false)
+	}
+
+	const handleConfirmBiometricSave = async () => {
+		setShowBiometricSaveModal(false)
+		setLoading(true)
+		await BiometricService.saveCredentialsWithBiometrics(username, password)
+		setLoading(false)
+		await onLoggedIn()
+	}
+
+	const handleDismissBiometricSave = async () => {
+		setShowBiometricSaveModal(false)
+		await onLoggedIn()
 	}
 
 	const loginWithEmailAndAccessKey = async () => {
@@ -195,8 +258,9 @@ export default function SignIn(props: RouteProps<SignInState>) {
 		setLoading(false)
 	}
 
-	const handleSocialLogin = async () => {
+	const handleSocialLogin = async (executor: () => Promise<unknown>) => {
 		try {
+			await executor()
 			onLoggedIn()
 		} catch (error) {
 			console.log(error)
@@ -361,6 +425,25 @@ export default function SignIn(props: RouteProps<SignInState>) {
 						)}
 				</GenericBox>
 			</View>
+
+			<HelpSection
+				className='mt-14'
+				hideTopDivisor
+				showItemDivisors
+			/>
+
+			<BiometricReauthModal
+				show={showReauthModal}
+				email={reauthEmail}
+				onConfirm={handleReauthConfirm}
+				onDismiss={dismissReauthModal}
+			/>
+
+			<BiometricSaveModal
+				show={showBiometricSaveModal}
+				onConfirm={handleConfirmBiometricSave}
+				onDismiss={handleDismissBiometricSave}
+			/>
 
 			<Alert
 				show={showLoginErrorAlert}

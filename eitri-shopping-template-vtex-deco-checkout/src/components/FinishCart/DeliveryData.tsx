@@ -72,7 +72,7 @@ export default function DeliveryData() {
 								)}
 
 								{/* Store Address */}
-								<View className='bg-neutral-50 p-3 rounded-lg w-full'>
+								<View className='bg-neutral-50 p-3 w-full'>
 									<Text className='text-sm font-medium mb-2'>{t('deliveryData.txtStoreAddress')}</Text>
 									<View className='flex flex-col gap-1'>
 										<Text className='text-xs text-neutral-600'>
@@ -95,7 +95,7 @@ export default function DeliveryData() {
 
 								{/* Important Information */}
 								{currentDelivery?.pickupStoreInfo?.additionalInfo != null && (
-									<View className='bg-blue-50 p-3 rounded-lg border-l-4 border-blue-400'>
+									<View className='bg-blue-50 p-3 border-l-4 border-blue-400'>
 										<View className='flex flex-row items-start gap-2'>
 											<svg
 												width='16'
@@ -164,7 +164,7 @@ export default function DeliveryData() {
 								)}
 
 								{/* Delivery Address */}
-								<View className='bg-neutral-50 p-3 rounded-lg'>
+								<View className='bg-neutral-50 p-3'>
 									<Text className='text-sm font-medium mb-2'>{t('deliveryData.txtDeliveryAddress')}</Text>
 									<View className='flex flex-col gap-1'>
 										<Text className='text-xs text-neutral-600'>

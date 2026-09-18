@@ -1,0 +1,7 @@
+{
+  "title": "Welcome to Your Store",
+  "post": "Discover our latest arrivals, curated for the season.\nTap through to shop the full collection.",
+  "datetime": "2026-07-16T12:00:00.000Z",
+  "photo": "https://placehold.co/600x400/eee/333.png?text=Post",
+  "__resolveType": "site/sections/Post.tsx"
+}

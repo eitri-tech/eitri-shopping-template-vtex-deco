@@ -16,12 +16,12 @@ export default function AddressTypeTabs(props: AddressTypeTabsProps) {
 	}
 
 	const tabClass = (tab: AddressTab) =>
-		`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+		`flex-1 py-2 px-4 text-sm font-medium transition-all duration-200 ${
 			selectedTab === tab ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/70 border border-transparent'
 		}`
 
 	return (
-		<View className='flex flex-row bg-base-200 rounded-lg p-1 mb-4'>
+		<View className='flex flex-row bg-base-200 p-1 mb-4'>
 			<CustomButton
 				label={
 					<View className='flex flex-row items-center justify-center gap-2'>

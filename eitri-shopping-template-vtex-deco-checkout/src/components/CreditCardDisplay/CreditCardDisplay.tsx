@@ -26,7 +26,7 @@ export default function CreditCardDisplay(props: CreditCardDisplayProps) {
 
 	return (
 		<View
-			className={`relative overflow-hidden rounded-lg p-4 bg-gradient-to-br ${getCardGradient(cardName)} shadow-md border border-gray-200 `}
+			className={`relative overflow-hidden p-4 bg-gradient-to-br ${getCardGradient(cardName)} shadow-md border border-gray-200 `}
 			height={'190'}>
 			{/* Efeito de brilho sutil */}
 			<View className='absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12' />

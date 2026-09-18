@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Page, View } from 'eitri-luminus'
-import { Loading, HeaderContentWrapper, HeaderText, HeaderReturn, BottomInset } from 'eitri-shopping-template-vtex-deco-shared'
+import {
+	Loading,
+	HeaderContentWrapper,
+	HeaderText,
+	HeaderReturn,
+	BottomInset,
+	useRetractableBottomBar
+} from 'eitri-shopping-template-vtex-deco-shared'
 import NoItem from '../components/NoItem/NoItem'
 import { sendScreenView } from '../services/TrackingService'
 import { useTranslation } from 'eitri-i18n'
@@ -18,6 +25,7 @@ interface ListOrdersResult {
 
 export default function OrderList() {
 	const { t } = useTranslation()
+	useRetractableBottomBar()
 	const [orders, setOrders] = useState<VtexOrder[]>([])
 	const [isLoading, setIsLoading] = useState(false)
 	const [pageHasEnded, setPageHasEnded] = useState(false)

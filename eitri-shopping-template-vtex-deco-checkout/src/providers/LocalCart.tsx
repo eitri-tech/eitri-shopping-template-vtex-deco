@@ -1,5 +1,7 @@
 import { createContext, useContext, useState } from 'react'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import Eitri from 'eitri-bifrost'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
 import {
 	addItem,
 	addUserData,
@@ -52,12 +54,35 @@ export default function CartProvider(props: CartProviderProps) {
 	const [selectedPaymentData, setSelectedPaymentData] = useState<CheckoutSelectedPayment | null>(null)
 	const [cardInfo, setCardInfo] = useState<CheckoutCardInfo | null>(null)
 
+	// Eitri.bottomBar.updateTabBadge's content field is typed string | undefined (not | null),
+	// but its own JSDoc says passing null or undefined removes the badge — undefined here is the
+	// behaviorally-identical, honestly-typed choice (same pattern as home/pdp/cart's LocalCart).
+	const updateTabBadge = async (newCart?: VtexCart | null) => {
+		try {
+			const tabIndex = await getCartTabBadgeIndex()
+			const items = (newCart as VtexCart | undefined)?.items
+			Eitri.bottomBar.updateTabBadge({
+				index: tabIndex,
+				content: items?.length ? `${items.reduce((acc: number, item) => acc + (item.quantity ?? 0), 0)}` : undefined
+			})
+		} catch (e) {
+			console.log('Erro ao atualizar tab badge: ', e)
+		}
+	}
+
 	const executeCartOperation = async <T,>(operation: (...args: any[]) => Promise<T>, ...args: any[]): Promise<T> => {
 		setCartIsLoading(true)
-		const newCart = await operation(...args)
-		setCart(newCart as unknown as VtexCart)
-		setCartIsLoading(false)
-		return newCart
+		try {
+			const newCart = await operation(...args)
+			setCart(newCart as unknown as VtexCart)
+			updateTabBadge(newCart as unknown as VtexCart)
+			return newCart
+		} catch (e) {
+			console.error('[LocalCart] executeCartOperation failed:', e)
+			throw e
+		} finally {
+			setCartIsLoading(false)
+		}
 	}
 
 	const startCart = async () => {

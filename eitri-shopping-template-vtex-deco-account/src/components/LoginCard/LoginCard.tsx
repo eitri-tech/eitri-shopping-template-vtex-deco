@@ -15,7 +15,7 @@ export default function LoginCard() {
 				</View>
 				<CustomButton
 					label={t('loginCard.lbButton')}
-					onPress={() => navigate(PAGES.SIGNIN, { redirectTo: 'Home' })}
+					onPress={() => navigate(PAGES.AUTH_SELECT, { redirectTo: PAGES.HOME })}
 				/>
 			</GenericBox>
 		</View>

@@ -1,4 +1,4 @@
-import { formatAmountInCents, formatGiftCardRedemptionCode, hideCreditCardNumber } from '../../utils/utils'
+import { formatAmountInCents, hideCreditCardNumber } from '../../utils/utils'
 import SimpleCard from '../Card/SimpleCard'
 import iconCard from '../../assets/images/credit_card.svg'
 import { useTranslation } from 'eitri-i18n'
@@ -33,7 +33,7 @@ function CreditCardVisual(props: CreditCardVisualProps) {
 
 	return (
 		<View
-			className={`relative overflow-hidden rounded-lg p-4 bg-gradient-to-br ${getCardGradient(cardName)} shadow-md border border-gray-200`}>
+			className={`relative overflow-hidden p-4 bg-gradient-to-br ${getCardGradient(cardName)} shadow-md border border-gray-200`}>
 			{/* Efeito de brilho sutil */}
 			<View className='absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12' />
 			<View className='absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8' />
@@ -139,7 +139,7 @@ export default function SelectedPaymentData(props: SelectedPaymentDataProps) {
 										/>
 
 										{/* Informações adicionais do cartão */}
-										<View className='bg-white border border-gray-200 rounded-lg p-3'>
+										<View className='bg-white border border-gray-200 p-3'>
 											<View className='flex flex-col items-center gap-1'>
 												<Text className='text-xs text-gray-600'>Parcelamento</Text>
 												<Text className='text-sm font-bold text-primary'>{installmentText}</Text>
@@ -186,6 +186,8 @@ export default function SelectedPaymentData(props: SelectedPaymentDataProps) {
 						})}
 					</View>
 				)}
+				{/* Disabled by main (gift card display turned off) — kept commented, not deleted, so
+				it's a one-line toggle to re-enable. Our typed/guarded version is preserved below.
 				{giftCards.length > 0 && (
 					<View className='flex flex-col gap-3'>
 						<View className='flex items-center gap-2'>
@@ -198,7 +200,7 @@ export default function SelectedPaymentData(props: SelectedPaymentDataProps) {
 								.map((gift, index) => (
 									<View
 										key={gift.id ?? index}
-										className='flex items-center justify-between p-3 bg-neutral-50 rounded'>
+										className='flex items-center justify-between p-3 bg-neutral-50'>
 										<View className='flex flex-col'>
 											<Text className='text-xs text-base-content/60'>Código</Text>
 											<Text className='text-sm font-mono font-medium text-base-content'>
@@ -213,7 +215,7 @@ export default function SelectedPaymentData(props: SelectedPaymentDataProps) {
 								))}
 						</View>
 					</View>
-				)}
+				)} */}
 			</View>
 		</SimpleCard>
 	)

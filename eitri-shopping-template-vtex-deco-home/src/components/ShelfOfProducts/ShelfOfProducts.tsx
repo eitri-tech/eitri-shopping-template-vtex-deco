@@ -3,6 +3,7 @@ import ShelfOfProductsCarousel from './components/ShelfOfProductsCarousel'
 import ShelfOfProductsSlider from './components/ShelfOfProductsSlider'
 import Eitri from 'eitri-bifrost'
 import { useTranslation } from 'eitri-i18n'
+import { ChevronRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import SectionTitle from '../SectionTitle/SectionTitle'
 import type { VtexProduct } from '../../types/vtex'
 
@@ -41,8 +42,12 @@ export default function ShelfOfProducts(props: ShelfOfProductsProps) {
 					{searchParams && (
 						<View
 							onClick={seeMore}
-							className='flex items-center min-w-fit text-primary'>
-							<Text className='font-bold'>{t('shelfOfProducts.seeMore')}</Text>
+							className='flex items-center min-w-fit text-neutral-content'>
+							<Text className='underline text-neutral-content'>{t('shelfOfProducts.seeMore')}</Text>
+							<ChevronRightIcon
+								size={15}
+								className='text-neutral-content ml-1'
+							/>
 						</View>
 					)}
 				</View>

@@ -18,7 +18,7 @@ export default function PickupPointList(props: PickupPointListProps) {
 				{[1, 2, 3].map(i => (
 					<Skeleton
 						key={i}
-						className='h-[72px] w-full rounded-lg mb-2'
+						className='h-[72px] w-full mb-2'
 					/>
 				))}
 			</View>
@@ -65,7 +65,7 @@ export default function PickupPointList(props: PickupPointListProps) {
 					? [1, 2, 3].map(i => (
 							<Skeleton
 								key={i}
-								className='h-[72px] w-full rounded-lg mb-2'
+								className='h-[72px] w-full mb-2'
 							/>
 						))
 					: options.map((option, index) => (
@@ -93,7 +93,7 @@ function PickupPointCard(props: PickupPointCardProps) {
 	const address = option?.address as { street?: string } | undefined
 	return (
 		<View
-			className={`rounded-lg shadow-sm transition-all duration-200 border ${
+			className={`shadow-sm transition-all duration-200 border ${
 				isSelected ? 'border-2 border-primary' : 'border-neutral-300 bg-base-100'
 			}`}
 			onClick={onClick}>

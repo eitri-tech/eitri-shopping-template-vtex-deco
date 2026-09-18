@@ -3,14 +3,14 @@ import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { openCart, openProduct } from '../../services/NavigationService'
 import { formatPrice } from '../../utils/utils'
 import { App, EventBus } from 'eitri-shopping-vtex-shared'
-import { ProductCardFullImage, TrackingService, getBadgesForProducts } from 'eitri-shopping-template-vtex-deco-shared'
+import { Datadog, ProductCardFullImage, TrackingService, getBadgesForProducts } from 'eitri-shopping-template-vtex-deco-shared'
 import { Vtex } from 'eitri-shopping-vtex-shared'
+import { useSnackBar } from '../../providers/SnackBar'
 import { useTranslation } from 'eitri-i18n'
+import type { VtexProduct } from '../../types/vtex'
 
 import { useCartItem, useWishlist } from './productCard.hooks'
 import { getProductVideo, formatInstallments, getFormattedListPrice } from './productCard.utils'
-import { useSnackBar } from '../../providers/SnackBar'
-import type { VtexProduct } from '../../types/vtex'
 
 // ========== Componente Principal ==========
 
@@ -29,6 +29,10 @@ export default function ProductCard(props: ProductCardProps) {
 	const [loadingCartOp, setLoadingCartOp] = useState(false)
 
 	const item = useMemo(() => {
+		if (product.items?.some(item => !item?.sellers?.length)) {
+			Datadog.sendDatadogInfoLog({ product }, 'productCard')
+		}
+
 		const availableSku = product.items?.find(item =>
 			item.sellers?.some(seller => (seller.commertialOffer?.AvailableQuantity ?? 0) > 0)
 		)
@@ -165,6 +169,7 @@ export default function ProductCard(props: ProductCardProps) {
 		loadingWishlistOp: wishlist.loading,
 		loadingCartOp,
 		itemQuantity,
+		imageAspectRatio: (App as any)?.configs?.appConfigs?.productCardImageAspectRatio,
 		onPressOnCard: handleCardPress,
 		onPressMainAction: handleAddToCart,
 		onPressOnWishlist: handleWishlistPress,

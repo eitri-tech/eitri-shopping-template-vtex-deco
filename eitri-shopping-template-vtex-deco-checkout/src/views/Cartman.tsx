@@ -19,7 +19,7 @@ export default function Cartman() {
 			const cart = await Vtex.cart.getCartIfExists()
 			setCart(cart)
 		} catch (error) {
-			console.log('Erro ao buscar cesta', error)
+			console.log('Erro ao buscar bolsa', error)
 		}
 	}
 
@@ -68,7 +68,7 @@ export default function Cartman() {
 				<Button
 					className='btn-primary w-full'
 					onClick={generateNewCart}>
-					Nova cesta
+					Nova bolsa
 				</Button>
 				<Button
 					className='btn-primary w-full'
@@ -78,7 +78,7 @@ export default function Cartman() {
 				<Button
 					className='btn-primary w-full'
 					onClick={clearCart}>
-					Limpar cesta
+					Limpar bolsa
 				</Button>
 				<Button
 					className='btn-primary w-full'

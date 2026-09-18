@@ -12,7 +12,7 @@ export default function Alert(props: AlertProps) {
 	const { message, colorMessage, backgroundColor, iconKey, colorIcon } = props
 
 	return (
-		<View className={`mt-2 ${backgroundColor ?? ''} rounded flex gap-3.5 items-center p-2`}>
+		<View className={`mt-2 ${backgroundColor ?? ''} flex gap-3.5 items-center p-2`}>
 			{iconKey && (
 				<Image
 					src={iconKey}

@@ -28,6 +28,24 @@ export const formatInstallments = (seller?: VtexSeller): string => {
 	return `em até ${maxInstallments.NumberOfInstallments}x ${formatPrice(maxInstallments.Value)}`
 }
 
+export const formatInstallmentsShort = (seller?: VtexSeller): string => {
+	const installments = seller?.commertialOffer?.Installments
+	if (!installments?.length) return ''
+
+	const interestFree = installments.filter(
+		installment => installment.InterestRate === 0 && (installment.NumberOfInstallments ?? 0) > 1
+	)
+	if (!interestFree.length) return ''
+
+	const best = interestFree.reduce((acc, installment) =>
+		(installment.NumberOfInstallments ?? 0) > (acc.NumberOfInstallments ?? 0) ? installment : acc
+	)
+
+	const value = formatPrice(best.Value)
+
+	return `${best.NumberOfInstallments}x de ${value} sem juros`
+}
+
 export const calculateBadge = (product?: VtexProduct, sellerDefault?: VtexSeller): string[] => {
 	const badges: string[] = []
 

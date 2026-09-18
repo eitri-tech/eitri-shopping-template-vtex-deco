@@ -1,6 +1,7 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import { CMS_PRODUCT_SORT } from '../utils/Constants'
 import { resolveSortParam } from './helpers/resolveSortParam'
+import type { VtexProduct } from '../types/vtex'
 
 interface SearchParams {
 	facets?: Array<{ key: string; value: string }>
@@ -95,26 +96,16 @@ export const getProductsFacetsService = async (params: SearchParams) => {
 		throw new Error('Invalid parameters provided to getProductsFacetsService')
 	}
 
-	// Garantir que selectedFacets seja um array válido ou null
-	const selectedFacets = Array.isArray(params?.facets) ? params.facets : null
-
-	const options: Record<string, unknown> = {
-		fullText: params?.query || params?.q || '',
-		selectedFacets: selectedFacets,
+	const options = {
+		query: params?.query || params?.q || '',
 		hideUnavailableItems: true
 	}
 
-	// Remover propriedades undefined que podem causar problemas no GraphQL
-	Object.keys(options).forEach(key => {
-		if (options[key] === undefined) {
-			delete options[key]
-		}
-	})
-
-	// Same library typing gap as productSearch above — Facets demands many fields
-	// (removeHiddenFacets, behavior, operator, fuzzy, searchState, categoryTreeBehavior...)
-	// this call never set and relies on server-side defaults for.
-	const result = (await Vtex.searchGraphql.facets(options as any)) as { facets?: unknown[] } | undefined
+	// Intelligent Search REST facets (replaces the GraphQL facets query, whose input typing
+	// demanded many fields this call never set).
+	const result = (await Vtex.intelligentSearch.facets(params.facets || [], options)) as
+		| { facets?: unknown[] }
+		| undefined
 
 	// Validar e garantir estrutura do resultado
 	if (!result || typeof result !== 'object') {
@@ -200,4 +191,26 @@ export const getCategoryTree = async (levels: number) => {
 
 export const getProductByEan = async (ean: string) => {
 	return await Vtex.searchGraphql.product({ identifier: [{ field: 'ean', value: ean }] } as any)
+}
+
+export const getProductSiblingsService = async (agrupadorCodes: string[]): Promise<VtexProduct[]> => {
+	if (!Array.isArray(agrupadorCodes) || agrupadorCodes.length === 0) {
+		return []
+	}
+
+	const options = {
+		// VTEX IS treats multiple entries with the same key as OR — returns all products matching any of the codes
+		selectedFacets: agrupadorCodes.map(code => ({ key: 'codigo-agrupador', value: code })),
+		from: 0,
+		// Cap: 12 products/page × ~4 siblings max = ~48; 99 provides safe headroom without over-fetching
+		to: 99,
+		hideUnavailableItems: true,
+		options: {
+			allowRedirect: false
+		}
+	}
+
+	// Same ProductSearchInput typing gap as productSearch above.
+	const result = (await Vtex.searchGraphql.productSearch(options as any)) as { products?: VtexProduct[] } | undefined
+	return result?.products ?? []
 }

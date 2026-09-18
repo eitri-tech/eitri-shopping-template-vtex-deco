@@ -9,7 +9,7 @@ import {
 	HeaderContentWrapper,
 	HeaderReturn,
 	Loading,
-	GenericBox
+	TrackingService
 } from 'eitri-shopping-template-vtex-deco-shared'
 import userIcon from '../assets/icons/user.svg'
 import { sendScreenView } from '../services/TrackingService'
@@ -18,13 +18,20 @@ import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import Alert from '../components/Alert/Alert'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
+import HelpSection from '../components/HelpSection/HelpSection'
+import type { RouteProps } from '../types/route'
 
 interface SavedUser {
 	email?: string
 	[key: string]: unknown
 }
 
-export default function SignUp() {
+interface SignUpState {
+	fromWelcome?: boolean
+}
+
+export default function SignUp(props: RouteProps<SignUpState>) {
+	const fromWelcome = props?.location?.state?.fromWelcome
 	const [email, setEmail] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [showLoginErrorAlert, setShowLoginErrorAlert] = useState(false)
@@ -83,6 +90,10 @@ export default function SignUp() {
 		try {
 			const loggedIn = await loginWithEmailAndKey(email, verificationCode)
 			if (loggedIn === 'Success') {
+				if (fromWelcome) {
+					Eitri.nativeNavigation.open({ slug: 'home' })
+					return
+				}
 				navigate(PAGES.EDIT_PROFILE)
 			} else {
 				setAlertMessage(t('signUp.alertMessageVerify'))
@@ -111,27 +122,39 @@ export default function SignUp() {
 			/>
 
 			<HeaderContentWrapper>
-				<HeaderReturn />
+				<HeaderReturn
+					onClick={() => {
+						if (fromWelcome) {
+							TrackingService.selectContentEvent({
+								content_type: 'welcome_modal',
+								content_id: 'back_from_sign_up'
+							})
+						}
+						Eitri.navigation.back(1)
+					}}
+				/>
 				<HeaderText text={t('signUp.lbRegister')} />
 			</HeaderContentWrapper>
 
 			<View className='p-4'>
-				<GenericBox>
-					<Text className='text-xl font-bold'>{t('signUp.lbEmailAccess')}</Text>
+				<View className='mb-4'>
+					<Text className='w-full text-gray-600'>{t('signUp.lbEmailAccess')}</Text>
+				</View>
 
-					<View className='mt-4 flex flex-col gap-y-4'>
-						<CustomInput
-							icon={userIcon}
-							value={email}
-							type='email'
-							placeholder='Email'
-							onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-							showClearInput={false}
-							required={true}
-						/>
+				<View className='mt-4 flex flex-col gap-y-4'>
+					<CustomInput
+						icon={userIcon}
+						value={email}
+						type='email'
+						placeholder='Email'
+						onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+						showClearInput={false}
+						required={true}
+					/>
 
-						{emailCodeSent && (
-							<>
+					{emailCodeSent && (
+						<>
+							<View className='mt-4'>
 								<CustomInput
 									label={t('signUp.lbVerifyCode')}
 									placeholder={t('signUp.lbVerifyCode')}
@@ -140,16 +163,20 @@ export default function SignUp() {
 									onChange={(e: ChangeEvent<HTMLInputElement>) => setVerificationCode(e.target.value)}
 									height='45px'
 								/>
+							</View>
 
+							<View className='mt-4'>
 								<CustomButton
 									label={t('signUp.lbLogin')}
 									onPress={loginWithEmailAndAccessKey}
 									disabled={!email || !verificationCode}
 									type='email'
 								/>
-							</>
-						)}
+							</View>
+						</>
+					)}
 
+					<View className='mt-4'>
 						<CustomButton
 							width='100%'
 							label={
@@ -160,15 +187,17 @@ export default function SignUp() {
 							disabled={resendCode || !email || loadingSendingCode}
 							onPress={sendAccessKey}
 						/>
-
-						<CustomButton
-							variant='outlined'
-							label={t('signUp.lbBack')}
-							onPress={() => Eitri.navigation.back(1)}
-						/>
 					</View>
-				</GenericBox>
+
+					<View className='mt-4 flex justify-center'>
+						<View onClick={() => navigate(PAGES.AUTH_SELECT)}>
+							<Text className='w-full text-primary'>{t('signUp.alreadyHaveAccount')}</Text>
+						</View>
+					</View>
+				</View>
 			</View>
+
+			<HelpSection />
 
 			<Alert
 				type='negative'

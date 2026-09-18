@@ -1,0 +1,64 @@
+name: Verificar e Publicar Versões
+
+on:
+    push:
+        branches:
+            - main
+            - master
+
+permissions:
+    contents: write
+
+jobs:
+    build:
+        name: Verificar e Publicar Versões
+        runs-on: ubuntu-latest
+
+        services:
+            docker:
+                image: docker:20.10.7
+                options: --privileged
+
+        steps:
+            - name: Checkout do código
+              uses: actions/checkout@v4
+              with:
+                  # Faz checkout na branch (e não em HEAD destacado) para permitir o push de volta.
+                  ref: ${{ github.ref_name }}
+                  # Histórico + tags completos são necessários para detectar alterações
+                  # no shared (diff desde a última tag `shared-*`) e para o push de volta.
+                  fetch-depth: 0
+                  fetch-tags: true
+
+            - name: Instalar Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+
+            - name: Configurar identidade do Git
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: Validar e Publicar Versões do Eitri App
+              env:
+                  EITRI_CLI_CLIENT_ID: ${{ secrets.EITRI_CLI_CLIENT_ID }}
+                  EITRI_CLI_CLIENT_SECRET: ${{ secrets.EITRI_CLI_CLIENT_SECRET }}
+                  EITRI_DEV_ENV_ID: ${{ secrets.EITRI_DEV_ENV_ID }}
+              run: |
+                  echo "Executando script..."
+                  npm install -g eitri-cli
+                  node check_and_push.js eitri-shopping-template-vtex-deco-shared
+
+            # - name: Configurar credenciais AWS
+            #   uses: aws-actions/configure-aws-credentials@v4
+            #   with:
+            #     aws-access-key-id: ${{ secrets.S3_VTEX_CMS_JSON_ID }}
+            #     aws-secret-access-key: ${{ secrets.S3_VTEX_CMS_JSON_KEY }}
+            #     aws-region: us-east-1
+
+            # - name: Enviar arquivos _cms para S3
+            #   env:
+            #     S3_VTEX_CMS_JSON_PATH: ${{ vars.S3_VTEX_CMS_JSON_PATH }}
+            #   run: |
+            #     aws s3 sync _cms s3://$S3_VTEX_CMS_JSON_PATH --delete

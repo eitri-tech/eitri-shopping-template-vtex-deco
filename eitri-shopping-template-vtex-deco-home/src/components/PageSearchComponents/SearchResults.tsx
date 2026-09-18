@@ -1,5 +1,4 @@
-import { Loading } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiXCircle } from 'react-icons/fi'
+import { Loading, CloseCircleIcon, getAgrupadorCode } from 'eitri-shopping-template-vtex-deco-shared'
 import { View, Text } from 'eitri-luminus'
 import ProductCard from '../ProductCard/ProductCard'
 import { useTranslation } from 'eitri-i18n'
@@ -8,17 +7,19 @@ import type { VtexProduct } from '../../types/vtex'
 interface SearchResultsProps {
 	searchResults: VtexProduct[]
 	isLoading?: boolean
+	// Sibling products keyed by their grouping code (see shared/utils/metalSwatches).
+	siblingsByCode?: Record<string, VtexProduct[]>
 }
 
 export default function SearchResults(props: SearchResultsProps) {
-	const { searchResults, isLoading } = props
+	const { searchResults, isLoading, siblingsByCode } = props
 
 	const { t } = useTranslation()
 
 	if (searchResults.length === 0 && !isLoading) {
 		return (
 			<View className='flex flex-col items-center justify-center mt-32 gap-4'>
-				<FiXCircle
+				<CloseCircleIcon
 					className='text-primary'
 					size={42}
 				/>
@@ -33,13 +34,20 @@ export default function SearchResults(props: SearchResultsProps) {
 	return (
 		<View className='flex flex-col p-4 gap-4'>
 			<View className='grid grid-cols-2 gap-4'>
-				{searchResults.map((product, index) => (
-					<View
-						key={product.productId}
-						className='w-full'>
-						<ProductCard product={product} />
-					</View>
-				))}
+				{searchResults.map(product => {
+					// metalSwatches is still untyped JS — the code is a string (or falsy) at runtime.
+					const code = getAgrupadorCode(product) as string | undefined
+					return (
+						<View
+							key={product.productId}
+							className='w-full'>
+							<ProductCard
+								product={product}
+								siblings={code ? siblingsByCode?.[code] : undefined}
+							/>
+						</View>
+					)
+				})}
 			</View>
 
 			{isLoading && (

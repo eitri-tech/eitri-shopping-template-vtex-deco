@@ -1,13 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Page, View } from 'eitri-luminus'
+import { Page, View, Text } from 'eitri-luminus'
 import { getWishlist, removeFromWishlist } from '../services/CustomerService'
 import WishlistItem from '../components/WishlistItem/WishlistItem'
-import { HeaderContentWrapper, HeaderReturn, HeaderText, Loading, BottomInset } from 'eitri-shopping-template-vtex-deco-shared'
-import NoItem from '../components/NoItem/NoItem'
+import {
+	HeaderContentWrapper,
+	HeaderReturn,
+	HeaderText,
+	HeaderLogo,
+	HeaderSearchIcon,
+	Loading,
+	BottomInset,
+	CustomButton,
+	WishlistIcon,
+	useRetractableBottomBar
+} from 'eitri-shopping-template-vtex-deco-shared'
 import { sendScreenView } from '../services/TrackingService'
 import { addonUserTappedActiveTabListener } from '../utils/backToTopListener'
 import { EventBusChannels, EventBus } from 'eitri-shopping-vtex-shared'
 import { useTranslation } from 'eitri-i18n'
+import { openCategories, openSearch } from '../services/NavigationService'
 import type { RouteProps } from '../types/route'
 
 interface WishlistEntry {
@@ -22,10 +33,12 @@ interface WishlistState {
 
 export default function Wishlist(props: RouteProps<WishlistState>) {
 	const { t } = useTranslation()
+	useRetractableBottomBar()
 	const [wishlistItems, setWishlistItems] = useState<WishlistEntry[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 
 	const openWithBottomBart = !!props?.location?.state?.tabIndex
+	const isEmpty = wishlistItems.length === 0 && !isLoading
 
 	useEffect(() => {
 		start()
@@ -88,11 +101,29 @@ export default function Wishlist(props: RouteProps<WishlistState>) {
 
 	return (
 		<Page title='Lista de desejos'>
-			<View className={'min-h-[100vh] flex flex-col'}>
-				<HeaderContentWrapper>
+			<View className='min-h-[100vh] flex flex-col'>
+				<HeaderContentWrapper className='items-center'>
 					{!openWithBottomBart && <HeaderReturn />}
-
-					<HeaderText text={t('wishlist.title')} />
+					<View className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center'>
+						{isEmpty ? (
+							<HeaderLogo />
+						) : (
+							<>
+								<HeaderText text={t('wishlist.title')} />
+								{wishlistItems.length > 0 && (
+									<Text className='text-sm text-gray-500'>
+										{t(
+											'wishlist.productsCount',
+											{ count: wishlistItems.length }
+										)}
+									</Text>
+								)}
+							</>
+						)}
+					</View>
+					<View className='ml-auto'>
+						<HeaderSearchIcon onClick={openSearch} />
+					</View>
 				</HeaderContentWrapper>
 
 				<Loading
@@ -109,12 +140,23 @@ export default function Wishlist(props: RouteProps<WishlistState>) {
 						/>
 					))}
 				</View>
-				{wishlistItems.length === 0 && !isLoading && (
-					<NoItem
-						title={t('wishlist.emptyTitle')}
-						subtitle={t('wishlist.emptySubtitle')}
-					/>
+
+				{isEmpty && (
+					<View className='flex flex-1 flex-col justify-center items-center px-8 gap-4'>
+						<WishlistIcon
+							filled
+							size={60}
+							className='text-black'
+						/>
+						<Text className='font-bold text-xl text-center'>{t('wishlist.emptyTitle')}</Text>
+						<Text className='text-center text-gray-600 text-sm'>{t('wishlist.emptySubtitle')}</Text>
+						<CustomButton
+							label={t('wishlist.discoverButton')}
+							onClick={openCategories}
+						/>
+					</View>
 				)}
+
 				<BottomInset />
 			</View>
 		</Page>

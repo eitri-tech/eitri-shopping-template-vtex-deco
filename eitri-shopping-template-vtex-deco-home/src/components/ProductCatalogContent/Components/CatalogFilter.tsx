@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { View, Text } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
+import { RemoteConfig } from 'eitri-shopping-vtex-shared'
 import { getProductsFacetsService } from '../../../services/ProductService'
-import { CustomButton, BottomInset, CustomCheckbox } from 'eitri-shopping-template-vtex-deco-shared'
+import { CustomButton, BottomInset, CustomCheckbox, SlidersIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import CustomModal from '../../CustomModal/CustomModal'
 import PriceRange from './PriceRange'
 
@@ -57,6 +58,14 @@ export default function CatalogFilter(props: CatalogFilterProps) {
 		setMaxPriceRange
 	} = props
 
+	// Reaproveita appConfigs.pdp.hiddenProperties (já configurada no Remote Config real) em vez de criar a chave
+	// appConfigs.productCatalog.hiddenFilters documentada em docs/remoteConfig.md, para não depender de uma nova
+	// configuração ser cadastrada antes do deploy
+	const hiddenFiltersConfig = RemoteConfig.getContent('appConfigs.pdp.hiddenProperties')
+	const hiddenFacetNames = (Array.isArray(hiddenFiltersConfig) ? hiddenFiltersConfig : []).map(name =>
+		name.toLowerCase()
+	)
+
 	const [showModal, setShowModal] = useState(false)
 	const [tempFilters, setTempFilters] = useState<Filters | undefined>(currentFilters)
 	const [filterFacets, setFilterFacets] = useState<Facet[]>([])
@@ -86,7 +95,9 @@ export default function CatalogFilter(props: CatalogFilterProps) {
 			}
 
 			const priceFacet = result.facets.find(f => f.type === 'PRICERANGE')
-			const filteredFacets = result.facets.filter(f => f.type !== 'PRICERANGE' && !f.hidden)
+			const filteredFacets = result.facets.filter(
+				f => f.type !== 'PRICERANGE' && !f.hidden && !hiddenFacetNames.includes(f.name?.toLowerCase())
+			)
 
 			const FACET_NAME_VALUES: Record<string, string> = {
 				sellerName: 'Vendido por'
@@ -98,12 +109,14 @@ export default function CatalogFilter(props: CatalogFilterProps) {
 				return {
 					...facet,
 					name: (facet.name && FACET_NAME_VALUES[facet.name]) || facet.name,
-					values: (facet.values ?? []).map(value => {
-						return {
-							...value,
-							name: (value.name && VALUE_NAME_VALUES[value.name]) || value.name
-						}
-					})
+					values: (facet.values ?? [])
+						.map(value => {
+							return {
+								...value,
+								name: (value.name && VALUE_NAME_VALUES[value.name]) || value.name
+							}
+						})
+						.sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
 				}
 			})
 
@@ -200,26 +213,17 @@ export default function CatalogFilter(props: CatalogFilterProps) {
 
 	return (
 		<>
-			<CustomButton
-				disabled={facetsLoading}
-				outlined
-				onClick={() => setShowModal(true)}
-				leftIcon={
-					<svg
-						xmlns='http://www.w3.org/2000/svg'
-						width='16'
-						height='16'
-						viewBox='0 0 24 24'
-						fill='none'
-						stroke='currentColor'
-						strokeWidth='2'
-						strokeLinecap='round'
-						strokeLinejoin='round'>
-						<path d='M22 3H2l8 9.46V19l4 2v-8.54L22 3z' />
-					</svg>
-				}
-				label={t('categoryPageModal.title')}
-			/>
+			<View
+				onClick={() => !facetsLoading && setShowModal(true)}
+				className={`h-[46px] w-full flex items-center justify-center gap-3 bg-[#E8E6DF] ${
+					facetsLoading ? 'opacity-40' : ''
+				}`}>
+				<SlidersIcon
+					size={24}
+					className='text-black'
+				/>
+				<Text className='text-lg font-normal text-black'>{t('categoryPageModal.title')}</Text>
+			</View>
 
 			{showModal && (
 				<CustomModal

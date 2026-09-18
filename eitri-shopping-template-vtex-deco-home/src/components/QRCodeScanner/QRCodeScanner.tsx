@@ -3,7 +3,7 @@ import Eitri from 'eitri-bifrost'
 import { Text, View } from 'eitri-luminus'
 import { getProductByEan } from '../../services/ProductService'
 import { openProduct } from '../../services/NavigationService'
-import { MdOutlineQrCodeScanner } from 'react-icons/md'
+import { QrCodeScannerIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 
 interface ScanResult {
@@ -111,7 +111,7 @@ export default function QRCodeScanner() {
 			<View
 				className={'w-[44px] h-[44px] flex justify-end items-center'}
 				onClick={handleScan}>
-				<MdOutlineQrCodeScanner
+				<QrCodeScannerIcon
 					className={'text-header-content'}
 					size={24}
 				/>

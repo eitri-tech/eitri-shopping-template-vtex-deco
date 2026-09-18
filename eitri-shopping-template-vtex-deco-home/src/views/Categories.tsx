@@ -1,60 +1,70 @@
-import { useState, useEffect, ReactNode } from 'react'
-import { Page } from 'eitri-luminus'
+import { useEffect } from 'react'
+import { Page, View, TextInput } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import {
-	Loading,
 	HeaderContentWrapper,
 	HeaderSearchIcon,
+	HeaderClose,
 	BottomInset,
-	TrackingService
+	TrackingService,
+	DecoCMSContentRender,
+	useRetractableBottomBar
 } from 'eitri-shopping-template-vtex-deco-shared'
-import { getCmsContent } from '../services/CmsService'
-import CmsContentRender from '../components/CmsContentRender/CmsContentRender'
-import type { CmsSection } from '../types/vtex'
+import type { RouteProps } from '../types/route'
 
-export default function Categories() {
-	const [cmsContent, setCmsContent] = useState<CmsSection[] | null>(null)
-	const [isLoading, setIsLoading] = useState(true)
-	const [pageTitle, setPageTitle] = useState<ReactNode>(null)
+interface CategoriesState {
+	// Screen to return to on close (e.g. 'Wishlist' closes the app instead of going home).
+	returnTo?: string
+}
+
+export default function Categories(props: RouteProps<CategoriesState>) {
+	useRetractableBottomBar()
+
+	const returnTo = props?.location?.state?.returnTo
 
 	useEffect(() => {
-		loadCms()
+		TrackingService.sendScreenView('Categorias', 'Categories')
 		Eitri.navigation.addOnResumeListener(() => {
 			TrackingService.sendScreenView('Categorias', 'Categories')
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	const loadCms = async () => {
-		const result = await getCmsContent('categories', 'categorias')
-		setCmsContent(result?.sections ?? [])
-		setIsLoading(false)
-	}
-
 	const goToSearch = () => {
 		Eitri.navigation.navigate({
-			path: '/Search'
+			path: '/Search',
+			state: { returnTo: 'Categories' }
 		})
+	}
+
+	const goToHome = () => {
+		if (returnTo === 'Wishlist') {
+			return Eitri.close()
+		}
+
+		Eitri.bottomBar.changeTab({ index: 0 })
+		Eitri.navigation.navigate({ path: '/Home', replace: true })
 	}
 
 	return (
 		<Page title='Categorias'>
-			<HeaderContentWrapper className='justify-between'>
-				{pageTitle}
-				<HeaderSearchIcon onClick={goToSearch} />
+			<HeaderContentWrapper className='flex justify-between'>
+				<TextInput
+					placeholder='Encontre sua Joia'
+					insideLeft={<HeaderSearchIcon />}
+					className='flex-auto !bg-[#F6F4F7]'
+					onClick={goToSearch}
+				/>
+				<HeaderClose onClick={goToHome} />
 			</HeaderContentWrapper>
 
-			<Loading
-				fullScreen
-				isLoading={isLoading}
-			/>
-
-			<CmsContentRender
-				cmsContent={cmsContent ?? undefined}
-				setPageTitle={setPageTitle}
-			/>
+			<DecoCMSContentRender page='Categories' />
 
 			<BottomInset />
+			<View
+				bottomInset={'auto'}
+				className='w-full'
+			/>
 		</Page>
 	)
 }

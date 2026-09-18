@@ -57,6 +57,7 @@ export interface VtexTotalizer {
 
 export interface VtexCartItem {
 	id?: string
+	uniqueId?: string
 	productId?: string
 	name?: string
 	quantity?: number

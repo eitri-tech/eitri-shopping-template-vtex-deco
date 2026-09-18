@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { View } from 'eitri-luminus'
-import { HeaderWishList } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiHeart } from 'react-icons/fi'
-import { FaHeart } from 'react-icons/fa'
+import { WishlistIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { addToWishlist, productOnWishlist, removeItemFromWishlist } from '../../services/customerService'
 import type { VtexProduct } from '../../types/vtex'
 
@@ -62,17 +60,10 @@ export default function Wishlist(props: WishlistProps) {
 
 	return (
 		<View onClick={handleSaveFavorite}>
-			{itemOnWishlist ? (
-				<FaHeart
-					size={28}
-					className={'text-primary'}
-				/>
-			) : (
-				<FiHeart
-					size={28}
-					className={'text-primary'}
-				/>
-			)}
+			<WishlistIcon
+				filled={itemOnWishlist}
+				size={28}
+			/>
 		</View>
 	)
 }

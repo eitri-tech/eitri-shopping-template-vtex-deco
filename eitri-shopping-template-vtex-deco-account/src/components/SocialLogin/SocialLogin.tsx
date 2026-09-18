@@ -1,8 +1,7 @@
 import { Image, Text, View } from 'eitri-luminus'
-import iconFacebook from '../../assets/images/social_facebook.svg'
 import iconGoogle from '../../assets/images/social_google.svg'
 import { useTranslation } from 'eitri-i18n'
-import { loginWithFacebook, loginWithGoogle } from '../../services/CustomerService'
+import { loginWithGoogle } from '../../services/CustomerService'
 
 interface OAuthProvider {
 	providerName?: string
@@ -10,7 +9,7 @@ interface OAuthProvider {
 }
 
 interface SocialLoginProps {
-	handleSocialLogin: () => void
+	handleSocialLogin: (executor: () => Promise<unknown>, providerName: string) => void
 	oAuthProviders?: OAuthProvider[]
 }
 
@@ -18,41 +17,18 @@ export default function SocialLogin(props: SocialLoginProps) {
 	const { handleSocialLogin, oAuthProviders } = props
 	const { t } = useTranslation()
 
-	const onSocialLogin = async (executor: () => Promise<unknown>) => {
-		try {
-			console.log('onSocialLogin')
-			await executor()
-			handleSocialLogin()
-		} catch (e) {
-			console.log('Error on social login:', e)
-		}
-	}
-
 	return (
 		<View className='flex flex-col gap-3'>
 			{oAuthProviders?.some(p => p.providerName === 'Google') && (
 				<View
-					className='flex items-center justify-center gap-3 h-12 bg-white rounded border border-gray-300 p-2 cursor-pointer'
-					onClick={() => onSocialLogin(loginWithGoogle)}>
+					className='flex flex-row items-center justify-center gap-3 h-12 bg-white rounded border border-gray-300 cursor-pointer'
+					onClick={() => handleSocialLogin(loginWithGoogle, 'google')}>
 					<Image
 						src={iconGoogle}
 						width='24px'
 						height='24px'
 					/>
-					<Text className='text-gray-700 font-bold uppercase text-sm'>{t('socialLogin.lbButton')}</Text>
-				</View>
-			)}
-
-			{oAuthProviders?.some(p => p.providerName === 'Facebook') && (
-				<View
-					className='flex items-center justify-center gap-3 bg-[#3D5A98] rounded h-12 p-2 cursor-pointer'
-					onClick={() => onSocialLogin(loginWithFacebook)}>
-					<Image
-						src={iconFacebook}
-						width='24px'
-						height='24px'
-					/>
-					<Text className='text-white font-bold uppercase text-sm'>{t('socialLogin.lbButtonFacebook')}</Text>
+					<Text className='text-gray-700 font-medium'>{t('authSelect.googleButton')}</Text>
 				</View>
 			)}
 		</View>

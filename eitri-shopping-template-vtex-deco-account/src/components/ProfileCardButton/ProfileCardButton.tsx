@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { View, Text } from 'eitri-luminus'
-import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiChevronRight } from 'react-icons/fi'
+import { ArrowRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 interface ProfileCardButtonProps {
 	icon?: ReactNode
@@ -13,17 +12,17 @@ export default function ProfileCardButton(props: ProfileCardButtonProps) {
 	const { icon, label, onClick } = props
 
 	return (
-		<GenericBox
-			className='flex justify-between items-center p-4 w-full'
+		<View
+			className='flex justify-between items-center px-4 py-4 w-full'
 			onClick={onClick}>
 			<View className='flex flex-row items-center gap-2'>
 				{icon}
 				<Text className='text-gray-700 font-medium'>{label}</Text>
 			</View>
-			<FiChevronRight
+			<ArrowRightIcon
 				size={16}
 				className='text-gray-700'
 			/>
-		</GenericBox>
+		</View>
 	)
 }

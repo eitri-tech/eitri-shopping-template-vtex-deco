@@ -5,7 +5,7 @@ import { useTranslation } from 'eitri-i18n'
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import { autocompleteSuggestions } from '../../services/productService'
 import Eitri from 'eitri-bifrost'
-import { FiSearch, FiChevronLeft } from 'react-icons/fi'
+import { SearchIcon, ChevronLeftIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import QRCodeScanner from '../QRCodeScanner/QRCodeScanner'
 import TopSearches from '../TopSearches/TopSearches'
 import SearchHistory from '../SearchHistory/SearchHistory'
@@ -140,7 +140,7 @@ export default function SearchInput(props: SearchInputProps) {
 		<View className={'flex items-center justify-between w-full gap-4 relative'}>
 			{(searchTerm || alwaysShowBackButton) && (
 				<View onClick={onBackPress}>
-					<FiChevronLeft className='text-primary-content' />
+					<ChevronLeftIcon className='text-primary-content' />
 				</View>
 			)}
 
@@ -162,10 +162,10 @@ export default function SearchInput(props: SearchInputProps) {
 					className='rounded-lg !outline-none !ring-0 focus:!outline-none focus:!ring-0 focus-within:!outline-none focus-within:!ring-0 !bg-transparent border-none shadow-none w-full px-2'
 				/>
 
-				<FiSearch className='text-primary' />
+				<SearchIcon className='text-primary' />
 			</View>
 
-			<QRCodeScanner />
+			{/* <QRCodeScanner /> */}
 
 			{showSearchInsights && !searchTerm && (
 				<View className='absolute top-[45px] left-0 w-full bg-white rounded-lg max-h-[70vh] overflow-y-auto'>

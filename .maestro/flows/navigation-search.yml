@@ -1,0 +1,58 @@
+appId: tech.eitri.play
+tags:
+  - navigation
+  - search
+env:
+  APP_SLUG: eitri-shopping-template-vtex-deco-home
+---
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+# "Categorias" é conteúdo da própria Home (seção do CMS); a tab "Inicio" só
+# existe dentro da shell nativa de tabs, que o dev launcher não fornece.
+- extendedWaitUntil:
+    visible: "Categorias"
+    timeout: 90000
+
+# --- Passo 1: abrir a busca a partir da Home ---
+# O "Categorias" acima é a seção de CMS da Home, NÃO a rota Categories.jsx,
+# TODO: update the placeholder text below to match your store's search placeholder
+# então o placeholder de busca não existe nesta tela. O caminho é o
+# ícone de lupa do header (icon-only), que leva a /Search. Medido no device
+# (1080x2400): bounds [852,151][921,222] -> centro (82%, 8%).
+- tapOn:
+    point: "82%,8%"
+
+# --- Passo 2: digitar o termo ---
+# O placeholder do campo é de um <input> em WebView e não é exposto na árvore
+# de acessibilidade, então não dá para esperar por ele. O campo tem autoFocus
+# (SearchInput.jsx:156) e o teclado já vem aberto, então esperamos pelo título
+# "histórico" (searchHistory.title), que é um Text real, e digitamos direto.
+# Verificado no device: o nó tem exatamente o texto 'histórico' — o que
+# importa, porque o matcher do Maestro é regex de STRING INTEIRA, não
+# substring (comprovado: "Run Eitri" não casa com "Run Eitri-App").
+- extendedWaitUntil:
+    visible: "histórico"
+    timeout: 20000
+# TODO: replace "anel" with a search term that returns results in your catalog
+- inputText: "anel"
+# Só o Enter dispara handleSearchSubmit (SearchInput.jsx:107-108) — não existe
+# botão de submit.
+- pressKey: Enter
+
+# --- Passo 3: confirmar a chegada no PLP ---
+# Buscar "anel" cai direto no ProductCatalog com resultados renderizados;
+# "Filtros" (CatalogFilter.jsx:169) e "Ordenar" (CatalogSort.jsx:30) aparecem
+# de imediato. Só os rótulos fixos são asseridos — a contagem e os nomes de
+# produto dependem do catálogo ao vivo.
+- extendedWaitUntil:
+    visible: "Filtros"
+    timeout: 30000
+- assertVisible: "Ordenar"
+
+# NOTA: uma versão anterior tentava `back` depois da busca para voltar às
+# categorias e tocar um tile de categoria como segundo caminho até o PLP. Foi
+# removida: no device o `back` não sai de forma confiável da tela de
+# resultados (provavelmente fecha o teclado primeiro), e chegar ao PLP pela
+# busca já cobre a mesma superfície de filtro/ordenação do ESS-936.

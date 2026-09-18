@@ -1,5 +1,7 @@
 import { createContext, useContext, useState } from 'react'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import Eitri from 'eitri-bifrost'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
 import { getCart, addItemToCart, removeCartItem, updateItemOnCart } from '../services/CartService'
 import type { VtexCart } from '../types/vtex'
 
@@ -24,6 +26,20 @@ export default function CartProvider(props: CartProviderProps) {
 	const [cart, setCart] = useState<VtexCart | null>(null)
 	const [cartIsLoading, setCartInLoading] = useState(false)
 
+	const updateTabBadge = async (newCart?: VtexCart) => {
+		try {
+			const tabIndex = await getCartTabBadgeIndex()
+			Eitri.bottomBar.updateTabBadge({
+				index: tabIndex,
+				content: newCart?.items?.length
+					? `${newCart?.items?.reduce((acc, item) => acc + (item.quantity ?? 0), 0)}`
+					: undefined
+			})
+		} catch (e) {
+			console.log('Erro ao atualizar tab badge: ', e)
+		}
+	}
+
 	const executeCartOperation = async <T extends unknown[]>(
 		operation: (...args: T) => Promise<VtexCart | undefined>,
 		...args: T
@@ -31,6 +47,7 @@ export default function CartProvider(props: CartProviderProps) {
 		try {
 			setCartInLoading(true)
 			const newCart = await operation(...args)
+			updateTabBadge(newCart)
 			setCart(newCart ?? null)
 			setCartInLoading(false)
 			return newCart

@@ -31,7 +31,7 @@ export default function CmsContentRender(props: CmsContentRenderProps) {
 	}, [cmsContent])
 
 	return (
-		<View className={`gap-6 flex flex-col pb-4 ${className || ''}`}>
+		<View className={`gap-8 flex flex-col pb-4 ${className || ''}`}>
 			{cmsContent?.map(content => getMappedComponent(content, key, rest))}
 		</View>
 	)

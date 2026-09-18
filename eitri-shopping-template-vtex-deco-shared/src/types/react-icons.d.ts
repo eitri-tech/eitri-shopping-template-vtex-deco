@@ -58,6 +58,16 @@ declare module 'react-icons/io5' {
 
 declare module 'react-icons/lu' {
 	export const LuChevronRight: IconType
+	export const LuArrowUpDown: IconType
+}
+
+declare module 'react-icons/hi2' {
+	export const HiOutlineClipboardDocument: IconType
+	export const HiOutlineClipboardDocumentCheck: IconType
+}
+
+declare module 'react-icons/ri' {
+	export const RiShoppingBagLine: IconType
 }
 
 declare module 'react-icons/md' {

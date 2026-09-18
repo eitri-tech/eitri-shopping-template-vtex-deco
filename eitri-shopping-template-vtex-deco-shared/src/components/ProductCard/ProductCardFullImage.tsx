@@ -4,8 +4,25 @@ import WishlistIcon from '../WishlistIcon/WishlistIcon'
 import { Text, View, Image, Loading } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import BadgeRender from '../BadgeRender/BadgeRender'
-import { IoBagAddOutline } from 'react-icons/io5'
+import ShoppingBagIcon from '../ShoppingBagIcon/ShoppingBagIcon'
 import type { VtexBadge } from '../../types/vtex'
+
+const BADGE_POSITION_CLASSES: Record<string, string> = {
+	'top-left': 'absolute top-[7px] left-[7px]',
+	'top-right': 'absolute top-[7px] right-[7px]',
+	'bottom-left': 'absolute bottom-[7px] left-[7px]',
+	'bottom-right': 'absolute bottom-[7px] right-[7px]'
+}
+
+function groupBadgesByPosition(badges?: VtexBadge[]): Record<string, VtexBadge[]> {
+	if (!badges?.length) return {}
+	return badges.reduce<Record<string, VtexBadge[]>>((acc, badge) => {
+		const pos = badge.position || 'top-left'
+		if (!acc[pos]) acc[pos] = []
+		acc[pos].push(badge)
+		return acc
+	}, {})
+}
 
 interface ProductCardFullImageProps {
 	listPrice?: string
@@ -18,6 +35,11 @@ interface ProductCardFullImageProps {
 	itemQuantity?: number
 	badges?: VtexBadge[]
 	showListItem?: boolean
+	showWishlist?: boolean
+	cartIcon?: ReactNode
+	swatches?: ReactNode
+	// '1:1' / '3x4' style ratio; falls back to remote config productCardImageAspectRatio.
+	imageAspectRatio?: string
 	onPressOnCard?: () => void
 	onPressMainAction?: () => void
 	onPressOnWishlist?: () => void
@@ -36,21 +58,29 @@ export default function ProductCardFullImage(props: ProductCardFullImageProps) {
 		itemQuantity,
 		badges,
 		showListItem,
+		showWishlist = true,
+		cartIcon,
 		onPressOnCard,
 		onPressMainAction,
 		onPressOnWishlist,
+		swatches,
+		imageAspectRatio,
 		className
 	} = props
 
 	const [cardContainerId] = useState(() => `product-card-${Math.random().toString(36).slice(2, 11)}`)
-	const [imageHeight, setImageHeight] = useState(180)
+	// Initial height from the declared ratio so the card doesn't jump once remote configs resolve.
+	const [imageHeight, setImageHeight] = useState(() => {
+		const [aspectWidth = 1, aspectHeight = 1] = (imageAspectRatio || '1:1').replace('x', ':').split(':').map(Number)
+
+		return Math.round((window.innerWidth / 2) * (aspectHeight / aspectWidth))
+	})
 	const [imageUrl, setImageUrl] = useState<string | null | undefined>(null)
 
 	useEffect(() => {
 		Eitri.environment.getRemoteConfigs().then((configs: any) => {
 			try {
-				const aspectRatio = configs.appConfigs.productCardImageAspectRatio
-
+				const aspectRatio = imageAspectRatio || configs.appConfigs.productCardImageAspectRatio
 				if (!aspectRatio) {
 					setImageUrl(image)
 					return
@@ -82,7 +112,7 @@ export default function ProductCardFullImage(props: ProductCardFullImageProps) {
 				setImageUrl(image)
 			}
 		})
-	}, [image])
+	}, [image, imageAspectRatio])
 
 	const _onPressOnWishlist = (e?: MouseEvent<HTMLElement>) => {
 		e?.stopPropagation()
@@ -91,78 +121,87 @@ export default function ProductCardFullImage(props: ProductCardFullImageProps) {
 
 	return (
 		<View
+			id={cardContainerId}
 			onClick={onPressOnCard}
-			className={`relative bg-white rounded-lg ${className}`}>
-			<View className={`flex flex-col w-full shadow-md rounded`}>
+			className={`relative bg-white shadow-sm h-full flex flex-col ${className}`}>
+			<View className={`flex flex-col w-full overflow-hidden flex-1`}>
 				<View
 					style={{ height: `${imageHeight}px`, maxHeight: `${imageHeight}px`, minHeight: `${imageHeight}px` }}
-					className={`relative flex flex-col w-full justify-center items-center rounded-t-lg`}>
+					className={`relative flex flex-col w-full justify-center items-center overflow-hidden`}>
 					{imageUrl && (
 						<Image
-							className={`object-contain h-full w-full rounded-t-lg`}
+							className={`object-cover h-full w-full`}
 							src={imageUrl}
 						/>
 					)}
 
-					<BadgeRender
-						className={`absolute top-[7px] p-2 left-[7px] z-10`}
-						badges={badges}
-					/>
-
-					<View
-						onClick={_onPressOnWishlist}
-						className='absolute top-[7px] p-2 right-[7px] flex items-center justify-center rounded-full backdrop-blur-sm bg-header-background z-[99] '>
-						<WishlistIcon
-							filled={isOnWishlist}
-							size={'20'}
+					{Object.entries(groupBadgesByPosition(badges)).map(([position, positionBadges]) => (
+						<BadgeRender
+							key={position}
+							className={`${BADGE_POSITION_CLASSES[position]} p-2 z-10`}
+							badges={positionBadges}
 						/>
-					</View>
+					))}
+
+					{showWishlist && (
+						<View
+							onClick={_onPressOnWishlist}
+							className='absolute top-[7px] p-2 right-[7px] flex items-center justify-center rounded-full bg-header-background z-[99]'>
+							<WishlistIcon
+								filled={isOnWishlist}
+								size={'24'}
+							/>
+						</View>
+					)}
 
 					<View
 						onClick={(e?: MouseEvent<HTMLElement>) => {
 							e?.stopPropagation()
 							if (onPressMainAction) onPressMainAction()
 						}}
-						className='absolute bottom-[7px] right-[7px] w-8 h-8 rounded-full bg-primary flex items-center justify-center z-[99]'>
+						className='absolute bottom-[7px] p-2 right-[7px] flex items-center justify-center z-[99]'>
 						{loadingCartOp ? (
 							<Loading
 								width='18px'
 								className='text-primary-content'
 							/>
-						) : itemQuantity && itemQuantity > 0 ? (
-							<Text className='text-primary-content font-bold text-xs'>{itemQuantity}</Text>
+						) : cartIcon ? (
+							cartIcon
 						) : (
-							<IoBagAddOutline
-								className='text-primary-content'
-								size={16}
-							/>
+							<ShoppingBagIcon />
 						)}
 					</View>
 				</View>
 
-				<View className={`w-full p-2`}>
-					<View className='mt-2 w-full flex justify-between gap-4 h-[40px]'>
-						<Text className='line-clamp-2 font-medium text-sm break-words'>{name}</Text>
+				<View className={`w-full p-2 flex-1`}>
+					<View className='mt-1 w-full flex justify-between gap-4 h-[40px] overflow-hidden'>
+						<Text className='family-poppins line-clamp-2 text-sm leading-5 break-words'>{name}</Text>
 					</View>
 
-					<View className='flex flex-col gap-2 mt-1'>
-						{showListItem && (
-							<>
-								{listPrice ? (
-									<Text className='line-through font-bold text-neutral-500 text-xs'>{listPrice}</Text>
-								) : (
-									<View className='h-[16px]' />
-								)}
-							</>
-						)}
+					<View className='flex flex-col gap-0'>
+						<View className='h-[16px] overflow-hidden'>
+							{showListItem && listPrice && (
+								<Text className='family-poppins line-through text-neutral-500 text-xs leading-4 line-clamp-1'>
+									{listPrice}
+								</Text>
+							)}
+						</View>
 
-						<Text className='font-bold text-primary-700 text'>{price}</Text>
+						<View className='h-[24px] overflow-hidden'>
+							<Text className='family-poppins font-bold text-primary-700 text-sm leading-6 line-clamp-1'>
+								{price}
+							</Text>
+						</View>
 
-						{installments ? (
-							<Text className='font-bold text-neutral-500 text-xs'>{installments}</Text>
-						) : (
-							<View className='h-[16px]' />
-						)}
+						<View className='h-[16px] overflow-hidden'>
+							{installments && (
+								<Text className='family-poppins text-neutral-500 text-[10px] leading-4 line-clamp-1'>
+									{installments}
+								</Text>
+							)}
+						</View>
+
+						<View className='flex flex-col'>{swatches}</View>
 					</View>
 				</View>
 			</View>

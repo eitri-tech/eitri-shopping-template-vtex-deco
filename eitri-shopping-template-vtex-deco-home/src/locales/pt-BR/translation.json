@@ -6,7 +6,11 @@
 		"title": "Categorias"
 	},
 	"productCatalog": {
-		"title": "Catálogo"
+		"title": "Catálogo",
+		"productCountSingle": "{{count}} produto em {{title}}",
+		"productCountMultiple": "{{count}} produtos em {{title}}",
+		"resultCountSingle": "{{count}} produto",
+		"resultCountMultiple": "{{count}} produtos"
 	},
 	"blogPostShelf": {
 		"seeMore": "Ver mais"
@@ -26,27 +30,28 @@
 		"labelSearch": "Procurar..."
 	},
 	"productCardVertical": {
-		"cart": "Na cesta",
+		"cart": "Na sacola",
 		"buy": "Comprar"
 	},
 	"productCard": {
-		"snackAdded": "adicionado à cesta com sucesso",
-		"snackRemoved": "produto removido da cesta",
-		"viewCart": "Ver cesta",
+		"snackAdded": "adicionado à sacola com sucesso",
+		"snackRemoved": "produto removido da sacola",
+		"viewCart": "Ver sacola",
 		"buy": "Comprar"
 	},
 	"scheduleCard": {
 		"button": "Confira"
 	},
 	"searchInput": {
-		"content": "Encontre seu produto..."
+		"content": "Encontre sua joia..."
 	},
 	"shelfOfProducts": {
 		"loading": "Carregando...",
-		"seeMore": "Ver mais"
+		"seeMore": "ver todos"
 	},
 	"lists": {
 		"title": "Ordenar por",
+		"controlLabel": "Ordenar",
 		"labelRelevance": "Relevância",
 		"labelBestSellers": "Mais vendidos",
 		"labelNewest": "Mais recentes",
@@ -91,5 +96,15 @@
 	"blogCard": {
 		"publishedByDate": "Publicado por {{author}} em {{date}}",
 		"publishedDate": "Publicado em {{date}}"
+	},
+	"welcomeModal": {
+		"description": "Faça login para acessar benefícios e ofertas exclusivas.",
+		"login": "Entrar",
+		"signUp": "Criar conta",
+		"continue": "Continuar sem login"
+	},
+	"addedToCartModal": {
+		"title": "Produto adicionado à sacola!",
+		"goToCart": "Ver sacola"
 	}
 }

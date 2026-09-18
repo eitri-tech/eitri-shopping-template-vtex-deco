@@ -1,0 +1,123 @@
+appId: tech.eitri.play
+tags:
+  - pdp
+  - sku
+env:
+  APP_SLUG: eitri-shopping-template-vtex-deco-home
+  CART_SLUG: eitri-shopping-template-vtex-deco-cart
+---
+# Variações de SKU na PDP: tamanho (nível de SKU) e os swatches de
+# material/pedra (produtos irmãos, ESS-974).
+#
+# Escopo deliberado dos dois eixos:
+#
+#   TAMANHO  — cobertura completa, incluindo a prova de que a escolha
+#              propaga: o nome do item na sacola termina com o tamanho
+#              escolhido.
+#   MATERIAL — só a asserção de que as seções renderizam. Os swatches são
+#   /PEDRAS    <Image> de 32x32 sem texto, sem alt e sem accessibility label
+#              (MaterialSwatches.jsx:43-54): os valores ("Prata", "Ouro
+#              Amarelo"...) existem apenas como chaves de lookup em
+#              shared/utils/variationImages.js e nunca chegam ao DOM. Não há
+#              como endereçar um swatch específico pelo matcher do Maestro,
+#              e a seleção atual só é sinalizada por classe CSS
+#              (`border-primary`), não exposta na árvore. Asserir os títulos
+#              cobre a regressão que importa: o componente inteiro retorna
+#              null quando há menos de 2 irmãos (MaterialSwatches.jsx:65-67).
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${APP_SLUG}
+- extendedWaitUntil:
+    visible: "Categorias"
+    timeout: 90000
+# Sacola limpa para que a asserção final sobre o nome do item não possa casar
+# com sobra de execuções anteriores.
+- runFlow:
+    file: ../subflows/clear-cart.yml
+
+# --- Chegar numa PDP com variações de SKU ---
+# TODO: replace the search term "anel" below with a term that returns multi-SKU
+# products in your catalog. The original term returned 25/25 multi-SKU results
+# with a size variation. No product is hardcoded.
+- tapOn:
+    point: "82%,8%"
+- extendedWaitUntil:
+    visible: "histórico"
+    timeout: 20000
+# TODO: replace "anel" with a search term for multi-SKU products in your catalog
+- inputText: "anel"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: "Filtros"
+    timeout: 30000
+- tapOn:
+    point: "25%,40%"
+# Sinal de "PDP carregou": o botão fixo do rodapé. NÃO use "Sobre o produto" —
+# verificado no device que, com a galeria já em cache, o acordeão de descrição
+# nasce ABAIXO DA DOBRA e a asserção falha de forma intermitente.
+- extendedWaitUntil:
+    visible: "Adicionar à Sacola"
+    timeout: 40000
+
+# --- Eixo 1: tamanho (Aro do Anel) ---
+# O rótulo é o nome CRU da variação vindo do VTEX (SkuSelector.jsx:206), não
+# TODO: "Aro do Anel" is the variation name from the original catalog — replace
+# with the actual SKU variation name from your VTEX catalog.
+# uma chave de i18n — é o nome cru da variação vindo do VTEX.
+# O scroll é OBRIGATÓRIO, não cosmético: sem ele os chips ficam em ~91% da
+# altura, colados na barra fixa "Adicionar à Sacola", e o tap não registra a
+# seleção (reproduzido no device — o item foi para a sacola com o tamanho
+# pré-selecionado em vez do tocado). `centerElement` traz a faixa para o meio.
+# TODO: replace "Aro do Anel" with the SKU variation name from your catalog
+- scrollUntilVisible:
+    element:
+      text: "Aro do Anel"
+    direction: DOWN
+    centerElement: true
+    timeout: 20000
+- assertVisible: "Aro do Anel"
+# Nenhum tamanho é hardcodado: a grade de aros muda por produto (tipicamente
+# entre 10 e 33) e os indisponíveis ficam FORA do DOM por padrão
+# (SkuSelector.jsx:147, isUnavailableHidden inicia true), atrás de um expansor
+# icon-only. `copyTextFrom` captura o SEGUNDO chip disponível — o segundo, e
+# não o primeiro, porque o app pré-seleciona o primeiro SKU disponível
+# (pdp Home.jsx:82-87), e tocar o já selecionado não provaria nada.
+#
+# O matcher é de string inteira, então "[0-9]{2}" casa só com nós cujo texto
+# INTEIRO são dois dígitos — os chips. Preço ("R$ 600,00") e parcelamento
+# ("7X de R$ 85,71 sem juros") não casam.
+- copyTextFrom:
+    text: "[0-9]{2}"
+    index: 1
+- tapOn: ${maestro.copiedText}
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# --- Eixo 2: swatches de material/pedra ---
+# Só renderizam quando o grupo de irmãos tem 2+ valores distintos naquela
+# dimensão (SwatchRow, MaterialSwatches.jsx:28). "Pedras" é opcional: nem todo
+# grupo varia pedra, então não é exigido aqui.
+- assertVisible: "Material"
+
+# --- Prova de que a variação de tamanho propagou para a sacola ---
+- tapOn: "Adicionar à Sacola"
+- extendedWaitUntil:
+    visible: "adicionado à sacola com sucesso"
+    timeout: 15000
+# A sacola é aberta por um bootstrap novo em vez do ícone do header: o header
+# da PDP NÃO é fixo e já saiu de vista por causa do scroll acima (verificado no
+# device — o tap em (91%,8%) acerta a galeria de imagens). Um novo launch é
+# determinístico e o orderForm sobrevive, pois é estado de servidor.
+- runFlow:
+    file: ../subflows/bootstrap.yml
+    env:
+      APP_SLUG: ${CART_SLUG}
+- extendedWaitUntil:
+    visible: "Finalizar Compra"
+    timeout: 60000
+# O nome do item na sacola é o nome do SKU, que termina com o aro escolhido
+# (e.g. the SKU name ending with the chosen size variation). Se a
+# seleção não tivesse pegado, viria o tamanho pré-selecionado (o primeiro
+# chip) e esta asserção falharia — é ela que dá sentido ao flow.
+- assertVisible: ".* ${maestro.copiedText}"

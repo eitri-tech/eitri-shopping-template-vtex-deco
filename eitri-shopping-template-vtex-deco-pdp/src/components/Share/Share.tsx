@@ -1,6 +1,5 @@
 import { View } from 'eitri-luminus'
-import { TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiShare2 } from 'react-icons/fi'
+import { TrackingService, ShareIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import Eitri from 'eitri-bifrost'
 import type { VtexProduct } from '../../types/vtex'
@@ -22,7 +21,7 @@ export default function Share(props: ShareProps) {
 
 	return (
 		<View onClick={shareLink}>
-			<FiShare2
+			<ShareIcon
 				size={28}
 				className={'text-primary'}
 			/>

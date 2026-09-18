@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { Page, View, Text } from 'eitri-luminus'
-import { Loading, HeaderContentWrapper, HeaderReturn, HeaderText, CustomButton, CustomInput } from 'eitri-shopping-template-vtex-deco-shared'
+import {
+	Loading,
+	HeaderContentWrapper,
+	HeaderReturn,
+	HeaderText,
+	CustomButton,
+	CustomInput
+} from 'eitri-shopping-template-vtex-deco-shared'
 import Alert from '../components/Alert/Alert'
 import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'

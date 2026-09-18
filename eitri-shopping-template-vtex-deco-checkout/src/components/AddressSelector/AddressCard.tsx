@@ -52,7 +52,7 @@ export default function AddressCard(props: AddressCardProps) {
 
 	return (
 		<View
-			className={`bg-white rounded shadow-sm border border-gray-300 p-4 w-full flex flex-col ${
+			className={`bg-white shadow-sm border border-gray-300 p-4 w-full flex flex-col ${
 				isSelected ? 'border-2 border-primary' : 'border-neutral-300 bg-base-100'
 			}`}
 			onClick={onClick}>

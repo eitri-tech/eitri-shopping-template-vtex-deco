@@ -1,5 +1,5 @@
 import { View, Text } from 'eitri-luminus'
-import { FiMinus, FiPlus } from 'react-icons/fi'
+import { MinusIcon, PlusIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 interface QuantityProps {
 	quantity: number
@@ -15,7 +15,7 @@ export default function Quantity(props: QuantityProps) {
 			<View
 				className='w-1/3 flex items-center justify-center'
 				onClick={() => quantity > 1 && handleItemQuantity(-1)}>
-				<FiMinus className={`${quantity === 1 || disable ? 'text-gray-300' : 'text-primary'}`} />
+				<MinusIcon className={`${quantity === 1 || disable ? 'text-gray-300' : 'text-primary'}`} />
 			</View>
 
 			<Text className='px-3 py-2 text-sm font-medium min-w-[3rem] text-center'>{quantity}</Text>
@@ -23,7 +23,7 @@ export default function Quantity(props: QuantityProps) {
 			<View
 				className='w-1/3 items-center justify-center pl-1'
 				onClick={() => handleItemQuantity(1)}>
-				<FiPlus className={`${disable ? 'text-gray-300' : 'text-primary'}`} />
+				<PlusIcon className={`${disable ? 'text-gray-300' : 'text-primary'}`} />
 			</View>
 		</View>
 	)

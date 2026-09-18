@@ -45,7 +45,7 @@ export default function Freight() {
 
 	return (
 		<View className='px-4'>
-			<View className='bg-[#FEFAE2] border border-yellow-300 rounded-lg p-4 flex flex-col gap-3'>
+			<View className='bg-[#FEFAE2] border border-yellow-300 p-4 flex flex-col gap-3'>
 				<View className='flex flex-col gap-1'>
 					<Text className='text-sm font-semibold text-gray-800'>
 						{cartPostalCode

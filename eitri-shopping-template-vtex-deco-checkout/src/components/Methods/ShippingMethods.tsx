@@ -59,7 +59,7 @@ function ShippingMethodCard(props: ShippingMethodCardProps) {
 	const { option, isSelected = false, onClick } = props
 	return (
 		<View
-			className={`rounded-lg shadow-sm transition-all duration-200 border ${
+			className={`shadow-sm transition-all duration-200 border ${
 				isSelected ? 'border-2 border-primary' : 'border-neutral-300 bg-base-100'
 			}`}
 			onClick={onClick}>

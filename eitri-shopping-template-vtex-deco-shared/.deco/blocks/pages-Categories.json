@@ -1,0 +1,84 @@
+{
+  "__resolveType": "website/pages/Page.tsx",
+  "name": "Categories",
+  "path": "/categories",
+  "sections": [
+    {
+      "content": [
+        {
+          "action": {
+            "type": "category",
+            "sort": "score:desc",
+            "value": "category-a"
+          },
+          "subcategories": [
+            {
+              "title": "View All",
+              "action": {
+                "type": "category",
+                "value": "category-a"
+              }
+            },
+            {
+              "title": "Subcategory A1",
+              "action": {
+                "type": "category",
+                "value": "category-a/subcategory-a1"
+              }
+            },
+            {
+              "title": "Subcategory A2",
+              "action": {
+                "type": "category",
+                "value": "category-a/subcategory-a2"
+              }
+            }
+          ],
+          "title": "Category A"
+        },
+        {
+          "action": {
+            "type": "category",
+            "sort": "score:desc",
+            "value": "category-b"
+          },
+          "subcategories": [
+            {
+              "title": "View All",
+              "action": {
+                "type": "category",
+                "value": "category-b"
+              }
+            },
+            {
+              "title": "Subcategory B1",
+              "action": {
+                "type": "category",
+                "value": "category-b/subcategory-b1"
+              }
+            }
+          ],
+          "title": "Category B"
+        },
+        {
+          "action": {
+            "type": "category",
+            "sort": "score:desc",
+            "value": "category-c"
+          },
+          "subcategories": [
+            {
+              "title": "View All",
+              "action": {
+                "type": "category",
+                "value": "category-c"
+              }
+            }
+          ],
+          "title": "Category C"
+        }
+      ],
+      "__resolveType": "site/sections/CategoryListSwipe.tsx"
+    }
+  ]
+}

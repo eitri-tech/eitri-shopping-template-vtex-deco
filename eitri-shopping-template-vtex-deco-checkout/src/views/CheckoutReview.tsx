@@ -18,7 +18,8 @@ import {
 	BottomInset,
 	CustomButton,
 	TrackingService,
-	Loading
+	Loading,
+	Datadog
 } from 'eitri-shopping-template-vtex-deco-shared'
 import Eitri from 'eitri-bifrost'
 import type { VtexCartItem } from '../types/vtex'
@@ -42,6 +43,7 @@ export default function CheckoutReview() {
 	const [recaptchaSiteKey, setRecaptchaSiteKey] = useState('')
 
 	const recaptchaRef = useRef<RecaptchaHandle>(null)
+	const readinessLoggedCartIdRef = useRef<string | null | undefined>(null)
 
 	useEffect(() => {
 		Eitri.environment.getRemoteConfigs().then(rc => {
@@ -66,6 +68,33 @@ export default function CheckoutReview() {
 			}
 		}
 	}, [cart])
+
+	const itemsReadyToPay = unavailableItems.length === 0 && cart?.items?.length > 0
+	const shippingAddressReadyToPay = Boolean(
+		cart?.shippingData?.address && cart?.shippingData?.address?.number
+	)
+	const readyToPay = itemsReadyToPay && shippingAddressReadyToPay
+
+	useEffect(() => {
+		if (!cart || cartIsLoading) return
+		if (readyToPay) {
+			readinessLoggedCartIdRef.current = null
+			return
+		}
+		if (readinessLoggedCartIdRef.current === cart.orderFormId) return
+
+		readinessLoggedCartIdRef.current = cart.orderFormId
+
+		Datadog.sendDatadogLogError(
+			new Error('checkoutReview.notReadyToPay'),
+			'isReadyToPay',
+			{
+				cartId: cart?.orderFormId,
+				itemsReadyToPay,
+				shippingAddressReadyToPay
+			}
+		)
+	}, [cart?.orderFormId, cartIsLoading, itemsReadyToPay, shippingAddressReadyToPay, readyToPay])
 
 	const runPaymentScript = async () => {
 		try {
@@ -142,12 +171,7 @@ export default function CheckoutReview() {
 	}
 
 	const isReadyToPay = () => {
-		return (
-			unavailableItems.length === 0 &&
-			(cart?.items?.length ?? 0) > 0 &&
-			!!cart?.shippingData?.address &&
-			!!cart?.shippingData?.address?.number
-		)
+		return readyToPay
 	}
 
 	const removeUnavailableItem = async (uItem: VtexCartItem) => {
@@ -188,7 +212,7 @@ export default function CheckoutReview() {
 				{/* Adiciona padding-bottom para não sobrepor o botão */}
 				<>
 					{unavailableItems.length > 0 && (
-						<View className='mb-4 p-4 bg-red-50 border border-red-200 rounded'>
+						<View className='mb-4 p-4 bg-red-50 border border-red-200'>
 							<Text className='text-sm text-red-600 font-medium'>{t('finishCart.errorItems')}</Text>
 
 							{unavailableItems.map(uItem => (
@@ -198,7 +222,7 @@ export default function CheckoutReview() {
 									<View className='flex items-center gap-2'>
 										<Image
 											src={uItem.imageUrl ?? ''}
-											className='w-[60px] rounded'
+											className='w-[60px]'
 										/>
 										<Text className='text-sm font-medium'>{uItem.name}</Text>
 									</View>
@@ -228,7 +252,7 @@ export default function CheckoutReview() {
 
 			{error.message && (
 				<View className='fixed bottom-[90px] left-0 w-full'>
-					<View className='p-4 bg-red-50 border border-red-200 rounded'>
+					<View className='p-4 bg-red-50 border border-red-200'>
 						<Text className='text-sm text-red-600 font-medium'>
 							{error.message || 'Houve um erro ao fechar o pedido'}
 						</Text>

@@ -1,0 +1,112 @@
+{
+	"home": {
+		"title": "Product"
+	},
+	"description": {
+		"txtDescription": "About the product",
+		"labelSeeLess": "See less",
+		"labelSeeMore": "See more"
+	},
+	"information": {
+		"txtInformation": "Technical details"
+	},
+	"supplier": {
+		"txtSupplier": "Supplier"
+	},
+	"freight": {
+		"labelZipCode": "00000-000",
+		"labelConsult": "Check",
+		"labelCalculate": "Calculate",
+		"txtCalculate": "Check shipping",
+		"txtSubtitle": "Check the estimated cost and delivery times",
+		"txtNoZipCode": "I don't know my ZIP code",
+		"txtDelivery": "Home delivery",
+		"txtPickup": "Pick up in store",
+		"labelFastest": "Fastest",
+		"errorUnavailable": "Sorry, this product is not available for your ZIP code. How about trying another ZIP code?"
+	},
+	"mainDescription": {
+		"txtUntil": "up to",
+		"txtOf": "of",
+		"installment": "up to {{installment}}x of {{value}} interest-free"
+	},
+	"modalComponent": {
+		"txtProductAdded": "Product added",
+		"txtQuantity": "Quantity:",
+		"txtGoToCart": "Go to bag",
+		"txtAddToCart": "Add to bag",
+		"txtBuyTogether": "Take advantage and buy together"
+	},
+	"product": {
+		"labelAddToCart": "Add to bag",
+		"labelGoToCart": "Go to bag",
+		"errorNoProduct": "Product unavailable"
+	},
+	"productBasicTemplate": {
+		"txtWhoSaw": "Who viewed this also viewed:"
+	},
+	"productCardVertical": {
+		"cart": "view bag",
+		"buy": "Add"
+	},
+	"review": {
+		"txtOpnion": "The customer did not write a review and only rated the product.",
+		"seeMoreReviews": "See more reviews"
+	},
+	"skuSelector": {
+		"txtSelect": "Select"
+	},
+	"tagsComponent": {
+		"labelOffer": "Offer"
+	},
+	"actionButton": {
+		"snackAdded": "successfully added to the bag",
+		"labelBuy": "Add to bag"
+	},
+	"buyTogether": {
+		"txtTitle": "Buy Together",
+		"add": "Add",
+		"added": "Added",
+		"total": "Buy together for: {{value}}",
+		"selectedValue": "Selected items value: {{value}}",
+		"installment": "{{count}}x of {{value}} interest-free",
+		"buy": "Buy",
+		"buying": "Buying...",
+		"snackAdded": "Products added to the bag"
+	},
+	"productCard": {
+		"snackAdded": "successfully added to the bag",
+		"snackRemoved": "product removed from the bag",
+		"viewCart": "View bag",
+		"buy": "Add"
+	},
+	"searchInput": {
+		"placeholder": "Find your Jewel"
+	},
+	"topSearches": {
+		"title": "top searches"
+	},
+	"searchHistory": {
+		"title": "history",
+		"clear": "clear history"
+	},
+	"qrCodeScanner": {
+		"title": "Scan barcode",
+		"description": "Center the code to scan",
+		"torch": "Flashlight",
+		"productNotFound": "Product not found"
+	},
+	"rating": {
+		"txtCount": "{{count}} reviews",
+		"txtComposition": "Rating breakdown"
+	},
+	"materialSwatches": {
+		"label": "Material",
+		"pedrasLabel": "Stones"
+	},
+	"serviceLinks": {
+		"returns": "Exchanges and Returns",
+		"digitalSeller": "Digital Seller",
+		"paymentMethods": "Payment methods"
+	}
+}

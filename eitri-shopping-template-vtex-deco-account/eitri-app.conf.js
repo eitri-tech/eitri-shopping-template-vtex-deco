@@ -23,5 +23,6 @@ module.exports = {
     }
   },
   "type": "module",
+  "sharedVersion": "v2",
   "check-js": false
 }

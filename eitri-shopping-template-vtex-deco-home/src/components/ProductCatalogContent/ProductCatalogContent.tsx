@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { Image, View, Text } from 'eitri-luminus'
-import { getProductsService } from '../../services/ProductService'
-import SearchResults from '../../components/PageSearchComponents/SearchResults'
+import { useTranslation } from 'eitri-i18n'
+import { getProductsService, getProductSiblingsService } from '../../services/ProductService'
+import { getAgrupadorCode, groupSiblingsByCode } from 'eitri-shopping-template-vtex-deco-shared'
+import SearchResults from '../PageSearchComponents/SearchResults'
 import CatalogSort from './Components/CatalogSort'
 import { getDefaultSortParam } from '../../services/helpers/resolveSortParam'
 import CatalogFilter from './Components/CatalogFilter'
@@ -19,20 +21,14 @@ interface ProductCatalogContentProps {
 	params?: CatalogParams
 	showFilters?: boolean
 	banner?: string
+	title?: string
+	hiddenSortOptions?: string[]
 	[key: string]: unknown
 }
 
 export default function ProductCatalogContent(props: ProductCatalogContentProps) {
-	/*
-	 * props:
-	 *
-	 * params: {
-	 *  facets: Array<{ key: string, value: string }>
-	 *  query: string
-	 *  sort: string
-	 * }
-	 * */
-	const { params, showFilters, banner, ...rest } = props
+	const { params, showFilters, banner, title, hiddenSortOptions = [], ...rest } = props
+	const { t } = useTranslation()
 
 	const [productLoading, setProductLoading] = useState(false)
 	const [products, setProducts] = useState<VtexProduct[]>([])
@@ -40,6 +36,8 @@ export default function ProductCatalogContent(props: ProductCatalogContentProps)
 	const [appliedFacets, setAppliedFacets] = useState<CatalogParams | null>(null) // Filtros efetivamente usados na busca
 	const [currentPage, setCurrentPage] = useState(1)
 	const [pagesHasEnded, setPageHasEnded] = useState(false)
+	const [siblingsByCode, setSiblingsByCode] = useState<Record<string, VtexProduct[]>>({})
+	const fetchedCodesRef = useRef(new Set<string>())
 
 	const [minPriceRange, setMinPriceRange] = useState<number | null>(null)
 	const [maxPriceRange, setMaxPriceRange] = useState<number | null>(null)
@@ -54,6 +52,8 @@ export default function ProductCatalogContent(props: ProductCatalogContentProps)
 			setPageHasEnded(false)
 			setCurrentPage(1)
 
+			fetchedCodesRef.current = new Set()
+			setSiblingsByCode({})
 			if (initialParams) getProducts(initialParams, 1)
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -100,11 +100,37 @@ export default function ProductCatalogContent(props: ProductCatalogContentProps)
 			setProducts(prev => (page === 1 ? result.products : [...prev, ...result.products]))
 			setTotalProducts(result?.recordsFiltered)
 			setCurrentPage(page)
+			loadSiblings(result.products)
 			setProductLoading(false)
 		} catch (error) {
 			console.log('error', error)
 			setProductLoading(false)
 		}
+	}
+
+	const loadSiblings = async (pageProducts: VtexProduct[]) => {
+		try {
+			// metalSwatches is still untyped JS — codes are strings (or falsy) at runtime.
+			const codes = [
+				...new Set(pageProducts.map(p => getAgrupadorCode(p) as string | undefined).filter((c): c is string => !!c))
+			]
+			const newCodes = codes.filter(code => !fetchedCodesRef.current.has(code))
+			if (newCodes.length === 0) return
+			newCodes.forEach(code => fetchedCodesRef.current.add(code))
+			const siblingProducts = await getProductSiblingsService(newCodes)
+			const grouped = groupSiblingsByCode(siblingProducts) as Record<string, VtexProduct[]>
+			setSiblingsByCode(prev => ({ ...prev, ...grouped }))
+		} catch (error) {
+			console.error('Error loading product siblings', error)
+		}
+	}
+
+	const resetPagination = () => {
+		setProducts([])
+		setCurrentPage(1)
+		setPageHasEnded(false)
+		fetchedCodesRef.current = new Set()
+		setSiblingsByCode({})
 	}
 
 	const onScrollEnd = async () => {
@@ -120,17 +146,13 @@ export default function ProductCatalogContent(props: ProductCatalogContentProps)
 			sort: newSort
 		}
 		setAppliedFacets(newParams)
-		setProducts([])
-		setCurrentPage(1)
-		setPageHasEnded(false)
+		resetPagination()
 		getProducts(newParams, 1)
 	}
 
 	const handleFilterChange = (filters: CatalogParams) => {
 		setAppliedFacets(filters)
-		setProducts([])
-		setCurrentPage(1)
-		setPageHasEnded(false)
+		resetPagination()
 		getProducts(filters, 1)
 	}
 
@@ -150,31 +172,39 @@ export default function ProductCatalogContent(props: ProductCatalogContentProps)
 
 			{products.length > 0 && showFilters && (
 				<>
-					<View className='p-4 flex flex-between gap-4 w-full'>
-						<CatalogFilter
-							minPriceRange={minPriceRange}
-							setMinPriceRange={setMinPriceRange}
-							maxPriceRange={maxPriceRange}
-							setMaxPriceRange={setMaxPriceRange}
-							currentFilters={appliedFacets ?? undefined}
-							onFilterChange={handleFilterChange}
-							onFilterClear={onFilterClear}
-						/>
-						<CatalogSort
-							currentSort={appliedFacets?.sort}
-							onSortChange={handleSortChange}
-						/>
-					</View>
-
 					{totalProducts > 0 && (
-						<View className='px-4'>
-							<Text>
-								{`Exibindo ${
-									totalProducts > 1 ? `${totalProducts} produtos` : `${totalProducts} produto`
-								}`}
+						<View className='px-4 pt-5 pb-3'>
+							<Text className='text-base text-black'>
+								{t(
+									totalProducts === 1
+										? 'productCatalog.resultCountSingle'
+										: 'productCatalog.resultCountMultiple',
+									{ count: totalProducts }
+								)}
 							</Text>
 						</View>
 					)}
+
+					<View className='mx-4 mb-5 flex w-auto gap-4'>
+						<View className='flex-1'>
+							<CatalogFilter
+								minPriceRange={minPriceRange}
+								setMinPriceRange={setMinPriceRange}
+								maxPriceRange={maxPriceRange}
+								setMaxPriceRange={setMaxPriceRange}
+								currentFilters={appliedFacets ?? undefined}
+								onFilterChange={handleFilterChange}
+								onFilterClear={onFilterClear}
+							/>
+						</View>
+						<View className='flex-1'>
+							<CatalogSort
+								currentSort={appliedFacets?.sort}
+								onSortChange={handleSortChange}
+								hiddenSortOptions={hiddenSortOptions}
+							/>
+						</View>
+					</View>
 				</>
 			)}
 
@@ -182,6 +212,7 @@ export default function ProductCatalogContent(props: ProductCatalogContentProps)
 				<SearchResults
 					isLoading={productLoading}
 					searchResults={products}
+					siblingsByCode={siblingsByCode}
 				/>
 			</InfiniteScroll>
 		</View>

@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { View, Text } from 'eitri-luminus'
-import { FaChevronRight } from 'react-icons/fa'
-import { GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
+import { GenericBox, ChevronRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 interface CardSelectorProps {
 	children?: ReactNode
@@ -21,7 +20,7 @@ export default function CardSelector(props: CardSelectorProps) {
 				className='flex flex-col'>
 				<View className='flex flex-row items-center justify-between mb-1 gap-2'>
 					<Text className='font-bold text-lg block'>{mainTitle ?? ''}</Text>
-					<FaChevronRight className='text-primary w-[24px]' />
+					<ChevronRightIcon className='text-primary w-[24px]' />
 				</View>
 				{children}
 			</View>

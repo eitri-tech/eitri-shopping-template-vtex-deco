@@ -12,18 +12,20 @@ export const PAGES = {
 	EDIT_PROFILE: '/EditProfile',
 	ORDER_LIST: '/OrderList',
 	ORDER_DETAILS: '/OrderDetails',
-	SUBSCRIPTIONS: '/Subscriptions',
-	SUBSCRIPTION_DETAILS: '/SubscriptionDetails',
 	WISH_LIST: '/WishList',
 	ADDRESS_LIST: '/AddressList',
 	ADDRESS_FORM: '/AddressForm',
 	CHANGE_PASSWORD: '/ChangePassword',
 	SAVED_CARDS: '/SavedCards',
-	ADD_CARD_FORM: '/AddCardForm'
+	ADD_CARD_FORM: '/AddCardForm',
+	AUTH_SELECT: '/AuthSelect',
+	SIGNIN_VARIANT: '/SignInVariant',
+	BONUS: '/Bonus'
 }
 
 export const openProduct = async (product: VtexProduct): Promise<void> => {
 	try {
+		Eitri.bottomBar.show().catch(() => {})
 		Eitri.nativeNavigation.open({
 			slug: 'pdp',
 			initParams: { product }
@@ -39,10 +41,35 @@ export const navigate = (page: string, state: Record<string, unknown> = {}, repl
 
 export const openCart = async (): Promise<void> => {
 	try {
+		Eitri.bottomBar.show().catch(() => {})
 		Eitri.nativeNavigation.open({
 			slug: 'cart'
 		})
 	} catch (e) {
 		console.error('Erro ao navegar para o carrinho', e)
+	}
+}
+
+export const openCategories = async () => {
+	try {
+		Eitri.bottomBar.show().catch(() => {})
+		Eitri.nativeNavigation.open({
+			slug: 'home',
+			initParams: { route: 'Categories', returnTo: 'Wishlist' }
+		})
+	} catch (e) {
+		console.error('Erro ao navegar para categorias', e)
+	}
+}
+
+export const openSearch = async () => {
+	try {
+		Eitri.bottomBar.show().catch(() => {})
+		Eitri.nativeNavigation.open({
+			slug: 'home',
+			initParams: { route: 'Search' }
+		})
+	} catch (e) {
+		console.error('Erro ao navegar para busca', e)
 	}
 }

@@ -1,6 +1,5 @@
 import { Text, View } from 'eitri-luminus'
-import { BottomInset } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiPackage } from 'react-icons/fi'
+import { BottomInset, PackageIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
 interface NoItemProps {
 	title?: string
@@ -13,7 +12,7 @@ export default function NoItem(props: NoItemProps) {
 	return (
 		<View className='flex flex-1 flex-col justify-center items-center'>
 			<View className='flex flex-col items-center gap-4 w-full max-w-xs mt-4'>
-				<FiPackage
+				<PackageIcon
 					size={50}
 					className={'text-primary'}
 				/>

@@ -38,7 +38,7 @@ export default function ShelfOfProducts(props: ShelfOfProductsProps) {
 						<View
 							onClick={seeMore}
 							className='flex items-center min-w-fit'>
-							<Text className='font-bold text-primary-content'>{t('shelfOfProducts.seeMore')}</Text>
+							<Text className='font-bold text-primary-content underline'>{t('shelfOfProducts.seeMore')}</Text>
 							<View>
 								{/* <Icon iconKey="chevron-right" color="primary-900" width={18} height={18} /> */}
 							</View>

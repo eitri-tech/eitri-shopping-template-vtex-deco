@@ -98,6 +98,7 @@ export interface VtexCart {
 	totalizers?: VtexTotalizer[]
 	shippingData?: VtexShippingData
 	marketingData?: { coupon?: string; [key: string]: unknown }
+	openTextField?: { value?: string; [key: string]: unknown }
 	paymentData?: { installmentOptions?: VtexInstallmentOption[]; [key: string]: unknown }
 	messages?: VtexMessage[]
 	value?: number

@@ -2,7 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent } from 'react'
 import { Page, View, Text } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
-import { HeaderContentWrapper, HeaderReturn, HeaderText, Loading, BottomInset, GenericBox, CustomButton, CustomInput } from 'eitri-shopping-template-vtex-deco-shared'
+import {
+	HeaderContentWrapper,
+	HeaderReturn,
+	HeaderText,
+	Loading,
+	BottomInset,
+	GenericBox,
+	CustomButton,
+	CustomInput,
+	CheckIcon
+} from 'eitri-shopping-template-vtex-deco-shared'
 import Alert from '../components/Alert/Alert'
 import Recaptcha from '../services/Recaptcha'
 import type { RecaptchaHandle } from '../services/Recaptcha'
@@ -10,7 +20,6 @@ import { addNewCard } from '../services/CustomerService'
 import { getAddresses, resolvePostalCode } from '../services/AddressService'
 import { sendScreenView } from '../services/TrackingService'
 import { useTranslation } from 'eitri-i18n'
-import { FiCheck } from 'react-icons/fi'
 import type { VtexAddress } from '../types/vtex'
 
 const PAYMENT_SYSTEMS = ['Visa', 'Mastercard', 'American Express', 'Elo', 'Hipercard', 'Diners']
@@ -336,7 +345,7 @@ export default function AddCardForm() {
 														: 'border-gray-300'
 												}`}>
 												{selectedAddressId === addr.addressId && (
-													<FiCheck
+													<CheckIcon
 														size={12}
 														className='text-primary-content'
 													/>
@@ -369,7 +378,7 @@ export default function AddCardForm() {
 													: 'border-gray-300'
 											}`}>
 											{selectedAddressId === 'manual' && (
-												<FiCheck
+												<CheckIcon
 													size={12}
 													className='text-primary-content'
 												/>

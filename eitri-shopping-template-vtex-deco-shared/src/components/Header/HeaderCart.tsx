@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Text, View } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
-import { IoBagOutline } from 'react-icons/io5'
+import ShoppingBagIcon from '../ShoppingBagIcon/ShoppingBagIcon'
 import type { VtexCart } from '../../types/vtex'
 
 interface HeaderCartProps {
@@ -37,19 +37,16 @@ export default function HeaderCart(props: HeaderCartProps) {
 
 	return (
 		<View
-			className={`relative w-[25px] h-[25px] flex items-center`}
+			className={`relative mr-[5px] w-[25px] h-[25px] flex items-center text-header-content`}
 			onClick={handlePress}>
 			<View>
-				<IoBagOutline
-					className='text-header-content'
-					size={24}
-				/>
+				<ShoppingBagIcon size={24} />
 			</View>
 
 			{_quantityOfItems > 0 && (
 				<View
-					className={`absolute top-[-8px] right-[-8px] flex rounded-full w-5 h-5 justify-center items-center bg-header-content`}>
-					<Text className='text-[12px] font-bold text-header-background'>{_quantityOfItems}</Text>
+					className={`absolute top-[-11px] right-[-10px] flex rounded-full w-[18px] h-[18px] justify-center items-center bg-warning`}>
+					<Text className='text-[12px] font-bold text-warning-content'>{_quantityOfItems}</Text>
 				</View>
 			)}
 		</View>

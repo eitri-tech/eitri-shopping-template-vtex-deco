@@ -176,7 +176,7 @@ export default function SkuSelector(props: SkuSelectorProps) {
 						acc[variation.name] = variation.values?.[0] ?? null
 					}
 					return acc
-				}, {})
+				}, {}) ?? {}
 			}
 		})
 
@@ -198,11 +198,17 @@ export default function SkuSelector(props: SkuSelectorProps) {
 
 	if (attributeKeys?.length === 0) return null
 
+	const hideUnavailable = RemoteConfig.getContent('appConfigs.pdp.hideUnavailableVariations') === true
+
 	return (
 		<View className={'flex flex-col gap-4 w-full'}>
 			{attributeKeys.map(key => {
 				const values = getUniqueValues(skus, key)
 				const statusMap = getOptionStatus(skus, attributeKeys, key, selections)
+				const sortedValues = sortSku(values) ?? []
+				const visibleValues = hideUnavailable
+					? sortedValues.filter(v => statusMap[v]?.availableExists)
+					: sortedValues
 
 				return (
 					<View key={key}>
@@ -213,7 +219,7 @@ export default function SkuSelector(props: SkuSelectorProps) {
 							)}
 						</View>
 						<View className='flex flex-row flex-wrap gap-2'>
-							{(sortSku(values) ?? []).map(value => {
+							{visibleValues.map(value => {
 								let imageUrl = ''
 								const isCor = key?.toLowerCase() === 'cor'
 								if (isCor) {

@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { Image, Text, View } from 'eitri-luminus'
-import WishlistIcon from './../WishlistIcon/WishlistIcon'
+import WishlistIcon from '../WishlistIcon/WishlistIcon'
 import Loading from '../Loading/LoadingComponent'
+import { View, Text, Image } from 'eitri-luminus'
 
 // LoadingComponent doesn't declare a `width` prop — kept as-is (pre-existing, likely a no-op).
 const LoadingAny = Loading as unknown as (props: Record<string, unknown>) => JSX.Element

@@ -14,7 +14,11 @@ interface CustomButtonProps {
 	onClick?: () => void
 	isLoading?: boolean
 	width?: string | number
-	borderRadius?: string | number
+	// Tailwind classes (e.g. 'h-[40px]', 'rounded-full'), not CSS values.
+	borderRadius?: string
+	height?: string
+	bold?: boolean
+	textClassName?: string
 	className?: string
 	outlined?: boolean
 	children?: ReactNode
@@ -34,10 +38,13 @@ export default function CustomButton(props: CustomButtonProps) {
 		isLoading,
 		width,
 		borderRadius,
+		height,
 		className,
 		outlined,
 		children,
 		leftIcon,
+		bold = true,
+		textClassName,
 		...rest
 	} = props
 
@@ -65,17 +72,19 @@ export default function CustomButton(props: CustomButtonProps) {
 		return isLoading || disabled ? 'text-gray-500' : 'text-primary-content'
 	})()
 
+	const _fontWeight = bold ? 'font-bold' : 'font-normal'
+
 	const renderContent = () => {
 		if (leftIcon) {
 			return (
 				<View className='flex items-center gap-2'>
 					<View className={_contentColor}>{leftIcon}</View>
-					<Text className={`font-bold ${_contentColor}`}>{label}</Text>
+					<Text className={`${_fontWeight} ${_contentColor} ${textClassName || ''}`}>{label}</Text>
 				</View>
 			)
 		}
 
-		return <Text className={`font-bold ${_contentColor}`}>{label}</Text>
+		return <Text className={`${_fontWeight} ${_contentColor} ${textClassName || ''}`}>{label}</Text>
 	}
 
 	return (
@@ -83,8 +92,8 @@ export default function CustomButton(props: CustomButtonProps) {
 			onClick={_onPress}
 			className={`
 				flex items-center justify-center
-				h-[45px]
-				rounded-lg
+				${height || 'h-[45px]'}
+				${borderRadius || ''}
 				w-full
 				${_backgroundColor ? `${_backgroundColor}` : ''}
 				${variant === 'outlined' || outlined ? `border border-primary border-2` : ''}

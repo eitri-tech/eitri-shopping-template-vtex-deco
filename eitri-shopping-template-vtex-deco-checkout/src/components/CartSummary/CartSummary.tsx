@@ -9,7 +9,7 @@ export default function CartSummary() {
 	const { cart } = useLocalShoppingCart()
 
 	const totalizers = Array.isArray(cart?.totalizers) ? cart.totalizers : []
-	const finalTotal = totalizers.reduce((acc, totalizer) => acc + (totalizer?.value ?? 0), 0)
+	const totalizersSum = totalizers.reduce((acc, totalizer) => acc + (totalizer?.value ?? 0), 0)
 
 	return (
 		<GenericBox className='p-4 w-full flex flex-col'>
@@ -23,12 +23,13 @@ export default function CartSummary() {
 						<Text className='text-neutral-700 font-medium'>{formatAmountInCents(totalizer?.value)}</Text>
 					</View>
 				))}
+
 			</View>
 
 			{/* Final total */}
 			<View className='flex flex-row w-full justify-between items-center pt-3 border-t border-neutral-300'>
 				<Text className='text-neutral-700 font-bold'>{t('finishCart.txtTotal')}</Text>
-				<Text className='font-bold text-primary-700'>{formatAmountInCents(finalTotal)}</Text>
+				<Text className='font-bold text-primary-700'>{formatAmountInCents(totalizersSum)}</Text>
 			</View>
 		</GenericBox>
 	)

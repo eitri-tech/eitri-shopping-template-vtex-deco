@@ -16,6 +16,7 @@ export interface VtexPickupStoreInfo {
 	address?: VtexAddress
 	friendlyName?: string
 	businessHours?: unknown
+	isPickupStore?: boolean
 	[key: string]: unknown
 }
 
@@ -141,6 +142,7 @@ export interface VtexCategoryTreeNode {
 
 export interface VtexBadge {
 	image?: string
+	position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | string
 	textBadge?: {
 		text?: string
 		bgColor?: string

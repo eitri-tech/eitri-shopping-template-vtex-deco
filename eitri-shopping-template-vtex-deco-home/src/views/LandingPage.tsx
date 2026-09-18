@@ -8,7 +8,8 @@ import {
 	HeaderText,
 	HeaderSearchIcon,
 	TrackingService,
-	BottomInset
+	BottomInset,
+	useRetractableBottomBar
 } from 'eitri-shopping-template-vtex-deco-shared'
 import { getCmsContent } from '../services/CmsService'
 import CmsContentRender from '../components/CmsContentRender/CmsContentRender'
@@ -22,6 +23,7 @@ interface LandingPageState {
 }
 
 export default function LandingPage(props: RouteProps<LandingPageState>) {
+	useRetractableBottomBar()
 	const [cmsContent, setCmsContent] = useState<CmsSection[] | null>(null)
 	const [isLoading, setIsLoading] = useState(true)
 	const pageTitle = props?.location?.state?.title ?? ''

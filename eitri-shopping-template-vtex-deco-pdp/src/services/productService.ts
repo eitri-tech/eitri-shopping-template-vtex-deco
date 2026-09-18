@@ -54,8 +54,48 @@ export const markLastViewedProduct = async (product: VtexProduct): Promise<void>
 	}
 }
 
-export const showTogether = async (productId: string) => {
-	return Vtex.catalog.showTogether(productId)
+const getValidBuyTogetherProducts = (products: unknown, currentProductId: string): VtexProduct[] => {
+	const list = Array.isArray(products) ? (products as VtexProduct[]) : []
+	return list.filter(product => {
+		if (!product?.productId || String(product.productId) === String(currentProductId)) {
+			return false
+		}
+
+		return (product?.items ?? []).some(item =>
+			(item?.sellers ?? []).some(seller => (seller?.commertialOffer?.AvailableQuantity ?? 0) > 0)
+		)
+	})
+}
+
+// Catalog "show together" first, then IS recommendation types as fallbacks — first non-empty wins.
+export const showTogether = async (productId: string): Promise<VtexProduct[]> => {
+	try {
+		const products = getValidBuyTogetherProducts(await Vtex.catalog.showTogether(productId), productId)
+		if (products.length > 0) return products
+	} catch (error) {
+		console.error('Error loading catalog buy together products', error)
+	}
+
+	const recommendationTypes = ['buy', 'viewAndBought', 'suggestions', 'similars', 'view']
+
+	for (const type of recommendationTypes) {
+		try {
+			const products = getValidBuyTogetherProducts(
+				await Vtex.searchGraphql.productRecommendations({
+					identifier: { field: 'id', value: productId },
+					type,
+					groupBy: 'PRODUCT'
+				}),
+				productId
+			)
+
+			if (products.length > 0) return products
+		} catch (error) {
+			console.error(`Error loading ${type} product recommendations`, error)
+		}
+	}
+
+	return []
 }
 
 export const autocompleteSuggestions = async (value: string) => {
@@ -64,4 +104,19 @@ export const autocompleteSuggestions = async (value: string) => {
 
 export const getProductByEan = async (ean: string) => {
 	return Vtex.searchGraphql.product({ identifier: [{ field: 'ean', value: ean }] } as any)
+}
+
+export const getProductSiblingsService = async (agrupadorCode: string): Promise<VtexProduct[]> => {
+	if (!agrupadorCode) return []
+	// VTEX IS treats multiple entries with the same key as OR — a single code returns all siblings.
+	// Same ProductSearchInput typing gap as the other searchGraphql calls above.
+	const result = (await Vtex.searchGraphql.productSearch({
+		selectedFacets: [{ key: 'codigo-agrupador', value: agrupadorCode }],
+		from: 0,
+		// Cap: a single product group rarely exceeds 10 siblings; 19 provides safe headroom
+		to: 19,
+		hideUnavailableItems: true,
+		options: { allowRedirect: false }
+	} as any)) as { products?: VtexProduct[] } | undefined
+	return result?.products ?? []
 }

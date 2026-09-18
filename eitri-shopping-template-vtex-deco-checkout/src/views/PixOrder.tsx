@@ -51,6 +51,13 @@ export default function PixOrder(props: RouteProps<PixOrderState>) {
 
 	const orderId = useRef<string | undefined>(undefined)
 
+	// `cart.value` is the raw order total — it doesn't account for gift cards
+	// that may have already reduced what's actually being charged via Pix.
+	// `paymentData.payments` reflects the real remainder.
+	const pixPaymentValue = cart?.paymentData?.payments?.length
+		? cart.paymentData.payments.reduce((acc, payment) => acc + (payment.value || 0), 0)
+		: cart?.value
+
 	useEffect(() => {
 		TrackingService.sendScreenView('Aguardando pagamento Pix', 'PixOrder')
 	}, [])
@@ -162,7 +169,7 @@ export default function PixOrder(props: RouteProps<PixOrderState>) {
 
 			<View className='p-4 flex flex-col gap-4'>
 				{/* Informação sobre PIX */}
-				<View className='flex items-center gap-3 bg-white rounded p-4'>
+				<View className='flex items-center gap-3 bg-white p-4'>
 					<View className='text-primary'>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
@@ -185,20 +192,20 @@ export default function PixOrder(props: RouteProps<PixOrderState>) {
 				</View>
 
 				{/* Valor do pagamento */}
-				<View className='bg-white rounded p-4'>
+				<View className='bg-white p-4'>
 					<Text className='text-base-content/70'>
 						{t('pixOrder.txtOrderValue')}{' '}
-						<Text className='font-bold'>{formatAmountInCents(cart?.value)}</Text>
+						<Text className='font-bold'>{formatAmountInCents(pixPaymentValue)}</Text>
 					</Text>
 				</View>
 
 				{/* Código PIX */}
-				<View className='bg-white rounded p-4'>
+				<View className='bg-white p-4'>
 					<Text className='text-base font-semibold mb-3 text-base-content'>{t('pixOrder.txtPixCode')}</Text>
 					<CustomInput
 						value={pixPayload.code ?? ''}
 						disabled
-						className='w-full rounded bg-base-100 border-base-300 mt-2'
+						className='w-full bg-base-100 border-base-300 mt-2'
 					/>
 				</View>
 
@@ -228,7 +235,7 @@ export default function PixOrder(props: RouteProps<PixOrderState>) {
 				{/* QR Code */}
 				{showQRCode && (
 					<View className='flex items-center justify-center gap-4'>
-						<View className='bg-white p-4 rounded shadow-lg'>
+						<View className='bg-white p-4 shadow-lg'>
 							<Image
 								src={`data:image;base64,${pixPayload.qrCodeBase64Image ?? ''}`}
 								className='w-48 h-48'
@@ -238,7 +245,7 @@ export default function PixOrder(props: RouteProps<PixOrderState>) {
 				)}
 
 				{/* Instruções */}
-				<View className='bg-white rounded p-4'>
+				<View className='bg-white p-4'>
 					<Text className='text-lg font-bold mb-3 text-base-content'>{t('pixOrder.txtHowToPay')}</Text>
 					<View className='flex flex-col gap-2 mt-2'>
 						<View className='flex flex-row items-center'>

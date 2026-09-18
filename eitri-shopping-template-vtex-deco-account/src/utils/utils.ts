@@ -9,6 +9,20 @@ export const formatPrice = (price?: number, _locale?: string, _currency?: string
 	return price.toLocaleString(locale, { style: 'currency', currency: currency })
 }
 
+/**
+ * Currency prefixed with an explicit +/- sign, used by the bonus statement
+ * ("+R$ 7.702,83" for credits, "-R$ 5.000,00" for redemptions).
+ */
+export const formatSignedPrice = (value?: number, _locale?: string, _currency?: string): string => {
+	if (typeof value !== 'number') return ''
+
+	const locale = _locale || (App as any)?.configs?.storePreferences?.locale || 'pt-BR'
+	const currency = _currency || (App as any)?.configs?.storePreferences?.currencyCode || 'BRL'
+
+	const amount = Math.abs(value).toLocaleString(locale, { style: 'currency', currency: currency })
+	return `${value < 0 ? '-' : '+'}${amount}`
+}
+
 export const formatPriceInCents = (price: unknown, _locale?: string, _currency?: string): string => {
 	if (typeof price !== 'number') {
 		return ''

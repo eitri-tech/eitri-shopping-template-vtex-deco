@@ -59,33 +59,31 @@ export default function FreightSelector() {
 			/>
 
 			<View className='flex-1 flex flex-col p-4 gap-4'>
-				<Text className='text-xl font-bold'>{t('freightSelector.txtTitle')}</Text>
+				<View className='flex flex-col gap-1'>
+					<Text className='text-2xl font-bold'>{t('freightSelector.txtTitle')}</Text>
+					<Text className='text-sm text-gray-500'>
+						{t('freightSelector.txtDeliverAt', {
+							street: userAddress?.street ?? '',
+							number: userAddress?.number || '',
+							complement: userAddress?.complement || ''
+						})}
+					</Text>
+				</View>
 
-				<Text>
-					{t('freightSelector.txtDeliverAt', {
-						street: userAddress?.street ?? '',
-						number: userAddress?.number || '',
-						complement: userAddress?.complement || ''
-					})}
-				</Text>
-
-				<GenericBox className='p-4 w-full flex flex-col gap-3'>
-					{deliveryOptions?.map((item, index) => (
-						<View
+				<View className='flex flex-col gap-4'>
+					{(deliveryOptions ?? []).map((item, index) => (
+						<GenericBox
 							key={index}
-							className='flex flex-col w-full gap-2'
+							className='p-4 w-full rounded-xl border border-gray-100 flex flex-col gap-3'
 							onClick={() => onSelectFreightOption(item)}>
-							<Text className='font-bold'>{item?.formattedShippingEstimate}</Text>
-							<View className='flex items-center'>
-								<Text
-									className={`font-semibold ${item.price === 0 ? 'text-green-600' : 'text-base-content/70'}`}>
-									{item?.formatedPrice}
-								</Text>
-							</View>
-							<View className={'text-primary font-bold flex justify-end mt-2'}>{t('freightSelector.txtContinue')}</View>
-						</View>
+							<Text className='font-bold text-lg block'>{item?.formattedShippingEstimate}</Text>
+							<Text className={`font-semibold ${item.price === 0 ? 'text-green-600' : 'text-base-content/70'}`}>
+								{item?.formatedPrice}
+							</Text>
+							<Text className='text-primary font-bold underline'>{t('freightSelector.txtContinue')}</Text>
+						</GenericBox>
 					))}
-				</GenericBox>
+				</View>
 			</View>
 
 			<FixedBottom className='flex flex-col align-center gap-4'>

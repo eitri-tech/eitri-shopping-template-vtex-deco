@@ -155,7 +155,11 @@ export interface VtexCart {
 	orderFormId?: string
 	canEditData?: boolean
 	ratesAndBenefitsData?: {
-		rateAndBenefitsIdentifiers?: Array<{ name?: string; [key: string]: unknown }>
+		rateAndBenefitsIdentifiers?: Array<{
+			name?: string
+			matchedParameters?: { paymentMethodId?: string; [key: string]: unknown }
+			[key: string]: unknown
+		}>
 		[key: string]: unknown
 	}
 	items: VtexCartItem[]

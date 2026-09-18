@@ -17,6 +17,9 @@ import type { VtexProduct } from '../../types/vtex'
 interface ProductCardProps {
 	product: VtexProduct
 	className?: string
+	// Sibling products (grouping-code variants) for the swatch selector. Accepted but not yet
+	// rendered here — main's `MetalSwatches` component is still untyped JS (Phase 4 conversion).
+	siblings?: VtexProduct[]
 }
 
 export default function ProductCard(props: ProductCardProps) {

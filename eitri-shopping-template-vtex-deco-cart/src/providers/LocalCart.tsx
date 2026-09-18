@@ -1,5 +1,7 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
+import Eitri from 'eitri-bifrost'
+import { getCartTabBadgeIndex } from 'eitri-shopping-template-vtex-deco-shared'
 import { setNewAddress, setLogisticInfo } from '../services/freigthService'
 import {
 	getCart,
@@ -9,11 +11,32 @@ import {
 	changeItemQuantity,
 	removeCartItem,
 	removeCoupon,
-	removeItemOffer
+	removeItemOffer,
+	updateVendorInOpenTextField
 } from '../services/cartService'
+import {
+	getSellerConfig,
+	lookupSellerCode,
+	buildPartIdentifier,
+	updateMarketingDataForVendor
+} from '../services/sellerCodeService'
 import type { VtexCart } from '../types/vtex'
 
+// sellerCodeService is still untyped JS — these are the shapes the provider actually reads.
+export interface SellerConfig {
+	enabled?: boolean
+	[key: string]: unknown
+}
+
+export interface SellerVendor {
+	name?: string
+	[key: string]: unknown
+}
+
 interface LocalCartContextValue {
+	vendor: SellerVendor | null
+	setVendor: (vendor: SellerVendor | null) => void
+	applySellerCode: (code: string) => Promise<SellerVendor>
 	setCart: (cart: VtexCart | null) => void
 	startCart: () => Promise<VtexCart | undefined>
 	cart: VtexCart | null
@@ -42,18 +65,36 @@ export default function CartProvider(props: CartProviderProps) {
 	const { children } = props
 	const [cart, setCart] = useState<VtexCart | null>(null)
 	const [cartIsLoading, setCartInLoading] = useState<boolean | null>(null)
+	const [vendor, setVendor] = useState<SellerVendor | null>(null)
+
+	const updateTabBadge = async (newCart: VtexCart) => {
+		try {
+			const tabIndex = await getCartTabBadgeIndex()
+			const totalItems = (newCart?.items ?? []).reduce((acc, item) => acc + (item?.quantity ?? 0), 0)
+			Eitri.bottomBar.updateTabBadge({
+				index: tabIndex,
+				content: totalItems > 0 ? `${totalItems}` : undefined
+			})
+		} catch (e) {
+			console.log('Erro ao atualizar tab badge: ', e)
+		}
+	}
 
 	const executeCartOperation = async (
 		operation: (...args: any[]) => Promise<VtexCart | void>,
 		...args: any[]
 	): Promise<VtexCart | undefined> => {
 		setCartInLoading(true)
-		const newCart = await operation(...args)
-		if (newCart) {
-			setCart(newCart)
+		try {
+			const newCart = await operation(...args)
+			if (newCart) {
+				setCart(newCart)
+				updateTabBadge(newCart)
+			}
+			return newCart || undefined
+		} finally {
+			setCartInLoading(false)
 		}
-		setCartInLoading(false)
-		return newCart || undefined
 	}
 
 	const startCart = async () => {
@@ -98,6 +139,27 @@ export default function CartProvider(props: CartProviderProps) {
 		return executeCartOperation(addCoupon, coupon)
 	}
 
+	const applySellerCode = async (code: string): Promise<SellerVendor> => {
+		const config = (await getSellerConfig()) as SellerConfig | null
+		if (!config?.enabled) throw new Error('DISABLED')
+
+		const found = (await lookupSellerCode(code, config)) as SellerVendor | null
+		if (!found) throw new Error('NOT_FOUND')
+
+		const vendorText = buildPartIdentifier(config, found, code) as string
+		const newCart = await executeCartOperation(updateVendorInOpenTextField, cart, vendorText)
+
+		try {
+			await updateMarketingDataForVendor(newCart || cart, config)
+			await executeCartOperation(getCart)
+		} catch (e) {
+			console.error('applySellerCode: marketingData update failed', e)
+		}
+
+		setVendor(found)
+		return found
+	}
+
 	return (
 		<LocalCart.Provider
 			value={{
@@ -113,7 +175,10 @@ export default function CartProvider(props: CartProviderProps) {
 				setNewAddress: _setNewAddress,
 				removeCoupon: _removeCoupon,
 				setLogisticInfo: _setLogisticInfo,
-				addCoupon: _addCoupon
+				addCoupon: _addCoupon,
+				vendor,
+				setVendor,
+				applySellerCode
 			}}>
 			{children}
 		</LocalCart.Provider>

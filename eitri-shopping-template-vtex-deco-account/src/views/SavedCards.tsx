@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { Page, View, Text } from 'eitri-luminus'
-import { FiCreditCard, FiTrash2 } from 'react-icons/fi'
-import { HeaderContentWrapper, HeaderReturn, HeaderText, Loading, BottomInset, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
+import {
+	HeaderContentWrapper,
+	HeaderReturn,
+	HeaderText,
+	Loading,
+	BottomInset,
+	GenericBox,
+	CustomButton,
+	CreditCardIcon,
+	TrashIcon
+} from 'eitri-shopping-template-vtex-deco-shared'
 import ProtectedView from '../components/ProtectedView/ProtectedView'
 import ModalConfirm from '../components/ModalConfirm/ModalConfirm'
 import { getSavedCards, deleteSavedCard } from '../services/CustomerService'
@@ -21,7 +30,7 @@ const CardItem = (props: CardItemProps) => {
 		<GenericBox className='p-4 mb-3'>
 			<View className='flex items-center justify-between'>
 				<View className='flex items-center gap-3'>
-					<FiCreditCard
+					<CreditCardIcon
 						size={24}
 						className='text-gray-500'
 					/>
@@ -35,7 +44,7 @@ const CardItem = (props: CardItemProps) => {
 					</View>
 				</View>
 				<View onClick={() => onDelete(card)}>
-					<FiTrash2
+					<TrashIcon
 						size={20}
 						className='text-red-400'
 					/>
@@ -106,7 +115,7 @@ export default function SavedCards() {
 					<View className='p-4'>
 						{cards.length === 0 ? (
 							<View className='flex flex-col items-center py-12 gap-3'>
-								<FiCreditCard
+								<CreditCardIcon
 									size={40}
 									className='text-gray-300'
 								/>

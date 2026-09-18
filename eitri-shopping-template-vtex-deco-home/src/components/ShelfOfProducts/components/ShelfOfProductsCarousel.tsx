@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { View } from 'eitri-luminus'
 import ProductCard from '../../ProductCard/ProductCard'
-import { CustomCarousel } from 'eitri-shopping-template-vtex-deco-shared'
+import { CustomCarousel, SliderPagination } from 'eitri-shopping-template-vtex-deco-shared'
 import type { VtexProduct } from '../../../types/vtex'
 
 interface ShelfOfProductsCarouselProps {
@@ -50,18 +50,11 @@ export default function ShelfOfProductsCarousel(props: ShelfOfProductsCarouselPr
 							</View>
 						))}
 					</CustomCarousel>
-					{productsPage.length > 1 && (
-						<View className='flex justify-center gap-2 mt-2'>
-							{productsPage.map((_, index) => (
-								<View
-									key={index}
-									className={`${currentSlide === index ? 'w-[36px]' : 'w-[12px]'} h-[6px] rounded-lg ${
-										currentSlide === index ? 'bg-primary' : 'bg-base-300'
-									} transition-[width,background-color] duration-300 ease-in-out"`}
-								/>
-							))}
-						</View>
-					)}
+					<SliderPagination
+						count={productsPage.length}
+						activeIndex={currentSlide}
+						className='mt-2'
+					/>
 				</>
 			)}
 		</>

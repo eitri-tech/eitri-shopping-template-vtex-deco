@@ -3,9 +3,8 @@ import { View, Text } from 'eitri-luminus'
 import { processActions } from '../../../services/ResolveCmsActions'
 import { getCategoryTree } from '../../../services/ProductService'
 import Eitri from 'eitri-bifrost'
-import { HeaderText, Loading } from 'eitri-shopping-template-vtex-deco-shared'
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
-import { CategoryNavItem } from '../CategoryListSwipe/components/CategoryPageItem'
+import { HeaderText, Loading, ChevronLeftIcon, ChevronRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
+import type { CategoryNavItem } from '../CategoryListSwipe/components/CategoryPageItem'
 
 // Raw shape returned by Vtex.catalog.getCategoryTree — its .d.ts types the whole call as
 // Promise<any>, so this is a local reconstruction of the fields this component actually reads.
@@ -41,7 +40,7 @@ function CategoryItem(props: CategoryItemProps) {
 			<Text className='text-stone-800 font-medium text-[15px] tracking-tight'>{item.title}</Text>
 			{hasChildren && (
 				<View className='text-stone-400 group-active:text-amber-500 transition-colors'>
-					<FiChevronRight size={14} />
+					<ChevronRightIcon size={14} />
 				</View>
 			)}
 		</View>
@@ -82,7 +81,7 @@ export default function CategoryListVtex(props: CategoryListVtexProps) {
 					<View
 						className={'flex items-center gap-2'}
 						onClick={() => pop()}>
-						<FiChevronLeft className={'text-primary-content'} />
+						<ChevronLeftIcon className={'text-primary-content'} />
 						<HeaderText text={current?.title ?? ''} />
 					</View>
 				)
@@ -115,20 +114,22 @@ export default function CategoryListVtex(props: CategoryListVtexProps) {
 			.map(cat => ({ ...cat, children: filterCategories(cat.children ?? [], exclusionSet) }))
 	}
 
-	const parseCategory = (category: VtexCategoryTreeNode): CategoryNavItem => {
+	const parseCategory = (category: VtexCategoryTreeNode, parentNames: string[] = []): CategoryNavItem => {
+		const categoryNames = [...parentNames, category.name ?? '']
 		const newCat: CategoryNavItem = {
 			action: {
 				type: 'category',
 				sort: 'score:desc',
 				value: category?.url ? new URL(category.url).pathname : '',
-				title: category.name
+				title: category.name,
+				categoryNames
 			},
 			title: category.name,
 			subcategories: []
 		}
 		if (category.hasChildren) {
 			;(category.children ?? []).forEach(subcategory => {
-				newCat.subcategories?.push(parseCategory(subcategory))
+				newCat.subcategories?.push(parseCategory(subcategory, categoryNames))
 			})
 			newCat.subcategories?.sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '', 'pt-BR'))
 		}
