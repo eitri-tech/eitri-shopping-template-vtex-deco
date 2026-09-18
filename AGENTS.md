@@ -108,7 +108,7 @@ home CMS components into the shared layer. Two rendering paths currently coexist
 | Resolution | by `name` in `home/src/utils/getMappedComponent.js` | by `__resolveType` in `shared/src/utils/resolveSection.ts` |
 | Editor | none | Deco builds a form from `Props` + JSDoc |
 
-> **Open question, not yet resolved:** `home/src/components/CmsComponents/` was fully converted to TypeScript (2026 migration) *before* this Deco sections model existed on `main`. Both trees now coexist post-merge. Whether/when to migrate `home`'s CMS rendering onto `shared/src/sections/` (or keep both) is a product/architecture decision, tracked in `MERGE_STATUS.md`'s Phase 5 — not something to resolve unilaterally. See also `CONTEXT.md`'s "CMS Section vs CMS Component" glossary entry for the terminology.
+> **Open question, not yet resolved:** `home/src/components/CmsComponents/` was fully converted to TypeScript (2026 migration) *before* this Deco sections model existed on `main`. Both trees now coexist post-merge. Whether/when to migrate `home`'s CMS rendering onto `shared/src/sections/` (or keep both) is a product/architecture decision -- not something to resolve unilaterally.
 
 ### Authoring a section
 
