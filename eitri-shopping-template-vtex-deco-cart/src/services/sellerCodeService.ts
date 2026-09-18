@@ -33,7 +33,8 @@ export const getSellerConfig = async (): Promise<SellerConfig | null> => {
 export const lookupSellerCode = async (code: string, config: SellerConfig): Promise<any> => {
 	const { masterDataEntity, searchField, responseFields } = config
 	const url = `https://www.${VTEX_ACCOUNT}.com.br/api/dataentities/${masterDataEntity}/search?_fields=${responseFields}&${searchField}=${encodeURIComponent(code)}&an=${VTEX_ACCOUNT}`
-	const res = await Eitri.http.get(url, { Accept: 'application/json' })
+	// HttpConfig expects headers nested under `headers` — passing them flat silently drops them (see AGENTS.md).
+	const res = await Eitri.http.get(url, { headers: { Accept: 'application/json' } })
 	const data = Array.isArray(res?.data) ? res.data : []
 	return data.length > 0 ? data[0] : null
 }
@@ -49,9 +50,12 @@ export const updateMarketingDataForVendor = async (cart: Cart | null | undefined
 	if (!orderFormId) return null
 	const payload = { ...(cart?.marketingData || {}), utmiCampaign: config.campaignIdentifier }
 	const url = `https://www.${VTEX_ACCOUNT}.com.br/api/checkout/pub/orderForm/${orderFormId}/attachments/marketingData`
+	// HttpConfig expects headers nested under `headers` — passing them flat silently drops them (see AGENTS.md).
 	const res = await Eitri.http.post(url, payload, {
-		'Content-Type': 'application/json',
-		Accept: 'application/json'
+		headers: {
+			'Content-Type': 'application/json',
+			Accept: 'application/json'
+		}
 	})
 	return res?.data ?? null
 }
