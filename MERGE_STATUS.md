@@ -1,6 +1,6 @@
 # Merge status: `main` → `worktree-ts-migration`
 
-**Read this first if resuming cold.** A `git merge --no-commit --no-ff main` is currently **in progress** (nothing committed yet — safe to `git merge --abort` if something looks wrong, but check with the user first since a lot of conflict-resolution work may already be done). Merge-base: `0b20288`. See `/home/sandhilt/.claude/plans/async-prancing-sundae.md` for full background/rationale.
+**Read this first if resuming cold.** The merge itself has **landed** (commit `304a356`), and a TypeScript 6 follow-up pass has landed on top of it — see the "Resume-here pointer" at the bottom of this file for the actual current state and what's still open. Merge-base was `0b20288`; see `/home/sandhilt/.claude/plans/async-prancing-sundae.md` for the original background/rationale (phases below are numbered to match that plan).
 
 ## Conflict inventory (confirmed via `git status --short` right after `git merge --no-commit --no-ff main`)
 
@@ -21,9 +21,9 @@ Full file lists for UU/DU/UD/AA captured below. Check off `[x]` as each is resol
 - [x] Grepped account for dangling `Subscriptions`/`SubscriptionDetails`/`OptionPicker` references — none found, feature was already isolated.
 
 ### DU — rename-pairing misses, need manual merge (Phase 3, handle per-app alongside that app's UU batch)
-- [ ] `account/src/components/WishlistItem/WishlistItem.jsx` (→ our `WishlistItem.tsx`)
-- [ ] `account/src/providers/LocalCart.jsx` (→ our `LocalCart.tsx`)
-- [ ] `account/src/services/ProductService.js` (→ our `ProductService.ts`)
+- [x] `account/src/components/WishlistItem/WishlistItem.jsx` (→ our `WishlistItem.tsx`) — see the account (19) prose entry below for what changed.
+- [x] `account/src/providers/LocalCart.jsx` (→ our `LocalCart.tsx`) — see the account (19) prose entry below for what changed.
+- [x] `account/src/services/ProductService.js` (→ our `ProductService.ts`) — see the account (19) prose entry below for what changed.
 - [x] `cart/src/providers/LocalCart.jsx` (→ our `LocalCart.tsx`) — added `updateTabBadge` (quantity sum, `undefined` for empty), try/finally in `executeCartOperation`, new `vendor`/`setVendor`/`applySellerCode` (seller-code feature; `sellerCodeService.js` is still JS → casts at the boundary via local `SellerConfig`/`SellerVendor` interfaces, retype in Phase 4).
 - [x] `cart/src/services/cartService.js` (→ our `cartService.ts`) — added `updateVendorInOpenTextField`; `openTextField` field added to cart's `VtexCart`.
 - [x] `checkout/src/components/AddressSelector/AddressCard.jsx` (→ our `AddressCard.tsx`) — removed `rounded` class.
@@ -85,4 +85,12 @@ See the plan file for the full breakdown: ~53 shared icon components, Bonus feat
 
 **Verified:** `npx -y -p typescript@6 tsc --noEmit -p tsconfig.json` → **0 errors** workspace-wide.
 
-**Next action:** commit this TS6 follow-up pass, then Phase 4 (new-file JS→TS conversion) and Phase 5 (sections/ flag) are still open — not started in this pass.
+**No-op prop cleanup pass.** Found and fixed two casts (`LoadingAny` in `pdp/ShelfOfProducts/components/ProductCardLoading.tsx` and `shared/ProductCard/ProductCardDefault.tsx`) that existed only to pass `width`/`inline` props the underlying `LoadingComponent.tsx` never reads — confirmed by reading that wrapper's source directly, since it's local to this repo (not an `eitri-luminus` primitive, which can't be verified the same way without the installed package). Dropped the dead props and the now-unneeded casts. `AGENTS.md`'s "Casting around library `.d.ts` gaps" section now documents this distinction — check before creating or keeping a cast.
+
+**Docs consolidated.** `MIGRATION_STATUS.md` (the pre-merge, per-app JS→TS conversion tracker) has been folded into this file and deleted — its "Resume-here"/"Longer-term" sections were stale (claimed the `main` rebase and the `@tanstack/react-query` finding were still open; both are resolved: the rebase is Phase 1-3 above, and main's merge replaced `home/Home.tsx`'s `useQuery`-based CMS fetch with `DecoCMSContentRender`, so the `shared/src/types/tanstack-react-query.d.ts` shim was dead and has been removed). Its per-file historical bug-fix notes remain available in git history (each conversion commit documents its own fixes) and aren't repeated here. `AGENTS.md`'s reference to `MIGRATION_STATUS.md` for the sections-architecture open question has been repointed to this file's Phase 5 section below.
+
+**Next action — this is the actual, current outstanding-work list:**
+1. **Phase 4** (new-file JS→TS conversion) — not started, see below.
+2. **Phase 5** (sections/ architecture decision) — not started, see below.
+3. **Verification** (never run this pass): full bundle build (`eitri app start` or production build — a clean `tsc` doesn't prove the build compiles) and a device smoke test on the cart/checkout/account flows (per the `eitri-typescript-migrate` skill's Step 8 and `AGENTS.md`'s "Quality Assurance & Critical Flows" section).
+4. **`CONTEXT.md`** is thin (2 terms) relative to the domain concepts the merge introduced — Bonus, Biometric Login/Reauth, and CMS Section (Deco) vs. CMS Component (legacy) are all real, easily-conflated terms not yet in the glossary. Resolve as Phase 4 actually touches each area, per the `domain-modeling` skill.

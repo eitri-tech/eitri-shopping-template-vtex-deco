@@ -60,5 +60,3 @@ jsconfig.json
 .vscode
 /tsconfig.json
 
-CONTEXT.md
-MIGRATION_STATUS.md
