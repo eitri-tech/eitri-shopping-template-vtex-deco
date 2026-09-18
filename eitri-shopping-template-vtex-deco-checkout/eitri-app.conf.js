@@ -20,7 +20,8 @@ module.exports = {
     },
     "i18n": {
       "version": "14.1.2"
-    }
+    },
+    'recaptcha': { providers: ['google'], version: '2' }
   },
   "type": "module",
   "check-js": false
