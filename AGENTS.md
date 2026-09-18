@@ -236,6 +236,10 @@ Use these for any tasks related to Datadog, including log analysis, metric queri
 
 This project underwent a JS → TypeScript migration (2026). The rules below apply to all code written from now on, TypeScript or not, on top of the architecture conventions above. This file documents conventions adopted during that migration.
 
+### An unimported file is not necessarily dead code — this is a template project
+
+This repo is a **template** (see the very top of this file): a client's fork can, and often does, wire up a component that currently has zero import sites in this template repo — that's expected, not a bug. During conversion, if `grep`ing for a component's import turns up nothing, **do not delete it or skip converting it on that basis alone.** Convert it exactly like any other file in scope. The only time deleting instead of converting is correct is when you've confirmed the file is a genuine duplicate/leftover of another file that *is* wired up (e.g. two copies of the same component after a merge, one of them actually imported) — and even then, prefer flagging it over silently deleting, since a template repo may deliberately keep both for different client forks to pick from.
+
 ### Type-checking: no `package.json`, no lockfile, no `node_modules` — always run via `npx`
 
 This project deliberately has **no `package.json`, no `package-lock.json`, and no `node_modules`** at the root (consistent with "Not an npm/pnpm monorepo" above -- TypeScript itself is not a project dependency either). Never add them, and never run a local/installed `tsc`. Always type-check with:
