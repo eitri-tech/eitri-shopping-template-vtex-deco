@@ -1,4 +1,4 @@
-const { execSync } = require('child_process')
+const { execSync, spawn } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
@@ -98,26 +98,46 @@ function isVersionGreater(localVersion, publishedVersion) {
 	return false // As versões são iguais
 }
 
+function spawnAsync(command, options = {}) {
+	const { label, ...spawnOpts } = options
+	return new Promise((resolve, reject) => {
+		const child = spawn('sh', ['-c', command], { ...spawnOpts, stdio: ['ignore', 'pipe', 'pipe'] })
+		const prefix = label ? `[${label}] ` : ''
+		child.stdout.on('data', data => {
+			String(data).split('\n').filter(Boolean).forEach(line => console.log(prefix + line))
+		})
+		child.stderr.on('data', data => {
+			String(data).split('\n').filter(Boolean).forEach(line => console.error(prefix + line))
+		})
+		child.on('close', code => {
+			if (code !== 0) reject(new Error(`${prefix}Command exited with code ${code}`))
+			else resolve()
+		})
+		child.on('error', reject)
+	})
+}
+
 async function publishProject(project, directoryPath, sharedVersion = false, message = '') {
-	// Caminho absoluto para o diretório do projeto
 	const projectPath = path.resolve(directoryPath, `./${project}`)
+	const safeMessage = String(message).replace(/'/g, "'\\''")
 
-	// Muda para o diretório do projeto
-	process.chdir(projectPath)
+	await spawnAsync(`eitri push-version -m '${safeMessage}' ${sharedVersion ? '--shared' : ''}`, {
+		cwd: projectPath,
+		label: project
+	})
 
-	// Executa o comando dentro do diretório do projeto
-	execSync(`eitri push-version -m '${message}' ${sharedVersion ? '--shared' : ''}`, { stdio: 'inherit' })
-	
-	// Publica versão em dev e prod
 	if (DEV_ENV_ID) {
-		execSync(`eitri publish -e ${DEV_ENV_ID}`, { stdio: 'inherit' })
+		await spawnAsync(`eitri publish -e ${DEV_ENV_ID}`, {
+			cwd: projectPath,
+			label: project
+		})
 	}
 	if (PROD_ENV_ID) {
-		execSync(`eitri publish -e ${PROD_ENV_ID}`, { stdio: 'inherit' })
+		await spawnAsync(`eitri publish -e ${PROD_ENV_ID}`, {
+			cwd: projectPath,
+			label: project
+		})
 	}
-
-	// Volta para o diretório original (opcional)
-	process.chdir(directoryPath)
 }
 
 async function checkAndPushInDirectory(directoryPath, token) {
@@ -156,15 +176,40 @@ async function checkAndPushInDirectory(directoryPath, token) {
 		}
 
 		if (updatedProjects.length > 0) {
-			const orderedList = updatedProjects.sort((a, b) => (a.sharedVersion ? -1 : 1))
-			for (const project of orderedList) {
+			// Shared must publish first — apps depend on it
+			const sharedList = updatedProjects.filter(p => p.sharedVersion)
+			const appList = updatedProjects.filter(p => !p.sharedVersion)
+
+			for (const project of sharedList) {
 				try {
-					console.log(`${project.project} Publicando ...`)
+					console.log(`${project.project} Publicando (shared)...`)
 					await publishProject(project.project, project.directoryPath, project.sharedVersion, project.message)
 					console.log(`${project.project} Publicado!`)
 				} catch (error) {
-					console.error(`${project.project} Erro ao atualizar o projeto:`, error.message)
+					console.error(`${project.project} Erro ao publicar shared:`, error.message)
 					hasError = true
+					if (appList.length > 0) {
+						console.error('Publicação do shared falhou. Apps não publicados:', appList.map(p => p.project).join(', '))
+					}
+				}
+			}
+
+			// Independent apps publish in parallel
+			if (!hasError && appList.length > 0) {
+				console.log(`Publicando ${appList.length} app(s) em paralelo...`)
+				const results = await Promise.allSettled(
+					appList.map(async project => {
+						console.log(`${project.project} Publicando...`)
+						await publishProject(project.project, project.directoryPath, project.sharedVersion, project.message)
+						console.log(`${project.project} Publicado!`)
+					})
+				)
+
+				for (let i = 0; i < results.length; i++) {
+					if (results[i].status === 'rejected') {
+						console.error(`${appList[i].project} Erro ao publicar:`, results[i].reason.message)
+						hasError = true
+					}
 				}
 			}
 		} else {
