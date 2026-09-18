@@ -10,6 +10,7 @@ import { useTranslation } from 'eitri-i18n'
 import { useCartItem, useWishlist } from './productCard.hooks'
 import { getProductVideo, formatInstallments, getFormattedListPrice } from './productCard.utils'
 import { useSnackBar } from '../../providers/SnackBar'
+import MetalSwatches from './MetalSwatches'
 import type { VtexProduct } from '../../types/vtex'
 
 // ========== Componente Principal ==========
@@ -17,13 +18,12 @@ import type { VtexProduct } from '../../types/vtex'
 interface ProductCardProps {
 	product: VtexProduct
 	className?: string
-	// Sibling products (grouping-code variants) for the swatch selector. Accepted but not yet
-	// rendered here — main's `MetalSwatches` component is still untyped JS (Phase 4 conversion).
+	// Sibling products (grouping-code variants) for the swatch selector.
 	siblings?: VtexProduct[]
 }
 
 export default function ProductCard(props: ProductCardProps) {
-	const { product, className } = props
+	const { product, className, siblings } = props
 	const { addItem, cart } = useLocalShoppingCart()
 	const { showSnackBar } = useSnackBar()
 	const { t } = useTranslation()
@@ -176,7 +176,14 @@ export default function ProductCard(props: ProductCardProps) {
 		onPressOnCard: handleCardPress,
 		onPressMainAction: handleAddToCart,
 		onPressOnWishlist: handleWishlistPress,
-		className
+		className,
+		swatches: siblings?.length ? (
+			<MetalSwatches
+				currentProductId={product.productId}
+				siblings={siblings}
+				onSwatchPress={openProduct}
+			/>
+		) : undefined
 	}
 
 	const Implementation = ProductCardFullImage

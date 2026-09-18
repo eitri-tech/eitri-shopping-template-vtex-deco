@@ -1,12 +1,14 @@
+import type { MouseEvent } from 'react'
 import { View, Text, Image } from 'eitri-luminus'
 import { getProductProperty, getMaterialImage } from 'eitri-shopping-template-vtex-deco-shared'
+import type { VtexProduct } from '../../types/vtex'
 
 const MAX_VISIBLE = 2
 
 // Selected material is conveyed purely by position (leftmost), not by a border,
 // so the current product's material must be moved to the front of the list.
-function getOrderedMaterialOptions(siblings, currentProductId) {
-	const byMaterial = new Map()
+function getOrderedMaterialOptions(siblings: VtexProduct[], currentProductId?: string): VtexProduct[] {
+	const byMaterial = new Map<string, VtexProduct>()
 	siblings.forEach(sibling => {
 		const material = getProductProperty(sibling, 'Material')
 		if (!material) return
@@ -24,7 +26,15 @@ function getOrderedMaterialOptions(siblings, currentProductId) {
 	return options
 }
 
-export default function MetalSwatches({ currentProductId, siblings, onSwatchPress }) {
+interface MetalSwatchesProps {
+	currentProductId?: string
+	siblings?: VtexProduct[]
+	onSwatchPress?: (product: VtexProduct) => void
+}
+
+export default function MetalSwatches(props: MetalSwatchesProps) {
+	const { currentProductId, siblings, onSwatchPress } = props
+
 	if (!Array.isArray(siblings) || siblings.length < 2) {
 		return null
 	}
@@ -46,8 +56,8 @@ export default function MetalSwatches({ currentProductId, siblings, onSwatchPres
 				return (
 					<View
 						key={sibling.productId}
-						onClick={e => {
-							e.stopPropagation()
+						onClick={(e?: MouseEvent<HTMLElement>) => {
+							e?.stopPropagation()
 							if (!isCurrent && onSwatchPress) onSwatchPress(sibling)
 						}}
 						className='w-4 h-4 rounded-sm overflow-hidden border border-neutral-300'>
