@@ -1,12 +1,16 @@
+import { useEffect, useRef } from 'react'
+import { Page } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import { addLoggedCustomerToCart, cartHasCustomerData, saveCartIdOnStorage } from '../services/cartService'
+import type { LoggedCustomer } from '../services/cartService'
 import { startConfigure } from '../services/AppService'
 import { useCustomer } from '../providers/Customer'
 import { useLocalShoppingCart } from '../providers/LocalCart'
 import { navigate } from '../services/navigationService'
 import { TrackingService, Loading } from 'eitri-shopping-template-vtex-deco-shared'
+import type { VtexCart } from '../types/vtex'
 
-export default function Home(props) {
+export default function Home() {
 	const { startCart, addPersonalData } = useLocalShoppingCart()
 	const { getCustomer, getUserByEmail } = useCustomer()
 	const pristineRef = useRef(true)
@@ -19,26 +23,28 @@ export default function Home(props) {
 		try {
 			await startConfigure()
 
-			// Carregar customer e cart em paralelo
 			const [loggedCustomer, cart] = await Promise.all([
-				getCustomer().catch(err => {
-					console.error('Failed to get customer:', err)
-					return null
-				}),
+				getCustomer
+					? (getCustomer().catch(err => {
+							console.error('Failed to get customer:', err)
+							return null
+						}) as Promise<LoggedCustomer | null>)
+					: Promise.resolve(null),
 				loadCart().catch(err => {
 					console.error('Failed to load cart:', err)
-					throw err // Cart é crítico
+					throw err
 				})
 			])
 
 			let _cart = cart
 
-			if (loggedCustomer) {
-				const cartEmail = cart?.clientProfileData?.email
-				const customerEmail = loggedCustomer?.email
-				if (cartEmail !== customerEmail) {
+			if (loggedCustomer && cart) {
+				const cartEmail = cart.clientProfileData?.email
+				const customerEmail = loggedCustomer.email
+				if (cartEmail !== customerEmail && addPersonalData) {
 					try {
-						_cart = await addLoggedCustomerToCart(loggedCustomer, cart, { addPersonalData })
+						const updated = await addLoggedCustomerToCart(loggedCustomer, cart, { addPersonalData })
+						if (updated) _cart = updated as VtexCart
 					} catch (e) {
 						console.error('Failed to add customer to cart:', e)
 					}
@@ -52,23 +58,20 @@ export default function Home(props) {
 		}
 	}
 
-	const loadCart = async () => {
-		const startParams = await Eitri.getInitializationInfos()
+	const loadCart = async (): Promise<VtexCart | undefined> => {
+		const startParams = (await Eitri.getInitializationInfos()) as { orderFormId?: string } | undefined
 
 		if (startParams?.orderFormId) {
-			await saveCartIdOnStorage(startParams?.orderFormId)
+			await saveCartIdOnStorage(startParams.orderFormId)
 		}
 
-		return await startCart()
+		return startCart?.()
 	}
 
-	const handleNavigation = async cart => {
-		// navigate('CheckoutReview')
-		// return
-		// console.log('cart=====>', cart?.orderFormId)
-
+	const handleNavigation = async (cart?: VtexCart) => {
 		if (!cart || cart.items.length === 0) {
-			return navigate('EmptyCart')
+			navigate('EmptyCart')
+			return
 		}
 
 		if (pristineRef.current) {
@@ -78,18 +81,18 @@ export default function Home(props) {
 
 		const destination = cartHasCustomerData(cart) ? 'FreightResolver' : 'PersonalData'
 
-		return navigate(destination, {}, true)
+		navigate(destination, {}, true)
 	}
 
-	const loadCheckoutProfile = async email => {
+	const loadCheckoutProfile = async (email?: string) => {
 		if (!email) return
-		await getUserByEmail(email)
+		await getUserByEmail?.(email)
 	}
 
 	return (
-		<Page title={'Checkout'}>
+		<Page title='Checkout'>
 			<Loading
-				fullScreen={true}
+				fullScreen
 				isLoading={true}
 			/>
 		</Page>

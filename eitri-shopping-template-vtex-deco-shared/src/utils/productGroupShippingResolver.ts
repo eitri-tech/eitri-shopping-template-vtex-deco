@@ -22,7 +22,7 @@ interface ProductGroup {
 	items: GroupItem[]
 }
 
-interface EnrichedProductGroup extends ProductGroup {
+export interface EnrichedProductGroup extends ProductGroup {
 	currentSla: string
 	slas: Array<GroupSla & { formatedShippingEstimate: string; formattedTotalPrice: string }>
 }

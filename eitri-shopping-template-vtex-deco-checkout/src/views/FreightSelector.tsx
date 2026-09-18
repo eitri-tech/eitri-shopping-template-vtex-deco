@@ -1,13 +1,14 @@
+import { useEffect, useState } from 'react'
+import { Page, Text, View } from 'eitri-luminus'
 import { useLocalShoppingCart } from '../providers/LocalCart'
 import { useTranslation } from 'eitri-i18n'
-import { Page, Radio, Text, View } from 'eitri-luminus'
 import { navigate } from '../services/navigationService'
-import { useState } from 'react'
 import { shippingResolver } from 'eitri-shopping-template-vtex-deco-shared'
+import type { EnrichedShippingOption } from 'eitri-shopping-template-vtex-deco-shared'
 import FixedBottom from '../components/FixedBottom/FixedBottom'
 import { HeaderContentWrapper, HeaderReturn, Loading, GenericBox, TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
 
-export default function FreightSelector(props) {
+export default function FreightSelector() {
 	const { cart, setFreight } = useLocalShoppingCart()
 
 	const [isLoading, setIsLoading] = useState(false)
@@ -18,7 +19,7 @@ export default function FreightSelector(props) {
 		TrackingService.sendScreenView('Seleção de frete', 'FreightSelector')
 	}, [])
 
-	const onSelectFreightOption = async freightOption => {
+	const onSelectFreightOption = async (freightOption: EnrichedShippingOption) => {
 		try {
 			setIsLoading(true)
 			const slas = freightOption.slas.map(sla => ({
@@ -30,9 +31,9 @@ export default function FreightSelector(props) {
 			const payload = {
 				clearAddressIfPostalCodeNotFound: false,
 				logisticsInfo: slas,
-				selectedAddresses: cart.shippingData.selectedAddresses
+				selectedAddresses: cart?.shippingData?.selectedAddresses
 			}
-			await setFreight(payload)
+			await setFreight?.(payload)
 			navigate('PaymentData', {}, true)
 		} catch (error) {
 			console.error('Error on select freight option', error)
@@ -41,7 +42,7 @@ export default function FreightSelector(props) {
 		}
 	}
 
-	const shippingOptions = shippingResolver(cart)
+	const shippingOptions = cart ? shippingResolver(cart) : null
 	const deliveryOptions = shippingOptions?.options?.filter(opt => !opt.isPickupInPoint)
 
 	const userAddress = cart?.shippingData?.address
@@ -61,11 +62,15 @@ export default function FreightSelector(props) {
 				<Text className='text-xl font-bold'>{t('freightSelector.txtTitle')}</Text>
 
 				<Text>
-					{t('freightSelector.txtDeliverAt', { street: userAddress.street, number: userAddress.number || '', complement: userAddress.complement || '' })}
+					{t('freightSelector.txtDeliverAt', {
+						street: userAddress?.street ?? '',
+						number: userAddress?.number || '',
+						complement: userAddress?.complement || ''
+					})}
 				</Text>
 
 				<GenericBox className='p-4 w-full flex flex-col gap-3'>
-					{deliveryOptions.map((item, index) => (
+					{deliveryOptions?.map((item, index) => (
 						<View
 							key={index}
 							className='flex flex-col w-full gap-2'

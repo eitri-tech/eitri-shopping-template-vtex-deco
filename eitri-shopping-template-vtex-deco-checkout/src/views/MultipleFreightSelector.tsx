@@ -1,29 +1,41 @@
-import { useLocalShoppingCart } from '../providers/LocalCart'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'eitri-i18n'
-import { Page, Text, View } from 'eitri-luminus'
+import { Page, Text, View, Image } from 'eitri-luminus'
+import { useLocalShoppingCart } from '../providers/LocalCart'
 import { navigate } from '../services/navigationService'
-import { useState } from 'react'
 import { productGroupShippingResolver, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
+import type { EnrichedProductGroup } from 'eitri-shopping-template-vtex-deco-shared'
 import FixedBottom from '../components/FixedBottom/FixedBottom'
 import { HeaderContentWrapper, HeaderReturn, CustomButton, Loading, TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
 import { FaChevronRight } from 'react-icons/fa'
+import type { VtexAddress } from '../types/vtex'
 
-function AddressSelectorCard({ sla, items }) {
-	const formatAddress = address => {
-		return `${address?.street}, ${address?.number || ''} ${address?.complement || ''} - ${address?.neighborhood}`
+type ShippingGroupSla = EnrichedProductGroup['slas'][number]
+type ShippingGroupItem = EnrichedProductGroup['items'][number]
+
+interface AddressSelectorCardProps {
+	sla: ShippingGroupSla
+	items?: ShippingGroupItem[]
+}
+
+function AddressSelectorCard(props: AddressSelectorCardProps) {
+	const { sla, items } = props
+
+	const formatAddress = (address?: VtexAddress | null) => {
+		return `${address?.street ?? ''}, ${address?.number || ''} ${address?.complement || ''} - ${address?.neighborhood ?? ''}`
 	}
 
 	return (
 		<View className='flex flex-row items-start w-full gap-3'>
 			<View className='flex flex-col w-full gap-1'>
 				<View className='flex flex-col gap-4 mb-3'>
-					{items?.map(product => (
-						<View className={'flex flex-row items-start gap-3'}>
-							<View
-								key={product.imageUrl}
-								className='min-w-12 max-w-12'>
+					{items?.map((product, index) => (
+						<View
+							key={index}
+							className={'flex flex-row items-start gap-3'}>
+							<View className='min-w-12 max-w-12'>
 								<Image
-									src={product.imageUrl}
+									src={product.imageUrl ?? ''}
 									width='100%'
 									height='100%'
 									className='object-cover'
@@ -41,9 +53,7 @@ function AddressSelectorCard({ sla, items }) {
 				)}
 
 				<Text className='text text-neutral-700'>
-					{sla?.pickupStoreInfo?.isPickupStore
-						? formatAddress(sla.pickupStoreInfo.address)
-						: formatAddress(sla.deliveryAddress)}
+					{sla?.pickupStoreInfo?.address ? formatAddress(sla.pickupStoreInfo.address) : formatAddress(sla.deliveryAddress)}
 				</Text>
 
 				<View className='flex items-center'>
@@ -56,8 +66,8 @@ function AddressSelectorCard({ sla, items }) {
 	)
 }
 
-export default function MultipleFreightSelector(props) {
-	const { cart, setFreight } = useLocalShoppingCart()
+export default function MultipleFreightSelector() {
+	const { cart } = useLocalShoppingCart()
 
 	const [isLoading, setIsLoading] = useState(false)
 
@@ -71,9 +81,9 @@ export default function MultipleFreightSelector(props) {
 		navigate('PaymentData', {}, true)
 	}
 
-	const shippingOptions = productGroupShippingResolver(cart)
+	const shippingOptions = cart ? productGroupShippingResolver(cart) : null
 
-	const getCurrentSla = (slas, currentSla) => {
+	const getCurrentSla = (slas: ShippingGroupSla[], currentSla: string) => {
 		return slas.find(sla => sla.id === currentSla)
 	}
 
@@ -96,11 +106,13 @@ export default function MultipleFreightSelector(props) {
 						const currentSla = getCurrentSla(group.slas, group.currentSla)
 
 						const label = currentSla?.isPickupInPoint
-							? `Retire na loja ${currentSla?.pickupStoreInfo.friendlyName}`
-							: `${currentSla?.formatedShippingEstimate}`
+							? `Retire na loja ${currentSla?.pickupStoreInfo?.friendlyName ?? ''}`
+							: `${currentSla?.formatedShippingEstimate ?? ''}`
 
 						return (
-							<GenericBox className='p-4 w-full flex flex-col'>
+							<GenericBox
+								key={index}
+								className='p-4 w-full flex flex-col'>
 								<View className='flex flex-row items-center justify-between pb-3 mb-3 border-b'>
 									<Text className='font-bold'>{`${currentSla ? label : `Escolha a entrega`}`}</Text>
 								</View>

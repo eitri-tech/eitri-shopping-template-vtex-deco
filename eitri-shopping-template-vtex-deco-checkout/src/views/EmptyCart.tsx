@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { Page, View, Text, Image } from 'eitri-luminus'
 import { closeEitriApp } from '../services/navigationService'
 import cartImage from '../assets/images/cart-01.svg'
 import { useTranslation } from 'eitri-i18n'

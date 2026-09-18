@@ -1,10 +1,11 @@
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { ChangeEvent } from 'react'
 import Eitri from 'eitri-bifrost'
+import { Page, View, Text } from 'eitri-luminus'
 import { useLocalShoppingCart } from '../providers/LocalCart'
 import { useTranslation } from 'eitri-i18n'
-import { Page, View } from 'eitri-luminus'
 import { resolvePostalCode } from '../services/freigthService'
 import { navigate, requestLogin } from '../services/navigationService'
-import { useState } from 'react'
 import FixedBottom from '../components/FixedBottom/FixedBottom'
 import {
 	HeaderContentWrapper,
@@ -16,8 +17,55 @@ import {
 	TrackingService,
 	Loading
 } from 'eitri-shopping-template-vtex-deco-shared'
+import type { RouteProps } from '../types/route'
 
-function PostalCodeInput({ value, onChange, isLoading, t, error, touched, onBlur }) {
+interface AddressFormState {
+	postalCode: string
+	street: string
+	neighborhood: string
+	city: string
+	state: string
+	country: string
+	geoCoordinates: number[]
+	number: string
+	complement: string
+	reference: string
+	addressQuery: string
+	addressType: string
+	receiverName: string
+	isDisposable: boolean
+	addressId?: string
+	[key: string]: unknown
+}
+
+interface AddressErrors {
+	postalCode: string
+	street: string
+	neighborhood: string
+	city: string
+	state: string
+	receiverName: string
+	number: string
+}
+
+// The real i18next TFunction's overloads are too specific to satisfy structurally here without
+// importing its types — callers pass the real `t` cast to this loose shape instead.
+interface TranslateFn {
+	(key: string, optionsOrDefault?: unknown): string
+}
+
+interface PostalCodeInputProps {
+	value?: string
+	onChange: (e: ChangeEvent<HTMLInputElement>) => void
+	isLoading: boolean
+	t: TranslateFn
+	error?: string
+	touched?: boolean
+	onBlur: () => void
+}
+
+function PostalCodeInput(props: PostalCodeInputProps) {
+	const { value, onChange, isLoading, t, error, touched, onBlur } = props
 	return (
 		<View className='flex flex-col gap-1 w-full'>
 			<View className='flex justify-between gap-2 w-full items-end'>
@@ -40,7 +88,19 @@ function PostalCodeInput({ value, onChange, isLoading, t, error, touched, onBlur
 	)
 }
 
-function AddressFields({ address, handleAddressChange, t, touched, errors, onBlur }) {
+type TouchableField = keyof AddressErrors | 'complement'
+
+interface AddressFieldsProps {
+	address: AddressFormState
+	handleAddressChange: (key: keyof AddressFormState, e: ChangeEvent<HTMLInputElement>) => void
+	t: TranslateFn
+	touched: Partial<Record<TouchableField, boolean>>
+	errors: AddressErrors
+	onBlur: (field: TouchableField) => void
+}
+
+function AddressFields(props: AddressFieldsProps) {
+	const { address, handleAddressChange, t, touched, errors, onBlur } = props
 	return (
 		<>
 			<View>
@@ -80,7 +140,7 @@ function AddressFields({ address, handleAddressChange, t, touched, errors, onBlu
 				<CustomInput
 					label={t('addNewShippingAddress.frmNeighborhood')}
 					placeholder={''}
-					value={address.neighborhood || ''}
+					value={address?.neighborhood || ''}
 					onChange={e => handleAddressChange('neighborhood', e)}
 					className={errors.neighborhood && touched.neighborhood ? 'border-red-500' : ''}
 					onBlur={() => onBlur('neighborhood')}
@@ -94,7 +154,7 @@ function AddressFields({ address, handleAddressChange, t, touched, errors, onBlu
 					<CustomInput
 						label={t('addNewShippingAddress.frmCity')}
 						placeholder={''}
-						value={address.city || ''}
+						value={address?.city || ''}
 						onChange={e => handleAddressChange('city', e)}
 						className={errors.city && touched.city ? 'border-red-500' : ''}
 						onBlur={() => onBlur('city')}
@@ -118,7 +178,7 @@ function AddressFields({ address, handleAddressChange, t, touched, errors, onBlu
 					placeholder={t('addNewShippingAddress.frmReceiveName')}
 					label={t('addNewShippingAddress.frmReceiveName')}
 					value={address?.receiverName || ''}
-					onChange={text => handleAddressChange('receiverName', text)}
+					onChange={e => handleAddressChange('receiverName', e)}
 					className={errors.receiverName && touched.receiverName ? 'border-red-500' : ''}
 					onBlur={() => onBlur('receiverName')}
 				/>
@@ -130,7 +190,7 @@ function AddressFields({ address, handleAddressChange, t, touched, errors, onBlu
 	)
 }
 
-function validateAddress(address, t) {
+function validateAddress(address: AddressFormState, t: TranslateFn): AddressErrors {
 	const postalCodeDigits = address.postalCode?.replace(/\D/g, '') || ''
 	return {
 		postalCode: !address.postalCode
@@ -147,17 +207,17 @@ function validateAddress(address, t) {
 	}
 }
 
-export default function AddressForm(props) {
+export default function AddressForm(props: RouteProps<{ addressId?: string }>) {
 	const PAGE_NAME = 'Adicionar endereço - checkout'
 
 	const { cart, cartIsLoading, setLogisticInfo, startCart } = useLocalShoppingCart()
 	const { t } = useTranslation()
 
-	const [addressId, setAddressId] = useState(props.location?.state?.addressId)
+	const [addressId, setAddressId] = useState<string | undefined>(props.location?.state?.addressId)
 	const [isLoading, setIsLoading] = useState(false)
 	const [addressError, setAddressError] = useState('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const [address, setAddress] = useState({
+	const [address, setAddress] = useState<AddressFormState>({
 		postalCode: '',
 		street: '',
 		neighborhood: '',
@@ -171,11 +231,11 @@ export default function AddressForm(props) {
 		addressQuery: '',
 		addressType: 'residential',
 		receiverName: cart?.clientProfileData?.firstName
-			? `${cart?.clientProfileData?.firstName} ${cart?.clientProfileData?.lastName}`
+			? `${cart?.clientProfileData?.firstName} ${cart?.clientProfileData?.lastName ?? ''}`
 			: '',
 		isDisposable: false
 	})
-	const [touched, setTouched] = useState({})
+	const [touched, setTouched] = useState<Partial<Record<TouchableField, boolean>>>({})
 
 	useEffect(() => {
 		TrackingService.sendScreenView('Adicionar endereço - checkout', 'AddressFormCheckout')
@@ -185,6 +245,7 @@ export default function AddressForm(props) {
 		if (addressId) {
 			init(addressId)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [addressId])
 
 	useEffect(() => {
@@ -193,39 +254,40 @@ export default function AddressForm(props) {
 		if (postalCodeDigits.length === 8) {
 			submitZipCode(address?.postalCode)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [address?.postalCode])
 
-	const errors = useMemo(() => validateAddress(address, t), [address, t])
+	const errors = useMemo(() => validateAddress(address, t as unknown as TranslateFn), [address, t])
 
-	const init = async addressId => {
+	const init = async (targetAddressId: string) => {
 		try {
-			if (!cart.canEditData) {
+			if (!cart?.canEditData) {
 				await requestLogin()
-				const newCart = await startCart()
+				const newCart = await startCart?.()
 				const _address = newCart?.shippingData?.selectedAddresses?.find(
-					address => address.addressId === addressId
+					selectedAddress => selectedAddress.addressId === targetAddressId
 				)
-				setAddress({
-					...address,
-					..._address
-				})
+				// Merging a partial VTEX address into the stricter local form shape — VtexAddress
+				// fields are all optional (real payloads vary by address type), the local form
+				// always needs a full string-keyed shape to render inputs safely.
+				setAddress(prev => ({ ...prev, ...(_address ?? {}) }) as AddressFormState)
 			} else {
-				const _address = cart?.shippingData?.selectedAddresses?.find(address => address.addressId === addressId)
+				const _address = cart?.shippingData?.selectedAddresses?.find(
+					selectedAddress => selectedAddress.addressId === targetAddressId
+				)
 				if (!_address && cart?.shippingData?.selectedAddresses?.[0]?.addressId) {
 					setAddressId(cart.shippingData.selectedAddresses[0].addressId)
 					return
 				}
-				setAddress({
-					...address,
-					..._address
-				})
+				setAddress(prev => ({ ...prev, ...(_address ?? {}) }) as AddressFormState)
 			}
 		} catch (e) {
-			Eitri.navigation.back()
+			console.error('Error loading address', e)
+			Eitri.navigation.back(1)
 		}
 	}
 
-	const handleAddressChange = useCallback((key, e) => {
+	const handleAddressChange = useCallback((key: keyof AddressFormState, e: ChangeEvent<HTMLInputElement>) => {
 		const { value } = e.target
 		setAddress(prev => ({
 			...prev,
@@ -233,31 +295,32 @@ export default function AddressForm(props) {
 		}))
 	}, [])
 
-	const onChangePostalCodeInput = async e => {
+	const onChangePostalCodeInput = async (e: ChangeEvent<HTMLInputElement>) => {
 		const { value } = e.target
-		setAddress({ ...address, postalCode: value })
+		setAddress(prev => ({ ...prev, postalCode: value }))
 	}
 
-	const submitZipCode = async postalCode => {
+	const submitZipCode = async (postalCode: string) => {
 		try {
 			if (!postalCode) return
 			setIsLoading(true)
 			const { street, neighborhood, city, state, country, geoCoordinates } = await resolvePostalCode(postalCode)
-			setAddress({
-				...address,
-				street,
-				neighborhood,
-				city,
-				state,
-				country,
-				geoCoordinates
-			})
+			setAddress(prev => ({
+				...prev,
+				street: street ?? '',
+				neighborhood: neighborhood ?? '',
+				city: city ?? '',
+				state: state ?? '',
+				country: country ?? prev.country,
+				geoCoordinates: geoCoordinates ?? []
+			}))
 			setIsLoading(false)
 			// Foco no campo número após buscar o CEP
 			setTimeout(() => {
 				document.getElementById('numberField')?.focus()
 			}, 100)
 		} catch (e) {
+			console.error('Error resolving postal code', e)
 			setIsLoading(false)
 		}
 	}
@@ -280,17 +343,18 @@ export default function AddressForm(props) {
 					clearAddressIfPostalCodeNotFound: false,
 					selectedAddresses: newSelectedAddresses
 				}
-				await setLogisticInfo(payload)
+				await setLogisticInfo?.(payload)
 			} else {
 				const payload = {
 					address,
 					clearAddressIfPostalCodeNotFound: false
 				}
-				await setLogisticInfo(payload)
+				await setLogisticInfo?.(payload)
 			}
 			navigate('FreightResolver', {}, true)
 		} catch (e) {
-			if (e.response?.status === 400) {
+			const status = (e as { response?: { status?: number } } | undefined)?.response?.status
+			if (status === 400) {
 				setAddressError(t('addNewShippingAddress.errorAddress'))
 				console.error('Error on submit', e)
 				return
@@ -302,7 +366,7 @@ export default function AddressForm(props) {
 		}
 	}
 
-	const onBlur = field => {
+	const onBlur = (field: TouchableField) => {
 		setTouched(prev => ({ ...prev, [field]: true }))
 	}
 
@@ -319,16 +383,15 @@ export default function AddressForm(props) {
 
 			<Loading
 				fullScreen
-				isLoading={cartIsLoading}
+				isLoading={!!cartIsLoading}
 			/>
 
 			<View className='flex flex-col gap-2 p-4 m-4 bg-white rounded shadow-sm border border-gray-300'>
 				<PostalCodeInput
 					value={address?.postalCode}
 					onChange={onChangePostalCodeInput}
-					onSubmit={submitZipCode}
 					isLoading={isLoading}
-					t={t}
+					t={t as unknown as TranslateFn}
 					error={errors.postalCode}
 					touched={touched.postalCode}
 					onBlur={() => onBlur('postalCode')}
@@ -341,7 +404,7 @@ export default function AddressForm(props) {
 				<AddressFields
 					address={address}
 					handleAddressChange={handleAddressChange}
-					t={t}
+					t={t as unknown as TranslateFn}
 					touched={touched}
 					errors={errors}
 					onBlur={onBlur}

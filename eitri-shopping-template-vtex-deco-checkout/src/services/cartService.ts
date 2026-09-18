@@ -81,7 +81,7 @@ export const cartHasCustomerData = (cart: VtexCart): boolean => {
 	)
 }
 
-interface LoggedCustomer {
+export interface LoggedCustomer {
 	email?: string
 	firstName?: string
 	lastName?: string

@@ -31,7 +31,7 @@ interface GroupedSla {
 	slas: Array<{ itemIndex: number; selectedSla?: string; selectedDeliveryChannel?: string }>
 }
 
-interface EnrichedShippingOption extends GroupedSla {
+export interface EnrichedShippingOption extends GroupedSla {
 	formatedPrice: string
 	fulfillsAllItems: boolean
 	deliveryAddress: VtexAddress | null
@@ -39,7 +39,7 @@ interface EnrichedShippingOption extends GroupedSla {
 	products: ProductRef[]
 }
 
-interface CurrentSla {
+export interface CurrentSla {
 	id: string
 	name?: string
 	isPickupInPoint: boolean

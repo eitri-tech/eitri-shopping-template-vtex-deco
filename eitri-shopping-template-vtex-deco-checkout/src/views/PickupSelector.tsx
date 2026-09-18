@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react'
 import { useLocalShoppingCart } from '../providers/LocalCart'
 import { Page, Text, View } from 'eitri-luminus'
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'eitri-i18n'
 import { navigate } from '../services/navigationService'
 import { shippingResolver } from 'eitri-shopping-template-vtex-deco-shared'
+import type { EnrichedShippingOption } from 'eitri-shopping-template-vtex-deco-shared'
 import CardSelector from '../components/CardSelector/CardSelector'
 import {
 	HeaderContentWrapper,
@@ -14,7 +15,7 @@ import {
 	Loading
 } from 'eitri-shopping-template-vtex-deco-shared'
 
-export default function PickupSelector(props) {
+export default function PickupSelector() {
 	const { cart, setFreight } = useLocalShoppingCart()
 	const { t } = useTranslation()
 
@@ -24,18 +25,19 @@ export default function PickupSelector(props) {
 	const PAGE = 'Seleção de ponto de retirada'
 
 	useEffect(() => {
-		if (cart?.shippingData?.availableAddresses?.length > 0) {
+		if ((cart?.shippingData?.availableAddresses?.length ?? 0) > 0) {
 			TrackingService.sendScreenView('Seleção de ponto de retirada', 'PickupSelector')
 		} else {
 			handleAddNewAddress()
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const handleAddNewAddress = () => {
 		navigate('AddressForm', {}, true)
 	}
 
-	const onSelectFreightOption = async freightOption => {
+	const onSelectFreightOption = async (freightOption: EnrichedShippingOption) => {
 		try {
 			setIsLoading(true)
 			const slas = freightOption.slas.map(sla => ({
@@ -47,9 +49,9 @@ export default function PickupSelector(props) {
 			const payload = {
 				clearAddressIfPostalCodeNotFound: false,
 				logisticsInfo: slas,
-				selectedAddresses: cart.shippingData.selectedAddresses
+				selectedAddresses: cart?.shippingData?.selectedAddresses
 			}
-			await setFreight(payload)
+			await setFreight?.(payload)
 			navigate('PaymentData')
 		} catch (error) {
 			console.error('Error on select freight option', error)
@@ -58,7 +60,7 @@ export default function PickupSelector(props) {
 		}
 	}
 
-	const shippingOptions = shippingResolver(cart)
+	const shippingOptions = cart ? shippingResolver(cart) : null
 	const pickUpOptions = shippingOptions?.options?.filter(opt => opt.isPickupInPoint)
 
 	return (
@@ -81,16 +83,17 @@ export default function PickupSelector(props) {
 				</View>
 
 				{pickUpOptions?.slice(0, seeMore ? Infinity : 3).map(option => {
-					const address = option.pickupStoreInfo.address
+					const address = option.pickupStoreInfo?.address
 
 					return (
 						<CardSelector
+							key={option.id}
 							mainTitle={option.pickupStoreInfo?.friendlyName}
 							mainClickHandler={() => onSelectFreightOption(option)}
 							secondaryActionTitle={option.formattedShippingEstimate}>
-							<Text className='text text-base-content/70'>{`${address.street}, ${address.number} ${address.complement}`}</Text>
-							<Text className='text text-base-content/70'>{`${address.neighborhood} - ${address.city} - ${address.state}`}</Text>
-							<Text className='text text-base-content/70'>{`CEP: ${address.postalCode}`}</Text>
+							<Text className='text text-base-content/70'>{`${address?.street ?? ''}, ${address?.number ?? ''} ${address?.complement ?? ''}`}</Text>
+							<Text className='text text-base-content/70'>{`${address?.neighborhood ?? ''} - ${address?.city ?? ''} - ${address?.state ?? ''}`}</Text>
+							<Text className='text text-base-content/70'>{`CEP: ${address?.postalCode ?? ''}`}</Text>
 							<Text
 								className={`text text-base-content/70 font-bold ${option.price === 0 ? 'text-green-600' : ''}`}>
 								{option.formatedPrice}
