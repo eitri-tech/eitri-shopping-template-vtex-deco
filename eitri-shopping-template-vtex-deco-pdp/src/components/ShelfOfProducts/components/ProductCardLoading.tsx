@@ -1,25 +1,13 @@
 import { View } from 'eitri-luminus'
 import { Loading } from 'eitri-shopping-template-vtex-deco-shared'
 
-interface ProductCardLoadingProps {
-	width?: string | number
-	gap?: string | number
-}
-
-// LoadingComponent doesn't declare an `inline` prop — kept as-is (pre-existing, likely a no-op).
-const LoadingAny = Loading as unknown as (props: Record<string, unknown>) => JSX.Element
-
-export default function ProductCardLoading(props: ProductCardLoadingProps) {
-	const { width, gap } = props
+export default function ProductCardLoading() {
 	return (
 		<View className='flex justify-center'>
 			<View className='p-8 pr-1 w-[50%]'>
 				<View className='min-h-341 p-2 border-neutral-content border'>
 					<View className='flex flex-col justify-center items-center p-2'>
-						<LoadingAny
-							inline
-							width='80px'
-						/>
+						<Loading />
 					</View>
 				</View>
 			</View>
@@ -30,10 +18,7 @@ export default function ProductCardLoading(props: ProductCardLoadingProps) {
 					minHeight='341px'
 					className='p-2 border-neutral-content border'>
 					<View className='flex flex-col justify-center items-center p-2'>
-						<LoadingAny
-							inline
-							width='80px'
-						/>
+						<Loading />
 					</View>
 				</View>
 			</View>

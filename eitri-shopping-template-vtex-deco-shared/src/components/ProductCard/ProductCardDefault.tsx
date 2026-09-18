@@ -3,9 +3,6 @@ import { Image, Text, View } from 'eitri-luminus'
 import WishlistIcon from '../WishlistIcon/WishlistIcon'
 import Loading from '../Loading/LoadingComponent'
 
-// LoadingComponent doesn't declare a `width` prop — kept as-is (pre-existing, likely a no-op).
-const LoadingAny = Loading as unknown as (props: Record<string, unknown>) => JSX.Element
-
 interface ProductCardDefaultProps {
 	listPrice?: string
 	image?: string
@@ -83,7 +80,7 @@ export default function ProductCardDefault(props: ProductCardDefaultProps) {
 					onClick={onPressCartButton}
 					className='mt-2 h-[36px] bg-primary w-full rounded-full flex justify-center items-center border border-primary-700 border-[0.5px] bg-primary-700 z-[99]'>
 					{loadingCartOp ? (
-						<LoadingAny width='36px' />
+						<Loading isLoading />
 					) : (
 						<Text className='text-primary-content font-medium text-xs'>{actionLabel}</Text>
 					)}

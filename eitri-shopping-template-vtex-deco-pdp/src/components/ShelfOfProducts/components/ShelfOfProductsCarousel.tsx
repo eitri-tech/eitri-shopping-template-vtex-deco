@@ -25,7 +25,7 @@ export default function ShelfOfProductsCarousel(props: ShelfOfProductsCarouselPr
 	return (
 		<>
 			{isLoading ? (
-				<ProductCardLoading gap={gap} />
+				<ProductCardLoading />
 			) : (
 				<View className='w-full overflow-x-auto flex space-x-4 px-2'>
 					<View className='flex gap-2'>
