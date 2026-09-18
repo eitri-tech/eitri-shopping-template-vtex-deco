@@ -3,21 +3,21 @@ import { FiAlertTriangle, FiGift, FiCalendar, FiAward } from 'react-icons/fi'
 import { MdAutoAwesome } from 'react-icons/md'
 import { useTranslation } from 'eitri-i18n'
 import { formatSignedPrice } from '../../utils/utils'
-import { MOVEMENT_STATUS, MOVEMENT_TYPE } from '../../services/BonusService'
+import { MOVEMENT_STATUS, MOVEMENT_TYPE, type BonusMovement, type MovementStatus, type MovementType } from '../../services/BonusService'
 
-const TYPE_LABEL_KEY = {
+const TYPE_LABEL_KEY: Record<MovementType, string> = {
 	[MOVEMENT_TYPE.RECEIVED]: 'bonusScreen.movementReceived',
 	[MOVEMENT_TYPE.REDEEMED]: 'bonusScreen.movementRedeemed',
 	[MOVEMENT_TYPE.SPECIAL]: 'bonusScreen.movementSpecial'
 }
 
-const BADGE_BY_STATUS = {
+const BADGE_BY_STATUS: Partial<Record<MovementStatus, { labelKey: string; className: string }>> = {
 	[MOVEMENT_STATUS.EXPIRING]: { labelKey: 'bonusScreen.badgeExpiring', className: 'bg-[#F2C832] text-black' },
 	[MOVEMENT_STATUS.EXPIRED]: { labelKey: 'bonusScreen.badgeExpired', className: 'bg-[#C8102E] text-white' },
 	[MOVEMENT_STATUS.PENDING]: { labelKey: 'bonusScreen.badgePending', className: 'bg-gray-200 text-gray-700' }
 }
 
-const renderIcon = (movement, className) => {
+const renderIcon = (movement: BonusMovement, className: string) => {
 	const size = 18
 	if (movement.status === MOVEMENT_STATUS.EXPIRING)
 		return (
@@ -55,11 +55,16 @@ const renderIcon = (movement, className) => {
 	)
 }
 
+interface BonusStatementItemProps {
+	movement: BonusMovement
+	[key: string]: unknown
+}
+
 /**
  * One row of the bonus statement ("extrato").
  * Expired movements are rendered muted, keeping only the badge at full contrast.
  */
-export default function BonusStatementItem(props) {
+export default function BonusStatementItem(props: BonusStatementItemProps) {
 	const { movement } = props
 	const { t } = useTranslation()
 

@@ -59,6 +59,7 @@ declare module 'react-icons/fi' {
 	export const FiArrowDown: IconType
 	export const FiArrowUp: IconType
 	export const FiArrowLeft: IconType
+	export const FiArrowRight: IconType
 	export const FiBell: IconType
 	export const FiHeadphones: IconType
 	export const FiHelpCircle: IconType
@@ -69,6 +70,10 @@ declare module 'react-icons/fi' {
 	export const FiRotateCcw: IconType
 	export const FiSliders: IconType
 	export const FiStar: IconType
+	export const FiAlertTriangle: IconType
+	export const FiGift: IconType
+	export const FiCalendar: IconType
+	export const FiAward: IconType
 }
 
 declare module 'react-icons/io5' {
@@ -101,6 +106,7 @@ declare module 'react-icons/md' {
 	export const MdFavoriteBorder: IconType
 	export const MdFavorite: IconType
 	export const MdOutlineQrCodeScanner: IconType
+	export const MdAutoAwesome: IconType
 }
 
 declare module 'react-icons/go' {

@@ -1,6 +1,7 @@
 import Eitri from 'eitri-bifrost'
 import { Vtex } from 'eitri-shopping-vtex-shared'
-import { Datadog, TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
+import { Datadog } from 'eitri-shopping-template-vtex-deco-shared'
+import type { BonusExtract } from '../types/bonus'
 
 /**
  * Real "Meu Bônus" extract (wallets / orders / incentives) — Monte Carlo's own
@@ -24,9 +25,11 @@ export const BONUS_API_ERROR = {
 	SERVER_ERROR: 'server_error',
 	TIMEOUT: 'timeout',
 	UNKNOWN: 'unknown'
-}
+} as const
 
-const ERROR_BY_STATUS = {
+export type BonusApiError = (typeof BONUS_API_ERROR)[keyof typeof BONUS_API_ERROR]
+
+const ERROR_BY_STATUS: Record<number, BonusApiError> = {
 	400: BONUS_API_ERROR.BAD_REQUEST,
 	401: BONUS_API_ERROR.UNAUTHORIZED,
 	403: BONUS_API_ERROR.FORBIDDEN,
@@ -34,30 +37,30 @@ const ERROR_BY_STATUS = {
 	500: BONUS_API_ERROR.SERVER_ERROR
 }
 
-const onlyDigits = value => String(value || '').replace(/\D/g, '')
-const getStatus = res => res?.status ?? res?.statusCode
-const pickPayload = res => (res && res.data !== undefined ? res.data : res)
+const onlyDigits = (value?: string | null): string => String(value || '').replace(/\D/g, '')
+const getStatus = (res: any): number => res?.status ?? res?.statusCode
+const pickPayload = (res: any): any => (res && res.data !== undefined ? res.data : res)
 
-const raiseError = (message, code) => {
-	const error = new Error(message)
+const raiseError = (message: string, code: BonusApiError): never => {
+	const error = new Error(message) as Error & { code: BonusApiError }
 	error.code = code
 	throw error
 }
 
-const isTimeoutError = error => error?.code === 'ECONNABORTED' || /timeout/i.test(error?.message || '')
+const isTimeoutError = (error: any): boolean => error?.code === 'ECONNABORTED' || /timeout/i.test(error?.message || '')
 
-const getSessionToken = async () => {
-	const rawToken = await Vtex?.customer?.getCustomerToken?.()
+const getSessionToken = async (): Promise<string | undefined> => {
+	const rawToken = await (Vtex?.customer as any)?.getCustomerToken?.()
 	return typeof rawToken === 'string' ? rawToken : rawToken?.token || rawToken?.value || rawToken?.authCookieValue
 }
 
 /**
  * Fetches the shopper's bonus extract from the Monte Carlo gateway.
- * @param {string} cpf customer document, any format — digits are extracted here
- * @returns {Promise<{ wallets: object[], orders: object[], incentives: object[] }>}
+ * @param cpf customer document, any format — digits are extracted here
+ * @returns {Promise<BonusExtract>}
  * @throws {Error} with a `code` from BONUS_API_ERROR when the gateway rejects the call
  */
-export const fetchBonusExtract = async cpf => {
+export const fetchBonusExtract = async (cpf: string): Promise<BonusExtract> => {
 	const document = onlyDigits(cpf)
 	if (!document) raiseError('CPF is required to fetch the bonus extract', BONUS_API_ERROR.BAD_REQUEST)
 
@@ -68,34 +71,34 @@ export const fetchBonusExtract = async cpf => {
 	// Eitri.http.post(url, data, config) works like axios: headers MUST be nested
 	// under `config.headers` — passing a flat object here is silently ignored by
 	// the native bridge (no headers actually go out on the wire).
-	let res
+	let res: any
 	try {
 		res = await Eitri.http.post(GATEWAY_URL, { cpf: document }, { headers, timeout: REQUEST_TIMEOUT_MS })
-	} catch (error) {
+	} catch (error: any) {
 		const isTimeout = isTimeoutError(error)
-		Datadog.sendDatadogLogError(error, 'BonusExtractService.fetchBonusExtract', {
+		Datadog.sendDatadogLogError(error as any, 'BonusExtractService.fetchBonusExtract', {
 			isTimeout,
 			timeoutMs: REQUEST_TIMEOUT_MS
 		})
 		if (isTimeout) {
-			TrackingService.sendSalesforceEvent('bonus_gateway_timeout', { timeout_ms: REQUEST_TIMEOUT_MS })
+			raiseError('Bonus gateway request timed out', BONUS_API_ERROR.TIMEOUT)
 		}
-		raiseError(
-			isTimeout ? 'Bonus gateway request timed out' : 'Bonus gateway request failed',
-			isTimeout ? BONUS_API_ERROR.TIMEOUT : BONUS_API_ERROR.UNKNOWN
-		)
+		const status = getStatus(error?.response || error)
+		const code = ERROR_BY_STATUS[status] || BONUS_API_ERROR.UNKNOWN
+		raiseError(error?.message || 'Bonus gateway request failed', code)
 	}
 
 	const status = getStatus(res)
-	if (status && status >= 400) raiseError(`Bonus gateway returned ${status}`, ERROR_BY_STATUS[status] || BONUS_API_ERROR.UNKNOWN)
+	if (status && (status < 200 || status >= 300)) {
+		const code = ERROR_BY_STATUS[status] || BONUS_API_ERROR.UNKNOWN
+		raiseError(`Bonus gateway returned HTTP ${status}`, code)
+	}
 
 	const payload = pickPayload(res)
-	if (!payload?.success) raiseError('Bonus gateway returned an unsuccessful response', BONUS_API_ERROR.UNKNOWN)
-
 	return {
-		wallets: payload.data?.wallets || [],
-		orders: payload.data?.orders || [],
-		incentives: payload.data?.incentives || []
+		wallets: payload?.wallets || [],
+		orders: payload?.orders || [],
+		incentives: payload?.incentives || []
 	}
 }
 

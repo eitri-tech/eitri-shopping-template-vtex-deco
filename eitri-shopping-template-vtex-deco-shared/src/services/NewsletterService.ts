@@ -19,21 +19,43 @@ const RCK_BASE = `https://rckmiddleware--${ACCOUNT}.myvtex.com`
 
 const DEFAULT_PAGE = 'lead_newsletter_footer'
 
-const JSON_HEADERS = { 'Content-Type': 'application/json' }
+// Eitri.http requires headers to be nested under `config.headers`.
+const JSON_HEADERS = { headers: { 'Content-Type': 'application/json' } }
 
-const getStatus = res => res?.status ?? res?.statusCode
+const getStatus = (res: any): number => res?.status ?? res?.statusCode
 
-const today = () => new Date().toISOString().slice(0, 10) // YYYY-MM-DD
+const today = (): string => new Date().toISOString().slice(0, 10) // YYYY-MM-DD
 
-const buildLeadPayload = ({ name, email, acceptedTerms, page }) => ({
+export interface NewsletterLead {
+	name: string
+	email: string
+	acceptedTerms: boolean
+	page?: string
+}
+
+interface LeadPayload {
+	name: string
+	email: string
+	termsAndConditions: boolean
+	creation_date: string
+	page: string
+}
+
+interface MasterDataNewsletterPayload {
+	email: string
+	firstName: string
+	termsofuse: boolean
+}
+
+const buildLeadPayload = ({ name, email, acceptedTerms, page }: NewsletterLead): LeadPayload => ({
 	name,
 	email,
-	termsAndConditions: !!acceptedTerms,
+	termsAndConditions: Boolean(acceptedTerms),
 	creation_date: today(),
 	page: page || DEFAULT_PAGE
 })
 
-const buildNewsletterPayload = ({ name, email }) => ({
+const buildNewsletterPayload = ({ name, email }: { name: string; email: string }): MasterDataNewsletterPayload => ({
 	email,
 	firstName: name,
 	termsofuse: true
@@ -46,7 +68,7 @@ const buildNewsletterPayload = ({ name, email }) => ({
  *
  * @returns {Promise<boolean>} true if already subscribed, false otherwise.
  */
-export const isEmailSubscribed = async email => {
+export const isEmailSubscribed = async (email: string): Promise<boolean> => {
 	try {
 		const res = await Eitri.http.get(`${MID_BASE}/_v/newsletter?email=${encodeURIComponent(email)}`, JSON_HEADERS)
 		const status = getStatus(res)
@@ -60,10 +82,15 @@ export const isEmailSubscribed = async email => {
 /**
  * Subscribes a lead to the newsletter (Marketing Cloud + VTEX master-data).
  *
- * @param {{ name: string, email: string, acceptedTerms: boolean, page?: string }} lead
+ * @param lead
  * @returns {Promise<{ success: boolean, alreadySubscribed: boolean }>}
  */
-export const subscribeToNewsletter = async ({ name, email, acceptedTerms, page }) => {
+export const subscribeToNewsletter = async ({
+	name,
+	email,
+	acceptedTerms,
+	page
+}: NewsletterLead): Promise<{ success: boolean; alreadySubscribed: boolean }> => {
 	if (!email || !name || !acceptedTerms) {
 		throw new Error('subscribeToNewsletter: name, email and acceptedTerms are required')
 	}

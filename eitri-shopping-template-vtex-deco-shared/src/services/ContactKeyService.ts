@@ -1,52 +1,40 @@
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import { fetchClientCode } from './ContactLookupService'
 
-/**
- * Contact key do Marketing Cloud: o codigo de cliente da loja quando
- * existe, o e-mail do cliente como fallback enquanto nao existe (o codigo so
- * aparece na APP_Salesforce depois da primeira nota faturada).
- *
- * Mora no shared, e nao no app de conta, porque a promocao de e-mail para
- * codigo precisa acontecer na abertura do app — e a maioria das aberturas cai
- * na Home do app `home` (aba Inicio), nao na aba Perfil.
- */
+const CONTACT_KEY_STORAGE = 'contact_key'
 
-export const saveContactKeyOnStorage = async contactKey => {
-	return await Vtex.customer.setCustomerData('contactKey', contactKey)
-}
-
-export const loadContactKeyFromStorage = async () => {
-	return await Vtex.customer.getCustomerData('contactKey')
-}
-
-export const clearContactKeyFromStorage = async () => {
-	// Espelha o notifyLogin do resolveContactKey: sem isso o addon do Salesforce
-	// segue com a identidade do usuario anterior depois do logout.
+export const saveContactKeyOnStorage = async (contactKey: string): Promise<void> => {
 	try {
-		await Vtex.customer.notifyLogoutToExposedApis()
+		await Vtex.customer.setCustomerData(CONTACT_KEY_STORAGE, contactKey)
 	} catch (e) {
-		console.log('notifyLogoutToExposedApis error', e)
+		console.log('saveContactKeyOnStorage error', e)
 	}
-	await Vtex.customer.setCustomerData('contactKeyCheckedAt', null)
-	return await Vtex.customer.setCustomerData('contactKey', null)
 }
 
-// Janela curta de proposito: quanto menor, mais cedo a chave e promovida depois
-// que o codigo passa a existir. Uma janela longa (testamos 24h) desperdicava a
-// abertura do cliente — se ele abrisse o app pouco depois do codigo aparecer mas
-// dentro da janela, a atualizacao ficava para o dia seguinte.
-//
-// O custo e baixo porque a guarda de "a chave ainda e e-mail?" restringe isso a
-// comprador novo, num estado transitorio: assim que promove, sao zero consultas
-// para sempre.
-//
-// A janela nao vai a zero porque os listeners de resume disparam a cada troca de
-// aba de volta para o app — sem ela, alternar entre Inicio e Sacola geraria um
-// lookup por toque.
+export const loadContactKeyFromStorage = async (): Promise<string | null> => {
+	try {
+		return await Vtex.customer.getCustomerData(CONTACT_KEY_STORAGE)
+	} catch (e) {
+		console.log('loadContactKeyFromStorage error', e)
+		return null
+	}
+}
+
+export const clearContactKeyFromStorage = async (): Promise<void> => {
+	try {
+		await Vtex.customer.setCustomerData(CONTACT_KEY_STORAGE, '')
+	} catch (e) {
+		console.log('clearContactKeyFromStorage error', e)
+	}
+}
+
+// 1h entre tentativas para clientes sem codigo (chave atual e e-mail ou null).
 const CONTACT_KEY_REFRESH_INTERVAL_MS = 60 * 60 * 1000
 
-// Backoff so para consulta que FALHOU: mais curto que a janela normal (o cliente
-// pode ter codigo agora mesmo), mas nao zero — sem ele o endpoint fora do ar
+// 5min quando a ultima tentativa FALHOU (timeout, rede, sessao ausente).
+// Evita esperar 1h inteira apos uma oscilacao temporaria de rede, sem o que o
+// e-mail ficaria congelado por muito tempo, mas ainda protege contra um backend
+// fora do ar gerando chamadas em loop — sem isso qualquer erro de rede ou 5xx
 // geraria um lookup por troca de aba.
 const CONTACT_KEY_FAILURE_RETRY_MS = 5 * 60 * 1000
 
@@ -74,12 +62,12 @@ const CONTACT_KEY_FAILURE_RETRY_MS = 5 * 60 * 1000
  *
  * Nunca lanca: e chamado em fire-and-forget no init das Homes.
  */
-export const refreshContactKeyIfStale = async () => {
+export const refreshContactKeyIfStale = async (): Promise<void> => {
 	try {
 		if (!(await Vtex.customer.isLoggedIn())) return
 
 		const current = await loadContactKeyFromStorage()
-		const isAlreadyClientCode = !!current && !current.includes('@')
+		const isAlreadyClientCode = Boolean(current && !current.includes('@'))
 		if (isAlreadyClientCode) return
 
 		const lastCheck = Number(await Vtex.customer.getCustomerData('contactKeyCheckedAt')) || 0
@@ -104,11 +92,11 @@ export const refreshContactKeyIfStale = async () => {
  * evento `login` NAO muda a identidade.
  *
  * Nunca lanca: um lookup que falha nao pode bloquear o login.
- * @param {string} [email] identidade de fallback; quando omitido, cai no
+ * @param [email] identidade de fallback; quando omitido, cai no
  * e-mail do perfil (login social, onde o cliente nao digitou e-mail)
- * @returns {Promise<string|null>} a contact key gravada
+ * @returns a contact key gravada
  */
-export const resolveContactKey = async email => {
+export const resolveContactKey = async (email?: string): Promise<string | null> => {
 	try {
 		const { ok, clientCode } = await fetchClientCode()
 		const fallbackEmail = email || (await getProfileEmail())
@@ -137,10 +125,10 @@ export const resolveContactKey = async email => {
 	}
 }
 
-const getProfileEmail = async () => {
+const getProfileEmail = async (): Promise<string | undefined> => {
 	try {
-		const result = await Vtex.customer.getCustomerProfile()
-		return result?.data?.profile?.email
+		const result = await (Vtex.customer as any).getCustomerProfile()
+		return (result as any)?.data?.profile?.email
 	} catch (e) {
 		console.log('getProfileEmail error', e)
 	}
@@ -150,9 +138,9 @@ const getProfileEmail = async () => {
  * Registra a contact key no addon nativo do Salesforce. Isolado e engolido
  * para um modulo ausente ou com falha nunca quebrar o login.
  */
-const notifyIdentity = async (contactKey, email) => {
+const notifyIdentity = async (contactKey: string, email?: string): Promise<void> => {
 	try {
-		await Vtex.customer.notifyLoginToExposedApis(contactKey, email || '')
+		await (Vtex.customer as any).notifyLoginToExposedApis(contactKey, email || '')
 	} catch (e) {
 		console.log('notifyIdentity error', e)
 	}

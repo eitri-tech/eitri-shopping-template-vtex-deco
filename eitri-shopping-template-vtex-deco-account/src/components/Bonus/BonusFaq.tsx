@@ -1,7 +1,14 @@
+import { useState } from 'react'
 import { View, Text } from 'eitri-luminus'
 import { FiChevronDown, FiChevronRight } from 'react-icons/fi'
 import { useTranslation } from 'eitri-i18n'
 import { getBonusFaq } from '../../services/BonusService'
+import type { BonusFaqItem } from '../../types/bonus'
+
+interface BonusFaqProps {
+	onSelect?: (item: BonusFaqItem) => void
+	[key: string]: unknown
+}
 
 /**
  * "Perguntas Frequentes" list.
@@ -9,15 +16,15 @@ import { getBonusFaq } from '../../services/BonusService'
  * Mirrors the /meu-bonus accordion: entries with confirmed copy expand inline,
  * entries without it fall through to `onSelect` so the caller can open the link.
  */
-export default function BonusFaq(props) {
+export default function BonusFaq(props: BonusFaqProps) {
 	const { onSelect } = props
 	const { t } = useTranslation()
 
-	const [expandedId, setExpandedId] = useState(null)
+	const [expandedId, setExpandedId] = useState<string | null>(null)
 
 	const items = getBonusFaq()
 
-	const handlePress = item => {
+	const handlePress = (item: BonusFaqItem) => {
 		if (!item.answer) {
 			if (onSelect) onSelect(item)
 			return

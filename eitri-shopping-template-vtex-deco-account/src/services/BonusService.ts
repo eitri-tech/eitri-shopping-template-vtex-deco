@@ -1,5 +1,20 @@
 import Eitri from 'eitri-bifrost'
 import { fetchBonusExtract, BONUS_API_ERROR } from './BonusExtractService'
+import {
+	MOVEMENT_TYPE,
+	MOVEMENT_STATUS,
+	STATEMENT_FILTER,
+	type MovementType,
+	type MovementStatus,
+	type StatementFilter,
+	type BonusExtract,
+	type BonusOrder,
+	type BonusIncentive,
+	type BonusMovement,
+	type BonusExpiration,
+	type BonusScreenData,
+	type BonusFaqItem
+} from '../types/bonus'
 
 /**
  * Meu Bônus — balance / statement / expiration / FAQ data.
@@ -20,34 +35,16 @@ import { fetchBonusExtract, BONUS_API_ERROR } from './BonusExtractService'
  *                   amount_total, expires_at, group, reason, status, type } }
  */
 
-export { BONUS_API_ERROR }
-
-export const MOVEMENT_TYPE = {
-	RECEIVED: 'received',
-	REDEEMED: 'redeemed',
-	SPECIAL: 'special'
-}
-
-export const MOVEMENT_STATUS = {
-	NONE: 'none',
-	EXPIRING: 'expiring',
-	EXPIRED: 'expired',
-	PENDING: 'pending'
-}
-
-export const STATEMENT_FILTER = {
-	ALL: 'all',
-	PENDING: 'pending',
-	EXPIRING: 'expiring'
-}
+export { BONUS_API_ERROR, MOVEMENT_TYPE, MOVEMENT_STATUS, STATEMENT_FILTER }
+export type { MovementType, MovementStatus, StatementFilter, BonusScreenData, BonusMovement, BonusExpiration, BonusFaqItem }
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000
 const EXPIRING_SOON_DAYS = 7
 
 // Gateway amounts are integers in CENTS.
-const centsToReais = cents => (Number.isFinite(Number(cents)) ? Number(cents) / 100 : 0)
+const centsToReais = (cents?: number | null): number => (Number.isFinite(Number(cents)) ? Number(cents) / 100 : 0)
 
-const parseIsoDate = isoDate => {
+const parseIsoDate = (isoDate?: string | null): Date | null => {
 	if (!isoDate) return null
 	// Accepts both date-only ("2026-12-31") and full ISO datetime
 	// ("2026-08-11T14:59:31Z") strings — only the former needs a local-midnight
@@ -57,7 +54,7 @@ const parseIsoDate = isoDate => {
 }
 
 // "18 jul 2026" — compact statement-row date.
-const formatMovementDate = isoDate => {
+const formatMovementDate = (isoDate?: string | null): string => {
 	const date = parseIsoDate(isoDate)
 	if (!date) return ''
 	const day = String(date.getDate()).padStart(2, '0')
@@ -66,7 +63,7 @@ const formatMovementDate = isoDate => {
 }
 
 // "07 de agosto" — expiration banner date (no year, matches the approved design).
-const formatExpirationDate = isoDate => {
+const formatExpirationDate = (isoDate?: string | null): string => {
 	const date = parseIsoDate(isoDate)
 	if (!date) return ''
 	const day = String(date.getDate()).padStart(2, '0')
@@ -77,7 +74,7 @@ const formatExpirationDate = isoDate => {
 // A received amount within EXPIRING_SOON_DAYS of its `expires_at` is flagged
 // EXPIRING; past it, EXPIRED. `fallback` covers everything else (e.g. a
 // pending incentive, or an order with no expiry data at all).
-const deriveExpiryStatus = (isoExpiresAt, fallback = MOVEMENT_STATUS.NONE) => {
+const deriveExpiryStatus = (isoExpiresAt?: string | null, fallback: MovementStatus = MOVEMENT_STATUS.NONE): MovementStatus => {
 	const expiresAt = parseIsoDate(isoExpiresAt)
 	if (!expiresAt) return fallback
 	const daysLeft = Math.ceil((expiresAt.getTime() - Date.now()) / DAY_IN_MS)
@@ -89,13 +86,13 @@ const deriveExpiryStatus = (isoExpiresAt, fallback = MOVEMENT_STATUS.NONE) => {
 // An order can carry cashback earned (`generated`) and/or cashback redeemed
 // against it (`used`) — each becomes its own statement row when present.
 // Only the earned side can expire; a redemption is a settled debit.
-const orderToMovements = order => {
+const orderToMovements = (order: BonusOrder): BonusMovement[] => {
 	const details = order.cashback_details || {}
 	const description = `Pedido: ${order.ticket || ''}`
 	const date = formatMovementDate(order.created_at)
-	const movements = []
+	const movements: BonusMovement[] = []
 
-	if (details.generated > 0) {
+	if ((details.generated ?? 0) > 0) {
 		movements.push({
 			id: `order-${order.ticket}-received`,
 			type: MOVEMENT_TYPE.RECEIVED,
@@ -107,7 +104,7 @@ const orderToMovements = order => {
 		})
 	}
 
-	if (details.used > 0) {
+	if ((details.used ?? 0) > 0) {
 		movements.push({
 			id: `order-${order.ticket}-redeemed`,
 			type: MOVEMENT_TYPE.REDEEMED,
@@ -124,15 +121,15 @@ const orderToMovements = order => {
 
 // "done" is the only status observed in production so far; anything else
 // (e.g. a future "pending"/"expired") falls back to NONE rather than guessing.
-const INCENTIVE_STATUS_TO_MOVEMENT_STATUS = {
+const INCENTIVE_STATUS_TO_MOVEMENT_STATUS: Record<string, MovementStatus> = {
 	done: MOVEMENT_STATUS.NONE,
 	pending: MOVEMENT_STATUS.PENDING,
 	expired: MOVEMENT_STATUS.EXPIRED
 }
 
-const incentiveToMovement = (incentive, index) => {
+const incentiveToMovement = (incentive: BonusIncentive, index: number): BonusMovement => {
 	const details = incentive.incentive_details || {}
-	const baseStatus = INCENTIVE_STATUS_TO_MOVEMENT_STATUS[details.status] ?? MOVEMENT_STATUS.NONE
+	const baseStatus = (details.status ? INCENTIVE_STATUS_TO_MOVEMENT_STATUS[details.status] : null) ?? MOVEMENT_STATUS.NONE
 	return {
 		id: `incentive-${incentive.created_at || index}`,
 		type: MOVEMENT_TYPE.SPECIAL,
@@ -144,7 +141,7 @@ const incentiveToMovement = (incentive, index) => {
 	}
 }
 
-const toStatement = extract => {
+const toStatement = (extract?: BonusExtract | null): BonusMovement[] => {
 	const settledOrders = (extract?.orders || []).filter(order => order?.cashback_details?.status !== 'canceled')
 	const movements = [...settledOrders.flatMap(orderToMovements), ...(extract?.incentives || []).map(incentiveToMovement)]
 	return movements.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
@@ -153,7 +150,7 @@ const toStatement = extract => {
 // Available balance (REAIS) for the wallet, or null when the gateway has no
 // wallet on file — distinct from a genuine R$0 balance. `pending_balance` is
 // held/not-yet-spendable, so the spendable amount is balance - pending.
-const toBalance = extract => {
+const toBalance = (extract?: BonusExtract | null): number | null => {
 	const wallet = extract?.wallets?.[0]
 	if (!wallet || wallet.balance == null) return null
 	return centsToReais(wallet.balance) - centsToReais(wallet.pending_balance)
@@ -170,13 +167,13 @@ const toBalance = extract => {
 // bug surfaced a stale, long-dead incentive as "expires today" for a real
 // customer whose actual soonest expiration was months away — the amount shown
 // wasn't even related to the current wallet balance.
-const toExpiration = extract => {
+const toExpiration = (extract?: BonusExtract | null): BonusExpiration | null => {
 	const now = Date.now()
 	const upcoming = (extract?.incentives || [])
 		.map(incentive => incentive?.incentive_details)
-		.filter(details => details && details.status === 'done' && details.amount_available > 0 && details.expires_at)
+		.filter((details): details is NonNullable<typeof details> => Boolean(details && details.status === 'done' && (details.amount_available ?? 0) > 0 && details.expires_at))
 		.map(details => ({ details, expirationDate: parseIsoDate(details.expires_at) }))
-		.filter(({ expirationDate }) => expirationDate && Math.ceil((expirationDate.getTime() - now) / DAY_IN_MS) >= 0)
+		.filter((item): item is { details: typeof item.details; expirationDate: Date } => Boolean(item.expirationDate && Math.ceil((item.expirationDate.getTime() - now) / DAY_IN_MS) >= 0))
 		.sort((a, b) => a.expirationDate.getTime() - b.expirationDate.getTime())[0]
 
 	if (!upcoming) return null
@@ -191,7 +188,7 @@ const toExpiration = extract => {
 	}
 }
 
-const onlyDigits = value => String(value || '').replace(/\D/g, '')
+const onlyDigits = (value?: string | null): string => String(value || '').replace(/\D/g, '')
 
 // Caches the whole screen payload (name/balance/statement/expiration), not
 // just the raw gateway extract — the Bonus screen's spinner is gated on the
@@ -211,7 +208,13 @@ const BONUS_CACHE_KEY = 'bonus-screen-cache'
 // in checkout's bonusRedeemService.notifyBonusChanged.
 const BONUS_CACHE_INVALIDATION_FLAG_KEY = 'bonus-cache-invalidate-after'
 
-const readCachedScreenData = async () => {
+interface CachedScreenData {
+	cpf: string
+	data: BonusScreenData
+	cachedAt: number
+}
+
+const readCachedScreenData = async (): Promise<CachedScreenData | null> => {
 	try {
 		return await Eitri.storage.getItemJson(BONUS_CACHE_KEY)
 	} catch (e) {
@@ -220,7 +223,7 @@ const readCachedScreenData = async () => {
 	}
 }
 
-const writeCachedScreenData = async (cpf, data) => {
+const writeCachedScreenData = async (cpf: string, data: BonusScreenData): Promise<void> => {
 	try {
 		await Eitri.storage.setItemJson(BONUS_CACHE_KEY, { cpf, data, cachedAt: Date.now() })
 	} catch (e) {
@@ -228,10 +231,10 @@ const writeCachedScreenData = async (cpf, data) => {
 	}
 }
 
-const isCacheStale = async cached => {
+const isCacheStale = async (cached: CachedScreenData): Promise<boolean> => {
 	try {
 		const invalidateAfter = await Eitri.storage.getItem(BONUS_CACHE_INVALIDATION_FLAG_KEY, { shared: true })
-		return !!invalidateAfter && Number(invalidateAfter) > cached.cachedAt
+		return Boolean(invalidateAfter && Number(invalidateAfter) > cached.cachedAt)
 	} catch (e) {
 		return false
 	}
@@ -245,7 +248,7 @@ const isCacheStale = async cached => {
  * is freshly opened (a background app switch or purchase in another
  * eitri-app could have changed the balance meanwhile).
  */
-export const invalidateBonusCache = async () => {
+export const invalidateBonusCache = async (): Promise<void> => {
 	try {
 		await Eitri.storage.removeItem(BONUS_CACHE_KEY)
 	} catch (e) {
@@ -267,9 +270,8 @@ export const invalidateBonusCache = async () => {
  * with the real, verified customer shortly after. On the very rare
  * shared-device account switch, this means the wrong customer's balance can
  * flash for one round trip before being corrected — never persists past that.
- * @returns {Promise<{ customerName: string, missingCpf: boolean, balance: number|null, statement: object[], expiration: object|null } | null>}
  */
-export const peekCachedBonusScreenData = async () => {
+export const peekCachedBonusScreenData = async (): Promise<BonusScreenData | null> => {
 	const cached = await readCachedScreenData()
 	if (!cached || (await isCacheStale(cached))) return null
 	return cached.data
@@ -294,11 +296,10 @@ export const peekCachedBonusScreenData = async () => {
  * than degraded to an empty result — a genuine "no balance" customer and a
  * failed gateway call must stay distinguishable to callers, otherwise the UI
  * can't tell them apart and shows the wrong empty/error state.
- * @param {{ document?: string, firstName?: string }} customer
- * @returns {Promise<{ customerName: string, missingCpf: boolean, balance: number|null, statement: object[], expiration: object|null }>}
+ * @param customer
  * @throws {Error} with a `code` from BONUS_API_ERROR when the gateway call fails
  */
-export const loadBonusScreenData = async customer => {
+export const loadBonusScreenData = async (customer?: { document?: string; firstName?: string } | null): Promise<BonusScreenData> => {
 	const customerName = customer?.firstName || ''
 	const document = onlyDigits(customer?.document)
 
@@ -312,7 +313,7 @@ export const loadBonusScreenData = async customer => {
 	}
 
 	const extract = await fetchBonusExtract(document)
-	const data = {
+	const data: BonusScreenData = {
 		customerName,
 		missingCpf: false,
 		balance: toBalance(extract),
@@ -324,7 +325,7 @@ export const loadBonusScreenData = async customer => {
 	return data
 }
 
-export const filterStatement = (movements, filter) => {
+export const filterStatement = (movements: BonusMovement[], filter: StatementFilter): BonusMovement[] => {
 	if (filter === STATEMENT_FILTER.PENDING) {
 		return movements.filter(movement => movement.status === MOVEMENT_STATUS.PENDING)
 	}
@@ -346,7 +347,7 @@ export const BONUS_LINKS = {
 	FAQ: 'https://montecarlojoias.zendesk.com/hc/pt-br',
 	WALLET: 'https://carteira.opencashback.io/montecarlo/login',
 	HOW_IT_WORKS: 'https://www.montecarlo.com.br/meu-bonus'
-}
+} as const
 
 /**
  * FAQ — copy taken from the real /meu-bonus accordion.
@@ -355,7 +356,7 @@ export const BONUS_LINKS = {
  * confirmed copy on the site, so it links out to the wallet instead of inventing
  * policy text (these are customer-facing rules — they must not be paraphrased).
  */
-export const getBonusFaq = () => [
+export const getBonusFaq = (): BonusFaqItem[] => [
 	{
 		id: 'how-to-use',
 		question: 'Como usar o bônus Monte Carlo?',

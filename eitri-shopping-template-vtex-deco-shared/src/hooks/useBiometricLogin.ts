@@ -4,25 +4,43 @@ import TrackingService from '../services/TrackingService'
 
 let biometricLoginAttempted = false
 
-export const resetBiometricLoginAttempt = () => { biometricLoginAttempted = false }
+export const resetBiometricLoginAttempt = (): void => {
+	biometricLoginAttempted = false
+}
+
+export interface BiometricLoginOptions {
+	doLogin: (email: string, password: string) => Promise<'Success' | string>
+	isLoggedIn: () => Promise<boolean>
+	onSuccess?: () => void
+	resolveContactKey?: (email: string) => Promise<string | null>
+}
+
+export interface UseBiometricLoginReturn {
+	attemptBiometricLogin: () => Promise<void>
+	showReauthModal: boolean
+	reauthEmail: string
+	handleReauthConfirm: (newPassword: string) => Promise<boolean>
+	dismissReauthModal: () => void
+}
 
 /**
- * @param {Object} options
- * @param {Function} options.doLogin `(email, password) => Promise<'Success'|string>`
- * @param {Function} options.isLoggedIn `() => Promise<boolean>`
- * @param {Function} [options.onSuccess]
- * @param {Function} [options.resolveContactKey] optional `(email) => Promise<string|null>`
+ * @param options
+ * @param options.doLogin `(email, password) => Promise<'Success'|string>`
+ * @param options.isLoggedIn `() => Promise<boolean>`
+ * @param [options.onSuccess]
+ * @param [options.resolveContactKey] optional `(email) => Promise<string|null>`
  * injected by the host app (the lookup lives in the account app's
  * CustomerService, which this shared hook can't import). Resolve-lo registra a
  * identidade do cliente no addon do Salesforce via `session.notifyLogin`, sem
  * o que o login biometrico ficaria sem contact key — os outros fluxos de login
  * chamam o mesmo resolvedor.
  */
-export default function useBiometricLogin({ doLogin, isLoggedIn, onSuccess, resolveContactKey }) {
+export default function useBiometricLogin(options: BiometricLoginOptions): UseBiometricLoginReturn {
+	const { doLogin, isLoggedIn, onSuccess, resolveContactKey } = options
 	const [showReauthModal, setShowReauthModal] = useState(false)
 	const [reauthEmail, setReauthEmail] = useState('')
 
-	const attemptBiometricLogin = async () => {
+	const attemptBiometricLogin = async (): Promise<void> => {
 		try {
 			if (biometricLoginAttempted) return
 			if (await isLoggedIn()) return
@@ -49,7 +67,7 @@ export default function useBiometricLogin({ doLogin, isLoggedIn, onSuccess, reso
 		}
 	}
 
-	const handleReauthConfirm = async newPassword => {
+	const handleReauthConfirm = async (newPassword: string): Promise<boolean> => {
 		try {
 			const loggedIn = await doLogin(reauthEmail, newPassword)
 			if (loggedIn !== 'Success') return false
@@ -66,7 +84,7 @@ export default function useBiometricLogin({ doLogin, isLoggedIn, onSuccess, reso
 		}
 	}
 
-	const dismissReauthModal = () => setShowReauthModal(false)
+	const dismissReauthModal = (): void => setShowReauthModal(false)
 
 	return {
 		attemptBiometricLogin,

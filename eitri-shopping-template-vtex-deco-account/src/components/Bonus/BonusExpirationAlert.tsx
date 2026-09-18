@@ -2,11 +2,17 @@ import { View, Text } from 'eitri-luminus'
 import { FiAlertTriangle } from 'react-icons/fi'
 import { useTranslation } from 'eitri-i18n'
 import { formatPrice } from '../../utils/utils'
+import type { BonusExpiration } from '../../types/bonus'
+
+interface BonusExpirationAlertProps {
+	expiration?: BonusExpiration | null
+	[key: string]: unknown
+}
 
 /**
  * Amber warning banner: "R$ 7.702,83 expiram em 6 dias".
  */
-export default function BonusExpirationAlert(props) {
+export default function BonusExpirationAlert(props: BonusExpirationAlertProps) {
 	const { expiration } = props
 	const { t } = useTranslation()
 

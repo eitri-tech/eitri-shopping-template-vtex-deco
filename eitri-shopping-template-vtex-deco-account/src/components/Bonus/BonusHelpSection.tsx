@@ -1,16 +1,28 @@
+import type { ComponentType } from 'react'
 import { View, Text } from 'eitri-luminus'
 import { FiArrowRight, FiInfo } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useTranslation } from 'eitri-i18n'
 
+interface BonusHelpSectionProps {
+	onWhatsapp?: () => void
+	onFaq?: () => void
+	[key: string]: unknown
+}
+
 /**
  * "Precisa de ajuda?" rows shown on the empty bonus state.
  */
-export default function BonusHelpSection(props) {
+export default function BonusHelpSection(props: BonusHelpSectionProps) {
 	const { onWhatsapp, onFaq } = props
 	const { t } = useTranslation()
 
-	const rows = [
+	const rows: Array<{
+		id: string
+		label: string
+		icon: ComponentType<{ size?: number; className?: string }>
+		onClick?: () => void
+	}> = [
 		{ id: 'whatsapp', label: t('bonusScreen.helpWhatsapp'), icon: FaWhatsapp, onClick: onWhatsapp },
 		{ id: 'faq', label: t('bonusScreen.helpFaq'), icon: FiInfo, onClick: onFaq }
 	]

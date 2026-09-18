@@ -3,8 +3,13 @@ import Eitri from 'eitri-bifrost'
 const CREDENTIALS_KEY = 'biometric_credentials'
 const STORAGE_OPTIONS = { secure: true, shared: true }
 
+export interface BiometricCredentials {
+	email?: string
+	password?: string
+	[key: string]: unknown
+}
 
-export const isBiometricAvailable = async () => {
+export const isBiometricAvailable = async (): Promise<boolean> => {
 	try {
 		if (!Eitri.canIUse('10')) return false
 		const result = await Eitri.biometrics.checkStatus()
@@ -15,16 +20,16 @@ export const isBiometricAvailable = async () => {
 	}
 }
 
-export const hasSavedCredentials = async () => {
+export const hasSavedCredentials = async (): Promise<boolean> => {
 	try {
 		const credentials = await Eitri.storage.getItemJson(CREDENTIALS_KEY, STORAGE_OPTIONS)
-		return !!credentials?.email
+		return Boolean(credentials?.email)
 	} catch (e) {
 		return false
 	}
 }
 
-const authenticate = async () => {
+const authenticate = async (): Promise<boolean> => {
 	try {
 		const result = await Eitri.biometrics.authenticate({
 			android: {
@@ -45,7 +50,7 @@ const authenticate = async () => {
 	}
 }
 
-export const saveCredentialsWithBiometrics = async (email, password) => {
+export const saveCredentialsWithBiometrics = async (email?: string | null, password?: string): Promise<boolean> => {
 	try {
 		const authenticated = await authenticate()
 		if (!authenticated) return false
@@ -57,7 +62,7 @@ export const saveCredentialsWithBiometrics = async (email, password) => {
 	}
 }
 
-export const updateSavedCredentials = async (email, password) => {
+export const updateSavedCredentials = async (email?: string | null, password?: string): Promise<boolean> => {
 	try {
 		await Eitri.storage.setItemJson(CREDENTIALS_KEY, { email, password }, STORAGE_OPTIONS)
 		return true
@@ -67,7 +72,7 @@ export const updateSavedCredentials = async (email, password) => {
 	}
 }
 
-export const getSavedCredentials = async () => {
+export const getSavedCredentials = async (): Promise<BiometricCredentials | null> => {
 	try {
 		const authenticated = await authenticate()
 		if (!authenticated) return null
@@ -78,7 +83,7 @@ export const getSavedCredentials = async () => {
 	}
 }
 
-export const clearSavedCredentials = async () => {
+export const clearSavedCredentials = async (): Promise<void> => {
 	try {
 		await Eitri.storage.removeItem(CREDENTIALS_KEY, STORAGE_OPTIONS)
 	} catch (e) {

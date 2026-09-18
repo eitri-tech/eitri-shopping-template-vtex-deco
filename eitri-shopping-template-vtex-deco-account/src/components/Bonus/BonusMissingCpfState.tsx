@@ -3,6 +3,13 @@ import { CustomButton, UserIcon } from 'eitri-shopping-template-vtex-deco-shared
 import { useTranslation } from 'eitri-i18n'
 import BonusHelpSection from './BonusHelpSection'
 
+interface BonusMissingCpfStateProps {
+	onPrimaryPress?: () => void
+	onWhatsapp?: () => void
+	onFaq?: () => void
+	[key: string]: unknown
+}
+
 /**
  * Shown when the shopper is logged in but has no CPF on their profile — the
  * bonus gateway requires one (see BonusExtractService.fetchBonusExtract) and
@@ -11,7 +18,7 @@ import BonusHelpSection from './BonusHelpSection'
  * gateway is ever called, and guide the shopper to register it instead of
  * dead-ending on BonusErrorState's "try again later".
  */
-export default function BonusMissingCpfState(props) {
+export default function BonusMissingCpfState(props: BonusMissingCpfStateProps) {
 	const { onPrimaryPress, onWhatsapp, onFaq } = props
 	const { t } = useTranslation()
 
@@ -21,7 +28,6 @@ export default function BonusMissingCpfState(props) {
 				<View className='w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center'>
 					<UserIcon
 						size={30}
-						strokeWidth={1.5}
 						className='text-gray-700'
 					/>
 				</View>

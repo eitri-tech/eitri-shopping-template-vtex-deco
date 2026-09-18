@@ -1,15 +1,21 @@
 import { View, Text } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
-import { STATEMENT_FILTER } from '../../services/BonusService'
+import { STATEMENT_FILTER, type StatementFilter } from '../../services/BonusService'
+
+interface BonusFiltersProps {
+	value: StatementFilter
+	onChange: (filter: StatementFilter) => void
+	[key: string]: unknown
+}
 
 /**
  * Segmented filter pills: Tudo / Pendente / A expirar.
  */
-export default function BonusFilters(props) {
+export default function BonusFilters(props: BonusFiltersProps) {
 	const { value, onChange } = props
 	const { t } = useTranslation()
 
-	const options = [
+	const options: Array<{ id: StatementFilter; label: string }> = [
 		{ id: STATEMENT_FILTER.ALL, label: t('bonusScreen.filterAll') },
 		{ id: STATEMENT_FILTER.PENDING, label: t('bonusScreen.filterPending') },
 		{ id: STATEMENT_FILTER.EXPIRING, label: t('bonusScreen.filterExpiring') }

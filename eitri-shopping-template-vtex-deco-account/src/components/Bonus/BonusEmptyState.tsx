@@ -4,10 +4,18 @@ import { useTranslation } from 'eitri-i18n'
 import BonusHelpSection from './BonusHelpSection'
 import bonusIcon from '../../assets/images/bonus.png'
 
+interface BonusEmptyStateProps {
+	onPrimaryPress?: () => void
+	onSecondaryPress?: () => void
+	onWhatsapp?: () => void
+	onFaq?: () => void
+	[key: string]: unknown
+}
+
 /**
  * Shown when the shopper has no available bonus balance.
  */
-export default function BonusEmptyState(props) {
+export default function BonusEmptyState(props: BonusEmptyStateProps) {
 	const { onPrimaryPress, onSecondaryPress, onWhatsapp, onFaq } = props
 	const { t } = useTranslation()
 

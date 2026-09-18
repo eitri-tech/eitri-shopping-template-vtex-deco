@@ -1,7 +1,16 @@
+import { useState } from 'react'
 import { CustomButton, CustomInput } from 'eitri-shopping-template-vtex-deco-shared'
 import { View, Text } from 'eitri-luminus'
 
-export default function BiometricReauthModal(props) {
+interface BiometricReauthModalProps {
+	show?: boolean
+	email?: string
+	onConfirm: (password: string) => Promise<boolean> | boolean
+	onDismiss: () => void
+	[key: string]: unknown
+}
+
+export default function BiometricReauthModal(props: BiometricReauthModalProps) {
 	const { show, email, onConfirm, onDismiss } = props
 
 	const [password, setPassword] = useState('')
@@ -40,7 +49,7 @@ export default function BiometricReauthModal(props) {
 			onClick={handleDismiss}>
 			<View
 				className='flex flex-col p-4 bg-base-100 items-center rounded w-11/12 max-w-xs mx-auto'
-				onClick={e => e.stopPropagation()}>
+				onClick={(e?: any) => e?.stopPropagation?.()}>
 				<Text className='text-center text-lg font-bold mb-2 text-base-content'>Confirme sua senha</Text>
 				<Text className='text-center text-sm mb-4 text-base-content'>
 					Sua senha pode ter mudado. Digite a senha atual para continuar com a biometria.
@@ -52,7 +61,7 @@ export default function BiometricReauthModal(props) {
 						type='password'
 						value={password}
 						error={error}
-						onChange={e => setPassword(e.target.value)}
+						onChange={(e: any) => setPassword(e?.target?.value ?? '')}
 					/>
 				</View>
 				<View className='flex flex-col gap-3 w-full mt-4'>

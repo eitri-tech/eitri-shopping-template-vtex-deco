@@ -1,19 +1,25 @@
+import { useEffect } from 'react'
 import Eitri from 'eitri-bifrost'
 import { View, Text } from 'eitri-luminus'
 import { CustomButton, AlertIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
 
+interface BonusErrorStateProps {
+	onRetryPress?: () => void
+	[key: string]: unknown
+}
+
 /**
  * Shown when the bonus gateway call fails (timeout, offline, 5xx, ...) —
  * distinct from BonusEmptyState, which is a legitimate zero-balance result.
  */
-export default function BonusErrorState(props) {
+export default function BonusErrorState(props: BonusErrorStateProps) {
 	const { onRetryPress } = props
 	const { t } = useTranslation()
 
 	useEffect(() => {
 		Eitri.bottomBar.show().catch(() => {})
-	},[])
+	}, [])
 
 	return (
 		<View className='flex flex-col items-center px-4 pt-16'>

@@ -1,7 +1,14 @@
 import { CustomButton } from 'eitri-shopping-template-vtex-deco-shared'
 import { View, Text } from 'eitri-luminus'
 
-export default function BiometricSaveModal(props) {
+interface BiometricSaveModalProps {
+	show?: boolean
+	onConfirm?: () => void
+	onDismiss?: () => void
+	[key: string]: unknown
+}
+
+export default function BiometricSaveModal(props: BiometricSaveModalProps) {
 	const { show, onConfirm, onDismiss } = props
 
 	if (!show) return null
@@ -12,7 +19,7 @@ export default function BiometricSaveModal(props) {
 			onClick={onDismiss}>
 			<View
 				className='flex flex-col p-4 bg-base-100 items-center rounded w-11/12 max-w-xs mx-auto'
-				onClick={e => e.stopPropagation()}>
+				onClick={(e?: any) => e?.stopPropagation?.()}>
 				<Text className='text-center text-lg font-bold mb-2 text-base-content'>Login mais rápido</Text>
 				<Text className='text-center text-sm mb-6 text-base-content'>
 					Deseja salvar sua senha com biometria para entrar mais rápido nas próximas vezes?

@@ -23,9 +23,14 @@ const CONTACT_LOOKUP_URL = 'https://YOUR_VTEX_ACCOUNT.myvtex.com/_v/contact-look
 // periódico / minReplicas), não continuar subindo este número.
 const REQUEST_TIMEOUT_MS = 25000
 
-const getSessionToken = async () => {
-	const rawToken = await Vtex?.customer?.getCustomerToken?.()
+const getSessionToken = async (): Promise<string | undefined> => {
+	const rawToken = await (Vtex?.customer as any)?.getCustomerToken?.()
 	return typeof rawToken === 'string' ? rawToken : rawToken?.token || rawToken?.value || rawToken?.authCookieValue
+}
+
+export interface ClientCodeResult {
+	ok: boolean
+	clientCode: string | null
 }
 
 /**
@@ -38,7 +43,7 @@ const getSessionToken = async () => {
  * ainda (primeira nota nao faturada). `ok` false e falha de consulta: sem
  * sessao, timeout, erro de rede ou HTTP.
  */
-export const fetchClientCode = async () => {
+export const fetchClientCode = async (): Promise<ClientCodeResult> => {
 	const token = await getSessionToken()
 	if (!token) return { ok: false, clientCode: null }
 
@@ -55,12 +60,12 @@ export const fetchClientCode = async () => {
 		})
 		const payload = res?.data ?? res
 		return { ok: true, clientCode: payload?.data?.codigoCliente ?? null }
-	} catch (error) {
+	} catch (error: any) {
 		// `code` é o que distingue timeout (ECONNABORTED) de erro de resposta;
 		// sem ele o diagnóstico fica cego. Nunca serializar o erro cru: um erro
 		// de HTTP client costuma carregar o request config junto, incluindo o
 		// header X-Vtex-Customer-Auth.
-		Datadog.sendDatadogLogError(error, 'ContactLookupService.fetchClientCode', {
+		Datadog.sendDatadogLogError(error as any, 'ContactLookupService.fetchClientCode', {
 			code: error?.code,
 			status: error?.status || error?.response?.status,
 			timeoutMs: REQUEST_TIMEOUT_MS
