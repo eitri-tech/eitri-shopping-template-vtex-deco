@@ -76,11 +76,24 @@ export interface VtexCart {
 	[key: string]: unknown
 }
 
+export interface VtexInstallment {
+	InterestRate?: number
+	NumberOfInstallments?: number
+	Value?: number
+	[key: string]: unknown
+}
+
+export interface VtexTeaser {
+	name?: string
+	[key: string]: unknown
+}
+
 export interface VtexCommertialOffer {
 	Price?: number
 	ListPrice?: number
 	AvailableQuantity?: number
-	Installments?: unknown[]
+	Installments?: VtexInstallment[]
+	teasers?: VtexTeaser[]
 	[key: string]: unknown
 }
 
@@ -99,6 +112,7 @@ export interface VtexSkuVariation {
 
 export interface VtexSku {
 	itemId?: string
+	name?: string
 	sellers?: VtexSeller[]
 	images?: Array<{ imageUrl?: string; [key: string]: unknown }>
 	variations?: VtexSkuVariation[]
@@ -111,6 +125,12 @@ export interface VtexCategoryTreeNode {
 	[key: string]: unknown
 }
 
+export interface VtexProductProperty {
+	name?: string
+	values?: string[]
+	[key: string]: unknown
+}
+
 export interface VtexProduct {
 	productId?: string
 	productName?: string
@@ -118,6 +138,7 @@ export interface VtexProduct {
 	categoryTree?: VtexCategoryTreeNode[]
 	productClusters?: VtexCategoryTreeNode[]
 	items?: VtexSku[]
+	properties?: VtexProductProperty[]
 	[key: string]: unknown
 }
 

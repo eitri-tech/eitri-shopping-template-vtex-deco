@@ -87,6 +87,8 @@ export interface VtexPaymentSystem {
 	stringId?: string
 	name?: string
 	groupName?: string
+	// Used by StoreCardForm/AddCardForm to detect card-number brand as the user types.
+	validator?: { regex?: string; [key: string]: unknown }
 	[key: string]: unknown
 }
 
@@ -126,6 +128,7 @@ export interface VtexPaymentData {
 
 export interface VtexCartItem {
 	id?: string
+	uniqueId?: string
 	productId?: string
 	name?: string
 	productName?: string
@@ -134,6 +137,9 @@ export interface VtexCartItem {
 	imageUrl?: string
 	price?: number
 	sellingPrice?: number
+	// 'available' when VTEX can fulfill the item at checkout time; anything else means it must be
+	// removed before payment (see CheckoutReview's unavailable-items flow).
+	availability?: string
 	additionalInfo?: { brandName?: string; [key: string]: unknown }
 	[key: string]: unknown
 }

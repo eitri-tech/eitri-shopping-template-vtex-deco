@@ -30,14 +30,14 @@ const componentMap: Record<string, ComponentType<any>> = {
 }
 
 interface CmsContent {
-	name: string
+	name?: string
 	id?: string | number
 	data?: unknown
 	[key: string]: unknown
 }
 
 export const getMappedComponent = (content: CmsContent, reloadKey?: unknown, rest?: Record<string, unknown>) => {
-	const Component = componentMap[content.name]
+	const Component = content.name ? componentMap[content.name] : undefined
 	if (!Component) {
 		console.error(`Component ${content.name} does not exist in the component map.`)
 		return null
