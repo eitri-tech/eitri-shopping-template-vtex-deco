@@ -22,6 +22,8 @@ declare module 'react-icons/fa' {
 	export const FaHeart: IconType
 	export const FaStar: IconType
 	export const FaRegTrashAlt: IconType
+	export const FaWhatsapp: IconType
+	export const FaHandHoldingUsd: IconType
 }
 
 declare module 'react-icons/pi' {
@@ -54,6 +56,19 @@ declare module 'react-icons/fi' {
 	export const FiLock: IconType
 	export const FiRepeat: IconType
 	export const FiXCircle: IconType
+	export const FiArrowDown: IconType
+	export const FiArrowUp: IconType
+	export const FiArrowLeft: IconType
+	export const FiBell: IconType
+	export const FiHeadphones: IconType
+	export const FiHelpCircle: IconType
+	export const FiInfo: IconType
+	export const FiLogOut: IconType
+	export const FiMail: IconType
+	export const FiMessageCircle: IconType
+	export const FiRotateCcw: IconType
+	export const FiSliders: IconType
+	export const FiStar: IconType
 }
 
 declare module 'react-icons/io5' {
@@ -65,6 +80,12 @@ declare module 'react-icons/io5' {
 declare module 'react-icons/lu' {
 	export const LuChevronRight: IconType
 	export const LuArrowUpDown: IconType
+	export const LuBadgePercent: IconType
+	export const LuCircleDollarSign: IconType
+	export const LuPercent: IconType
+	export const LuShoppingCart: IconType
+	export const LuTag: IconType
+	export const LuTicket: IconType
 }
 
 declare module 'react-icons/hi2' {
@@ -80,4 +101,13 @@ declare module 'react-icons/md' {
 	export const MdFavoriteBorder: IconType
 	export const MdFavorite: IconType
 	export const MdOutlineQrCodeScanner: IconType
+}
+
+declare module 'react-icons/go' {
+	export const GoAlert: IconType
+	export const GoGift: IconType
+}
+
+declare module 'react-icons/tfi' {
+	export const TfiArrowRight: IconType
 }
