@@ -5,7 +5,7 @@ export const addonUserTappedActiveTabListener = (): void => {
 	// only types `channel` as the EventBusCommonEvents enum — cast to keep this custom channel.
 	Eitri.eventBus.subscribe({
 		channel: 'onUserTappedActiveTab' as any,
-		callback: _ => {
+		callback: (_: unknown) => {
 			Eitri.navigation.backToTop()
 		}
 	})

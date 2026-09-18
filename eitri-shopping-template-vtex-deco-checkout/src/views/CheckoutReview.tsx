@@ -46,7 +46,7 @@ export default function CheckoutReview() {
 	const readinessLoggedCartIdRef = useRef<string | null | undefined>(null)
 
 	useEffect(() => {
-		Eitri.environment.getRemoteConfigs().then(rc => {
+		Eitri.environment.getRemoteConfigs().then((rc: { appConfigs?: { checkout?: { recaptchaKey?: string } } }) => {
 			const recaptchaSiteKey = rc?.appConfigs?.checkout?.recaptchaKey
 			if (recaptchaSiteKey) {
 				setRecaptchaSiteKey(recaptchaSiteKey)
@@ -69,7 +69,7 @@ export default function CheckoutReview() {
 		}
 	}, [cart])
 
-	const itemsReadyToPay = unavailableItems.length === 0 && cart?.items?.length > 0
+	const itemsReadyToPay = unavailableItems.length === 0 && (cart?.items?.length ?? 0) > 0
 	const shippingAddressReadyToPay = Boolean(
 		cart?.shippingData?.address && cart?.shippingData?.address?.number
 	)
@@ -86,7 +86,7 @@ export default function CheckoutReview() {
 		readinessLoggedCartIdRef.current = cart.orderFormId
 
 		Datadog.sendDatadogLogError(
-			new Error('checkoutReview.notReadyToPay'),
+			new Error('checkoutReview.notReadyToPay') as Error & Record<string, unknown>,
 			'isReadyToPay',
 			{
 				cartId: cart?.orderFormId,

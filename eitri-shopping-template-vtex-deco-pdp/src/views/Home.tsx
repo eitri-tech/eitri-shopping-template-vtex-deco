@@ -41,7 +41,7 @@ export default function Home() {
 	const [configLoaded, setConfigLoaded] = useState(false)
 	const [currentSku, setCurrentSku] = useState<VtexSku | null>(null)
 	const [siblings, setSiblings] = useState<VtexProduct[]>([])
-	const [statusBarTextColor, setStatusBarTextColor] = useState<string | undefined>(undefined)
+	const [statusBarTextColor, setStatusBarTextColor] = useState<'black' | 'white' | undefined>(undefined)
 
 	useEffect(() => {
 		window.scroll(0, 0)

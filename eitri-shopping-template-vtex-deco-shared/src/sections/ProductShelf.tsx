@@ -56,7 +56,7 @@ export default function ProductShelf({
 		const result = await getProductsService(params)
 		if (result) {
 			setCurrentProducts(result.products)
-			setSearchParams({ facets, ...params })
+			setSearchParams(params)
 		}
 		setIsLoadingProducts(false)
 	}

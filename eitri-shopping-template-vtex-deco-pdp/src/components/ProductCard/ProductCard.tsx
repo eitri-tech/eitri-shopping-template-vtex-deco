@@ -168,7 +168,7 @@ export default function ProductCard(props: ProductCardProps) {
 		loadingWishlistOp: wishlist.loading,
 		loadingCartOp,
 		itemQuantity,
-		imageAspectRatio: App?.configs?.appConfigs?.productCardImageAspectRatio,
+		imageAspectRatio: (App as any)?.configs?.appConfigs?.productCardImageAspectRatio,
 		onPressOnCard: handleCardPress,
 		onPressMainAction: handleAddToCart,
 		onPressOnWishlist: handleWishlistPress,

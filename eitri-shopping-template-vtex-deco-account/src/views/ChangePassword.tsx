@@ -119,7 +119,7 @@ export default function ChangePassword(props: RouteProps<ChangePasswordState>) {
 		}
 	}
 
-	const syncBiometricCredentials = async updatedPassword => {
+	const syncBiometricCredentials = async (updatedPassword: string) => {
 		try {
 			if (await BiometricService.hasSavedCredentials()) {
 				await BiometricService.updateSavedCredentials(email, updatedPassword)

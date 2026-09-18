@@ -76,7 +76,13 @@ export const showTogether = async (productId: string): Promise<VtexProduct[]> =>
 		console.error('Error loading catalog buy together products', error)
 	}
 
-	const recommendationTypes = ['buy', 'viewAndBought', 'suggestions', 'similars', 'view']
+	const recommendationTypes: Array<'buy' | 'viewAndBought' | 'suggestions' | 'similars' | 'view'> = [
+		'buy',
+		'viewAndBought',
+		'suggestions',
+		'similars',
+		'view'
+	]
 
 	for (const type of recommendationTypes) {
 		try {

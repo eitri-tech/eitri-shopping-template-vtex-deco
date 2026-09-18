@@ -153,7 +153,7 @@ export default function VideoHero({
 				/>
 			) : (
 				<Image
-					src={resolvedBackgroundImage}
+					src={resolvedBackgroundImage ?? ''}
 					className='absolute inset-0 w-full h-full object-cover'
 					width='100%'
 					height='100%'

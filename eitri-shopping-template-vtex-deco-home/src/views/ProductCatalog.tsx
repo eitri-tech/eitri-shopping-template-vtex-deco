@@ -56,7 +56,7 @@ export default function ProductCatalog(props: RouteProps<ProductCatalogState>) {
 			// (same pattern already established in account/src/utils/backToTopListener.ts).
 			Eitri.eventBus.subscribe({
 				channel: 'onUserTappedActiveTab' as any,
-				callback: _ => {
+				callback: (_: unknown) => {
 					Eitri.navigation.back(1)
 				}
 			})

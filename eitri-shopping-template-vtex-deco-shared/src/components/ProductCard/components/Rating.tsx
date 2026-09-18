@@ -1,6 +1,5 @@
 import { Text, View } from 'eitri-luminus'
 import { FaStar } from 'react-icons/fa'
-import { View, Text } from 'eitri-luminus'
 
 interface RatingProps {
 	ratingValue: number

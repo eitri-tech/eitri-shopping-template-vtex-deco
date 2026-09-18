@@ -178,7 +178,7 @@ export default function WelcomeModal({
 				/>
 			) : (
 				<Image
-					src={resolvedBackground}
+					src={resolvedBackground ?? ''}
 					className='absolute inset-0 w-full h-full object-cover'
 					width='100%'
 					height='100%'

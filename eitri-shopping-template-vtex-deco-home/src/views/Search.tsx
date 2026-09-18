@@ -53,7 +53,7 @@ export default function Search(props: RouteProps<SearchState>) {
 		// (same pattern already established in account/src/utils/backToTopListener.ts).
 		Eitri.eventBus.subscribe({
 			channel: 'onUserTappedActiveTab' as any,
-			callback: _ => {
+			callback: (_: unknown) => {
 				Eitri.navigation.backToTop()
 			}
 		})

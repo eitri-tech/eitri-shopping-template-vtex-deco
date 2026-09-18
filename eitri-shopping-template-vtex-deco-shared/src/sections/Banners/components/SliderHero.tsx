@@ -34,7 +34,7 @@ export default function SliderHero({ data, onClick }: Props) {
 				options={{
 					loop: imagesList.length === 1 ? false : data?.autoPlay,
 					renderMode: 'performance',
-					slideChanged(s) {
+					slideChanged(s: { track: { details: { rel: number } } }) {
 						setCurrentSlide(s.track.details.rel)
 					}
 				}}
@@ -53,7 +53,7 @@ export default function SliderHero({ data, onClick }: Props) {
 								<Image
 									fadeIn={1000}
 									className='w-full h-full'
-									src={imageUrl}
+									src={imageUrl ?? ''}
 								/>
 							</View>
 						</View>

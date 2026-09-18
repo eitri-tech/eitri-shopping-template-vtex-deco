@@ -34,7 +34,7 @@ function DeliveryGroupCard(props: DeliveryGroupCardProps) {
 	}
 
 	const title = sla?.isPickupInPoint
-		? `Retire na loja ${sla?.pickupStoreInfo.friendlyName}`
+		? `Retire na loja ${sla?.pickupStoreInfo?.friendlyName}`
 		: sla?.formatedShippingEstimate
 
 	return (
@@ -96,7 +96,7 @@ export default function MultipleFreightSelector() {
 	}
 
 	const totalGroups = shippingOptions?.length || 0
-	const allResolved = totalGroups > 0 && shippingOptions.every(opt => opt.currentSla)
+	const allResolved = totalGroups > 0 && (shippingOptions ?? []).every(opt => opt.currentSla)
 
 	return (
 		<Page title='Seleção de frete múltiplo'>

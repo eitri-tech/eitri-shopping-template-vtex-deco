@@ -274,7 +274,7 @@ export default class TrackingService {
 		try {
 			const sfShipping = cart?.shippingData?.logisticsInfo?.map(item => item.selectedSla)
 			const sfUniqueSla = [...new Set(sfShipping)]
-			const sfTotalItemPrice = cart.totalizers.find(item => item.id === 'Items')?.value / 100
+			const sfTotalItemPrice = (cart.totalizers?.find(item => item.id === 'Items')?.value ?? 0) / 100
 
 			TrackingService.sendSalesforceEvent('add_shipping_info', {
 				currency: cart?.storePreferencesData?.currencyCode || 'BRL',
@@ -482,7 +482,7 @@ export default class TrackingService {
 
 		// Salesforce
 		try {
-			const sfShippingPrice = cart.totalizers.find(item => item.id === 'Shipping')?.value / 100
+			const sfShippingPrice = (cart.totalizers?.find(item => item.id === 'Shipping')?.value ?? 0) / 100
 
 			TrackingService.sendSalesforceEvent('purchase', {
 				currency: 'BRL',

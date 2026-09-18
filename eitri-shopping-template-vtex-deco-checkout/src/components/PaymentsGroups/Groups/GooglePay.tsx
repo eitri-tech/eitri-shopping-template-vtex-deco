@@ -33,8 +33,8 @@ export default function GooglePay(props: PaymentGroupProps) {
 		if (Eitri.canIUse(31)) {
 			Eitri.googlePay
 				.isAvailable()
-				.then(res => setGPayAvailable(!!res))
-				.catch(err => console.error('GooglePay: isAvailable failed', err))
+				.then((res: unknown) => setGPayAvailable(!!res))
+				.catch((err: unknown) => console.error('GooglePay: isAvailable failed', err))
 		}
 	}, [])
 

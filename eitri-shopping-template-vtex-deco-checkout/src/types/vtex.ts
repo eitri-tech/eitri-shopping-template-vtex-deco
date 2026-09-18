@@ -157,6 +157,7 @@ export interface VtexCart {
 	ratesAndBenefitsData?: {
 		rateAndBenefitsIdentifiers?: Array<{
 			name?: string
+			description?: string
 			matchedParameters?: { paymentMethodId?: string; [key: string]: unknown }
 			[key: string]: unknown
 		}>

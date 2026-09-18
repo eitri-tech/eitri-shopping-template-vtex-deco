@@ -58,13 +58,21 @@ export const getProductsService = async (params: ProductSearchParams, page?: num
 		}
 	})
 
-	return await Vtex.searchGraphql.productSearch(options)
+	// eitri-shopping-vtex-shared's ProductSearchInput stub demands many fields (salesChannel,
+	// priceRange, simulationBehavior, operator, fuzzy, searchState...) this app never set and
+	// doesn't even list the `orderBy` field the code actually relies on — a library typing gap
+	// (auto-generated from usage), not something this call is missing.
+	return await Vtex.searchGraphql.productSearch(options as any)
 }
 
+// ProductInput.identifier is a list of fallback identifiers, not a single object — the original
+// call sent a bare object, which doesn't match the GraphQL input type VTEX expects. ProductInput
+// also demands `slug`/`regionId`/`salesChannel` this app never set — same library typing gap as
+// ProductSearchInput/Facets above (auto-generated from usage).
 export const getProductById = async (productId: string): Promise<any> => {
 	return await Vtex.searchGraphql.product({
-		identifier: { field: 'id', value: productId }
-	})
+		identifier: [{ field: 'id', value: productId }]
+	} as any)
 }
 
 let cachedCategoryTree: any = null
@@ -96,7 +104,8 @@ export const getProductsFacetsService = async (params: ProductSearchParams): Pro
 		}
 	})
 
-	const result = await Vtex.searchGraphql.facets(options)
+	// Same Facets typing gap as ProductSearchInput above (auto-generated from usage).
+	const result = await Vtex.searchGraphql.facets(options as any)
 
 	if (!result || typeof result !== 'object') {
 		return { facets: [] }
@@ -124,5 +133,6 @@ export const getProductSiblingsService = async (agrupadorCodes: string[]): Promi
 		}
 	}
 
-	return (await Vtex.searchGraphql.productSearch(options))?.products || []
+	// Same ProductSearchInput typing gap as productSearch above.
+	return (await Vtex.searchGraphql.productSearch(options as any))?.products || []
 }

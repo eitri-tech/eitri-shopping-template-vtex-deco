@@ -19,10 +19,10 @@ export default function SnackBarComponent(props: SnackBarComponentProps) {
 	const { children } = props
 	const [showSnackbar, setShowSnackbar] = useState(false)
 	const [isVisible, setIsVisible] = useState(false)
-	const [currentType, setCurrentType] = useState<{ color: string; icon: typeof FiCheck } | null>(null)
+	const [currentType, setCurrentType] = useState<{ color: string; icon: typeof CheckIcon } | null>(null)
 	const [message, setMessage] = useState<ReactNode>(null)
 
-	const TYPES: Record<SnackBarType, { color: string; icon: typeof FiCheck }> = {
+	const TYPES: Record<SnackBarType, { color: string; icon: typeof CheckIcon }> = {
 		success: {
 			color: 'success-500',
 			icon: CheckIcon

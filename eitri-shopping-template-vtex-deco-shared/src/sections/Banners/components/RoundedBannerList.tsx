@@ -43,7 +43,7 @@ export default function RoundedBannerList({ data, onClick }: Props) {
 								key={slider.imageUrl}
 								className='flex flex-col items-center'>
 								<Image
-									src={slider.imageUrl}
+									src={slider.imageUrl ?? ''}
 									width={dimensions.width}
 									height={dimensions.height}
 									className='rounded-full shadow-md object-cover'

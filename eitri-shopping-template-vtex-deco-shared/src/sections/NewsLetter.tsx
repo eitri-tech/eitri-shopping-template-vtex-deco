@@ -1,11 +1,17 @@
 import { View, Text, TextInput } from 'eitri-luminus'
 import { useState } from 'react'
+import type { ChangeEvent, ComponentProps } from 'react'
 import TrackingService from '../services/TrackingService'
 import NewsletterService from '../services/NewsletterService'
 // TEMPORÁRIO — snackbar vem do proxy CmsDependencies (injetado pelo app no DecoCMSContentRender).
 import { useSnackBar } from '../providers/CmsDependencies'
 import { processActions } from '../services/ResolveCmsActions'
 import type { CmsAction } from './types'
+
+// TextInputProps deliberately omits `type` from its InputHTMLAttributes — this local override
+// preserves the existing behavior instead of silently dropping it.
+type TextInputWithType = ComponentProps<typeof TextInput> & { type?: string }
+const TextInputAny = TextInput as unknown as (props: TextInputWithType) => JSX.Element
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -91,18 +97,18 @@ export default function NewsLetter({
 				<Text className='text-lg text-gray-800'>{subtitle}</Text>
 			</View>
 
-			<TextInput
+			<TextInputAny
 				type='email'
 				value={email}
-				onChange={(e: any) => setEmail(e.target.value)}
+				onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
 				placeholder={emailPlaceholder}
 				className='w-full h-12 px-4 border border-gray-300 border-solid bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0'
 			/>
 
-			<TextInput
+			<TextInputAny
 				type='text'
 				value={name}
-				onChange={(e: any) => setName(e.target.value)}
+				onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
 				placeholder={namePlaceholder}
 				className='w-full h-12 px-4 border border-gray-300 border-solid bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0'
 			/>

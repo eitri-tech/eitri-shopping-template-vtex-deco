@@ -19,6 +19,15 @@ import {
 import { doLogin, isLoggedIn } from '../services/CustomerService'
 import { handleReservedPathDeeplink } from '../utils/deeplinkFallback'
 
+// Matches shared's CmsDependencies UseLocalShoppingCart/UseSnackBar contract (not re-exported
+// from the shared package's public export.ts, so redeclared locally). That contract types
+// addItem/showSnackBar as required, but this app's provider hooks type them optional (undefined
+// before mount) — by the time DecoCMSContentRender renders, the providers are always mounted.
+type UseLocalShoppingCartForCms = () => { cart?: any; addItem: (payload: any) => Promise<any>; [key: string]: any }
+type UseSnackBarForCms = () => { showSnackBar: (type: string, message: string) => void; [key: string]: any }
+const useLocalShoppingCartForCms = useLocalShoppingCart as unknown as UseLocalShoppingCartForCms
+const useSnackBarForCms = useSnackBar as unknown as UseSnackBarForCms
+
 // Eitri.getInitializationInfos()'s .d.ts declares the return type as the bare `Object` (no
 // members) — a library typing gap, not a real "any shape" API. This models the field this app
 // actually reads.
@@ -44,7 +53,7 @@ export default function Home() {
 		useBiometricLogin({
 			doLogin,
 			isLoggedIn,
-			onSuccess: () => startCart()
+			onSuccess: () => startCart?.()
 		})
 
 	useEffect(() => {
@@ -138,8 +147,8 @@ export default function Home() {
 				{enableCmsQuery && (
 					<DecoCMSContentRender
 						page='Home'
-						useLocalShoppingCart={useLocalShoppingCart}
-						useSnackBar={useSnackBar}
+						useLocalShoppingCart={useLocalShoppingCartForCms}
+						useSnackBar={useSnackBarForCms}
 						onReady={() => setCmsReady(true)}
 					/>
 				)}

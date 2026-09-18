@@ -21,6 +21,12 @@ declare module 'react-icons/fa' {
 	export const FaChevronRight: IconType
 	export const FaHeart: IconType
 	export const FaStar: IconType
+	export const FaRegTrashAlt: IconType
+}
+
+declare module 'react-icons/pi' {
+	export const PiHeartStraightLight: IconType
+	export const PiHeartStraightFill: IconType
 }
 
 declare module 'react-icons/fi' {
