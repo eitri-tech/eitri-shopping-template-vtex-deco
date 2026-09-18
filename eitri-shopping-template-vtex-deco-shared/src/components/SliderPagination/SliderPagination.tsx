@@ -1,12 +1,21 @@
 import { View } from 'eitri-luminus'
 import { FiChevronLeft } from 'react-icons/fi'
 
-export default function SliderPagination(props) {
+interface SliderPaginationProps {
+	count: number
+	activeIndex: number
+	className?: string
+	onPrev?: () => void
+	onNext?: () => void
+	[key: string]: unknown
+}
+
+export default function SliderPagination(props: SliderPaginationProps) {
 	const { count, activeIndex, className, onPrev, onNext } = props
 
 	if (count <= 1) return null
 
-	const showArrows = !!(onPrev || onNext)
+	const showArrows = Boolean(onPrev || onNext)
 
 	return (
 		<View

@@ -1,7 +1,18 @@
 import { View, Image } from 'eitri-luminus'
 import { openProduct } from '../../../services/NavigationService'
 
-export function ProductImageShelf(props) {
+interface Product {
+	productId?: string
+	items?: Array<{ images?: Array<{ imageUrl?: string }> }>
+	[key: string]: unknown
+}
+
+interface ProductImageShelfProps {
+	products?: Product[]
+	isLoading?: boolean
+}
+
+export function ProductImageShelf(props: ProductImageShelfProps) {
 	const { products, isLoading } = props
 
 	return (

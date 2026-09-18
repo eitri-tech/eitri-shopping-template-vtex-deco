@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+import { Page, View, Text, Image } from 'eitri-luminus'
 import iconGoogle from '../assets/images/social_google.svg'
 import lockIcon from '../assets/icons/lock.svg'
 import bonusIcon from '../assets/images/bonus.png'
@@ -14,8 +16,7 @@ import {
 } from 'eitri-shopping-template-vtex-deco-shared'
 import {
 	isLoggedIn,
-	loginWithGoogle,
-	loginWithApple
+	loginWithGoogle
 } from '../services/CustomerService'
 import Alert from '../components/Alert/Alert'
 import { sendScreenView } from '../services/TrackingService'
@@ -23,8 +24,27 @@ import { navigate, PAGES } from '../services/NavigationService'
 import { useTranslation } from 'eitri-i18n'
 import { getLoginProviders } from '../services/StoreService'
 import HelpSection from '../components/HelpSection/HelpSection'
+import type { RouteProps } from '../types/route'
 
-export default function SignInVariant(props) {
+interface LoginProviders {
+	oAuthProviders?: Array<{ providerName?: string; [key: string]: unknown }>
+	passwordAuthentication?: boolean
+	[key: string]: unknown
+}
+
+interface SignInVariantLocationState {
+	redirectTo?: string
+	redirectState?: any
+	closeAppAfterLogin?: boolean
+	[key: string]: unknown
+}
+
+interface SignInVariantProps extends RouteProps<SignInVariantLocationState> {
+	defaultAfterLogin?: string
+	[key: string]: unknown
+}
+
+export default function SignInVariant(props: SignInVariantProps) {
 	const { t } = useTranslation()
 	const redirectTo = props?.location?.state?.redirectTo
 	const redirectState = props?.location?.state?.redirectState
@@ -35,7 +55,7 @@ export default function SignInVariant(props) {
 
 	const [loading, setLoading] = useState(false)
 	const [showLoginErrorAlert, setShowLoginErrorAlert] = useState(false)
-	const [loginProviders, setLoginProviders] = useState()
+	const [loginProviders, setLoginProviders] = useState<LoginProviders | null | undefined>()
 	const [loadingProviders, setLoadingProviders] = useState(true)
 	const [isIOS, setIsIOS] = useState(false)
 	const [canUseSocialLogin, setCanUseSocialLogin] = useState(false)
@@ -83,7 +103,7 @@ export default function SignInVariant(props) {
 	const resolveSocialLoginAvailability = async () => {
 		try {
 			const modules = await Eitri.modules()
-			const isAvailable = modules?.vtexOAuth?.isAvailable
+			const isAvailable = (modules as any)?.vtexOAuth?.isAvailable
 			if (!isAvailable) return false
 			return await isAvailable()
 		} catch (error) {
@@ -121,7 +141,7 @@ export default function SignInVariant(props) {
 		return navigate(PAGES.BONUS, {}, true)
 	}
 
-	const handleSocialLogin = async (executor, method) => {
+	const handleSocialLogin = async (executor: () => Promise<any>, method: string) => {
 		setLoading(true)
 		setShowLoginErrorAlert(false)
 		try {
@@ -130,16 +150,16 @@ export default function SignInVariant(props) {
 				console.error('Erro ao registrar evento de login social', error)
 			})
 			await onLoggedIn()
-		} catch (error) {
+		} catch (error: any) {
 			console.error(`Erro ao entrar com ${method}`, error)
-			Datadog.sendDatadogLogError(error, 'handleSocialLogin', { screen: 'SignInVariant', provider: method })
+			Datadog.sendDatadogLogError(error as any, 'handleSocialLogin', { screen: 'SignInVariant', provider: method })
 			setShowLoginErrorAlert(true)
 		} finally {
 			setLoading(false)
 		}
 	}
 
-	const goToEmailLogin = loginMode => {
+	const goToEmailLogin = (loginMode: string) => {
 		const emailRedirectTo = redirectTo || (defaultAfterLogin === 'bonus' ? PAGES.BONUS : undefined)
 		navigate(PAGES.SIGNIN, {
 			redirectTo: emailRedirectTo,
@@ -153,7 +173,7 @@ export default function SignInVariant(props) {
 		navigate(PAGES.SIGNUP, { fromWelcome: isWelcomeFlow, redirectTo, closeAppAfterLogin })
 	}
 
-	const hasGoogle = !isIOS && canUseSocialLogin && loginProviders?.oAuthProviders?.some(p => p.providerName === 'Google')
+	const hasGoogle = !isIOS && canUseSocialLogin && Boolean(loginProviders?.oAuthProviders?.some(p => p.providerName === 'Google'))
 
 	return (
 		<Page

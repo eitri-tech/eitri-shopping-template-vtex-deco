@@ -1,6 +1,14 @@
+import type { ReactNode } from 'react'
 import { View } from 'eitri-luminus'
 
-export default function CustomModal(props) {
+interface CustomModalProps {
+	children?: ReactNode
+	open?: boolean
+	onClose?: () => void
+	[key: string]: unknown
+}
+
+export default function CustomModal(props: CustomModalProps) {
 	const { children, open, onClose } = props
 
 	if (!open) return null

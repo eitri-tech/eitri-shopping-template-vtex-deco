@@ -1,9 +1,14 @@
 import { View, Image } from 'eitri-luminus'
 import { useState, useEffect } from 'react'
+import type { VtexSku } from '../../types/vtex'
 
 const THUMBNAIL_SIZE = 'calc((100vw - 28px) / 4)'
 
-export default function ImageGallery(props) {
+interface ImageGalleryProps {
+  currentSku?: VtexSku | null
+}
+
+export default function ImageGallery(props: ImageGalleryProps) {
   const { currentSku } = props
 
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -18,14 +23,14 @@ export default function ImageGallery(props) {
   const selectedImage = currentSku.images[safeIndex]
 
   return (
-    <View orientation='column'>
+    <View className='flex flex-col'>
       <View className='overflow-hidden relative' width='100vw'>
         <Image
           key={safeIndex}
           pinchZoom
           zoomMaxScale={8}
           fadeIn={300}
-          src={selectedImage.imageUrl}
+          src={selectedImage?.imageUrl || ''}
           width='100vw'
         />
       </View>
@@ -43,7 +48,7 @@ export default function ImageGallery(props) {
               width={THUMBNAIL_SIZE}
               height={THUMBNAIL_SIZE}>
               <Image
-                src={item.imageUrl}
+                src={item.imageUrl || ''}
                 width={THUMBNAIL_SIZE}
                 height={THUMBNAIL_SIZE}
                 style={{ objectFit: 'cover' }}

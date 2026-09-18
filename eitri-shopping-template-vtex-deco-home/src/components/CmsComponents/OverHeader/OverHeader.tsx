@@ -1,8 +1,18 @@
 import { View, Text } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import { CopyIcon, CheckIcon } from 'eitri-shopping-template-vtex-deco-shared'
+import { useState, useEffect } from 'react'
 
-export default function OverHeader(props) {
+interface OverHeaderData {
+	promotionalText?: string
+	couponCode?: string
+}
+
+interface OverHeaderProps {
+	data?: OverHeaderData
+}
+
+export default function OverHeader(props: OverHeaderProps) {
 	const { data } = props
 	const promotionalText = data?.promotionalText
 	const couponCode = data?.couponCode

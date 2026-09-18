@@ -27,9 +27,21 @@ const WEB_HOST = 'https://www.YOUR_STORE_DOMAIN.com'
 
 const CATEGORY_FACET = /^category-(\d+)$/
 
+interface Facet {
+	key?: string
+	value?: string
+}
+
+interface StartParams {
+	deeplink?: string
+	params?: { facets?: Facet[] }
+	facets?: Facet[]
+	[key: string]: unknown
+}
+
 // Caminho A: uma entrada no `deeplinkMap` faz o resolver repassar a URL original
 // em `initParams.deeplink` (DeeplinkResolver.js:169) — com query string e hash.
-const pathFromDeeplink = deeplink => {
+const pathFromDeeplink = (deeplink: unknown): string | null => {
 	if (typeof deeplink !== 'string') return null
 
 	const withoutOrigin = deeplink.replace(/^https?:\/\/[^/]+/, '')
@@ -38,25 +50,25 @@ const pathFromDeeplink = deeplink => {
 
 // Caminho B: sem entrada no mapa — remonta o path dos facets que o fallback de
 // categoria inventou. É o estado atual de produção.
-const pathFromCategoryFacets = facets => {
+const pathFromCategoryFacets = (facets: unknown): string | null => {
 	if (!Array.isArray(facets)) return null
 
 	const segments = facets
-		.map(facet => [CATEGORY_FACET.exec(facet?.key ?? ''), facet?.value])
+		.map((facet: Facet) => [CATEGORY_FACET.exec(facet?.key ?? ''), facet?.value] as [RegExpExecArray | null, string | undefined])
 		.filter(([match, value]) => match && value)
-		.sort(([a], [b]) => Number(a[1]) - Number(b[1]))
-		.map(([, value]) => encodeURIComponent(value))
+		.sort(([a], [b]) => Number((a as RegExpExecArray)[1]) - Number((b as RegExpExecArray)[1]))
+		.map(([, value]) => encodeURIComponent(value as string))
 
 	return segments.length ? `/${segments.join('/')}` : null
 }
 
-const firstSegmentOf = path => path.split('?')[0].split('/').filter(Boolean)[0]
+const firstSegmentOf = (path: string): string => path.split('?')[0].split('/').filter(Boolean)[0] ?? ''
 
 // ponytail: casa só pelo path, nunca por `route`. Foi o que derrubou a tentativa
 // anterior (PR #227, revertido no #239, que tratava qualquer rota desconhecida
 // como path do site e descartava os query params de links como
 // `<app-scheme>://collection?filter=…&utm_source=…`).
-export function resolveReservedPath(startParams) {
+export function resolveReservedPath(startParams: StartParams | null | undefined): string | null {
 	const path =
 		pathFromDeeplink(startParams?.deeplink) ??
 		pathFromCategoryFacets(startParams?.params?.facets ?? startParams?.facets)
@@ -69,7 +81,7 @@ export function resolveReservedPath(startParams) {
 
 // Manda o deep link pro navegador. Retorna `false` quando não é path reservado,
 // para o chamador seguir com o fluxo normal de rota.
-export function handleReservedPathDeeplink(startParams) {
+export function handleReservedPathDeeplink(startParams: StartParams | null | undefined): boolean {
 	const path = resolveReservedPath(startParams)
 	if (!path) return false
 

@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+import type { ChangeEvent } from 'react'
 import { View, Text } from 'eitri-luminus'
 import { CustomInput, CustomButton, GenericBox } from 'eitri-shopping-template-vtex-deco-shared'
 import { useTranslation } from 'eitri-i18n'
@@ -5,7 +7,11 @@ import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { getSellerConfig } from '../../services/sellerCodeService'
 import { FaRegTrashAlt } from 'react-icons/fa'
 
-export default function SellerCode(props) {
+interface SellerCodeProps {
+	[key: string]: unknown
+}
+
+export default function SellerCode(props: SellerCodeProps) {
 	const { cart, vendor, setVendor, applySellerCode } = useLocalShoppingCart()
 	const { t } = useTranslation()
 
@@ -20,7 +26,7 @@ export default function SellerCode(props) {
 
 	const checkConfig = async () => {
 		const config = await getSellerConfig()
-		setIsEnabled(!!config?.enabled)
+		setIsEnabled(Boolean(config?.enabled))
 	}
 
 	const onPressAdd = async () => {
@@ -28,8 +34,10 @@ export default function SellerCode(props) {
 		setErrorText('')
 		setIsLoading(true)
 		try {
-			await applySellerCode(code.trim().toUpperCase())
-		} catch (e) {
+			if (applySellerCode) {
+				await applySellerCode(code.trim().toUpperCase())
+			}
+		} catch (e: any) {
 			if (e?.message === 'NOT_FOUND') {
 				setErrorText(t('sellerCode.errorNotFound'))
 			} else if (e?.message === 'DISABLED') {
@@ -43,7 +51,9 @@ export default function SellerCode(props) {
 	}
 
 	const onPressChange = () => {
-		setVendor(null)
+		if (setVendor) {
+			setVendor(null)
+		}
 		setCode('')
 		setErrorText('')
 	}
@@ -78,7 +88,7 @@ export default function SellerCode(props) {
 								<CustomInput
 									placeholder={t('sellerCode.placeholder')}
 									value={code}
-									onChange={e => { setCode(e.target.value); setErrorText('') }}
+									onChange={(e: ChangeEvent<HTMLInputElement>) => { setCode(e.target.value); setErrorText('') }}
 								/>
 							</View>
 							<View className='w-1/3'>

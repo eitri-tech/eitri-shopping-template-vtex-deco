@@ -4,15 +4,39 @@ import { getProductProperty, getMaterialImage, getPedraImage } from 'eitri-shopp
 
 const PEDRA_PROP = 'Pedra Principal'
 
-const getSwatchImage = product => product?.items?.[0]?.images?.[0]?.imageUrl || ''
+interface ProductItem {
+	images?: Array<{ imageUrl?: string }>
+	[key: string]: unknown
+}
+
+interface Product {
+	productId?: string
+	items?: ProductItem[]
+	properties?: Array<{ name?: string; values?: string[] }>
+	[key: string]: unknown
+}
+
+interface SwatchOption {
+	value: string
+	product: Product
+	image: string | null
+}
+
+const getSwatchImage = (product?: Product | null) => product?.items?.[0]?.images?.[0]?.imageUrl || ''
 
 // Agrupa os irmãos por `groupProp` (ex.: 'Material'), com 1 opção por valor distinto.
 // Como cada combinação Material×Pedra é um produto separado, escolhemos como
 // representante de cada opção o irmão que casa com a seleção atual na OUTRA
 // dimensão (`matchProp`) — assim clicar em "Ouro Branco" mantém a pedra atual.
 // `resolveImage(value, sibling)` define o thumbnail exibido (imagem curada da variação).
-function buildOptions(siblings, groupProp, matchProp, currentMatchValue, resolveImage) {
-	const byValue = new Map()
+function buildOptions(
+	siblings: Product[],
+	groupProp: string,
+	matchProp: string,
+	currentMatchValue: string | null | undefined,
+	resolveImage: (value: string, sibling: Product) => string | null
+): SwatchOption[] {
+	const byValue = new Map<string, SwatchOption>()
 	siblings.forEach(sibling => {
 		const value = getProductProperty(sibling, groupProp)
 		if (!value) return
@@ -24,7 +48,15 @@ function buildOptions(siblings, groupProp, matchProp, currentMatchValue, resolve
 	return Array.from(byValue.values())
 }
 
-function SwatchRow({ label, options, currentValue, onSelect }) {
+interface SwatchRowProps {
+	label: string
+	options: SwatchOption[]
+	currentValue?: string | null
+	onSelect?: (product: Product) => void
+}
+
+function SwatchRow(props: SwatchRowProps) {
+	const { label, options, currentValue, onSelect } = props
 	if (options.length < 2) return null
 
 	return (
@@ -36,8 +68,8 @@ function SwatchRow({ label, options, currentValue, onSelect }) {
 					return (
 						<View
 							key={option.value}
-							onClick={e => {
-								e.stopPropagation()
+							onClick={(e?: any) => {
+								e?.stopPropagation?.()
 								if (!isCurrent && onSelect) onSelect(option.product)
 							}}
 							className={`w-11 h-10 rounded overflow-hidden flex items-center justify-center border-2 ${
@@ -59,7 +91,15 @@ function SwatchRow({ label, options, currentValue, onSelect }) {
 	)
 }
 
-export default function MaterialSwatches({ currentProductId, currentProduct, siblings, onSwatchPress }) {
+interface MaterialSwatchesProps {
+	currentProductId?: string
+	currentProduct?: Product | null
+	siblings?: Product[]
+	onSwatchPress?: (product: Product) => void
+}
+
+export default function MaterialSwatches(props: MaterialSwatchesProps) {
+	const { currentProductId, currentProduct, siblings, onSwatchPress } = props
 	const { t } = useTranslation()
 
 	if (!Array.isArray(siblings) || siblings.length < 2) {

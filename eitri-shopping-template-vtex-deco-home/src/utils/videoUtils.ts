@@ -1,4 +1,10 @@
-export function resolveVideoProps(url) {
+interface VideoProps {
+	youTubeId?: string
+	vimeoId?: string
+	source?: string
+}
+
+export function resolveVideoProps(url: string | null | undefined): VideoProps | null {
 	if (!url) return null
 
 	const youTubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/)

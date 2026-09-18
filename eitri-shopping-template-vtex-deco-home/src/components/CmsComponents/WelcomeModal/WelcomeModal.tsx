@@ -5,14 +5,28 @@ import { useTranslation } from 'eitri-i18n'
 import { resolveVideoProps } from '../../../utils/videoUtils'
 
 const STORAGE_KEY = 'welcome-modal-dismissal'
-const DISMISS_DURATION_IN_MILISECONDS =  30 * 60 * 1000
+const DISMISS_DURATION_IN_MILISECONDS = 30 * 60 * 1000
 
-export default function WelcomeModal(props) {
+interface WelcomeModalData {
+	backgroundImage?: string
+	externalBackgroundImage?: string
+	backgroundVideo?: string
+	externalBackgroundVideo?: string
+	logoImage?: string
+	externalLogoImage?: string
+	[key: string]: unknown
+}
+
+interface WelcomeModalProps {
+	data?: WelcomeModalData
+}
+
+export default function WelcomeModal(props: WelcomeModalProps) {
 	const { data } = props
 
 	const [visible, setVisible] = useState(false)
 	const [ready, setReady] = useState(false)
-	const videoRef = useRef(null)
+	const videoRef = useRef<any>(null)
 
 	const resolvedBackground = data?.backgroundImage || data?.externalBackgroundImage
 	const resolvedVideo = data?.backgroundVideo || data?.externalBackgroundVideo
@@ -132,14 +146,14 @@ export default function WelcomeModal(props) {
 					controls={false}
 					playsInline
 					onEnded={handleVideoEnded}
-					/>
+				/>
 			) : (
 				<Image
-					src={resolvedBackground}
+					src={resolvedBackground || ''}
 					className='absolute inset-0 w-full h-full object-cover'
 					width='100%'
 					height='100%'
-					/>
+				/>
 			)}
 
 			{resolvedLogo ? (
@@ -151,25 +165,25 @@ export default function WelcomeModal(props) {
 			<View className='absolute bottom-0 left-0 right-0 flex flex-col'>
 				<View className='h-12 bg-[linear-gradient(180deg,transparent_0%,#000000_100%)]' />
 				<View className='bg-black pt-8 px-4 pb-10 flex flex-col items-center gap-4'>
-				<Text className='text-center text-white text-base leading-6 px-2'>{t('welcomeModal.description')}</Text>
+					<Text className='text-center text-white text-base leading-6 px-2'>{t('welcomeModal.description')}</Text>
 
-				<View
-					className='w-full flex items-center justify-center h-14 bg-[#F2C94C] rounded-lg'
-					onClick={handleLogin}>
-					<Text className='text-black font-bold text-xl'>{t('welcomeModal.login')}</Text>
-				</View>
+					<View
+						className='w-full flex items-center justify-center h-14 bg-[#F2C94C] rounded-lg'
+						onClick={handleLogin}>
+						<Text className='text-black font-bold text-xl'>{t('welcomeModal.login')}</Text>
+					</View>
 
-				<View
-					className='w-full flex items-center justify-center h-14 rounded-lg border border-white'
-					onClick={handleSignUp}>
-					<Text className='text-white font-bold text-xl'>{t('welcomeModal.signUp')}</Text>
-				</View>
+					<View
+						className='w-full flex items-center justify-center h-14 rounded-lg border border-white'
+						onClick={handleSignUp}>
+						<Text className='text-white font-bold text-xl'>{t('welcomeModal.signUp')}</Text>
+					</View>
 
-				<View
-					className='flex items-center justify-center py-2'
-					onClick={handleDismiss}>
-					<Text className='text-white text-sm underline'>{t('welcomeModal.continue')}</Text>
-				</View>
+					<View
+						className='flex items-center justify-center py-2'
+						onClick={handleDismiss}>
+						<Text className='text-white text-sm underline'>{t('welcomeModal.continue')}</Text>
+					</View>
 				</View>
 			</View>
 		</View>

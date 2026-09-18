@@ -1,7 +1,16 @@
 import { View } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 
-export default function HeaderClose(props) {
+interface HeaderCloseProps {
+	// Note: Eitri.navigation.back(steps) takes a number of screens to go back, not a page identifier.
+	// Typed as number to match HeaderReturn convention.
+	backPage?: number
+	onClick?: () => void
+	className?: string
+	[key: string]: unknown
+}
+
+export default function HeaderClose(props: HeaderCloseProps) {
 	const { backPage, onClick, className } = props
 
 	const onClose = () => {

@@ -1,10 +1,22 @@
+interface ProductProperty {
+	name?: string
+	values?: string[]
+	[key: string]: unknown
+}
+
+interface Product {
+	properties?: ProductProperty[]
+	[key: string]: unknown
+}
+
 // Returns null (not '') for missing properties — callers should guard with !value or ?? default
-export const getProductProperty = (product, propertyName) => {
+export const getProductProperty = (product?: Product | null, propertyName?: string): string | null => {
+	if (!product || !propertyName) return null
 	const prop = product?.properties?.find(p => p.name === propertyName)
 	return prop?.values?.[0] || null
 }
 
-export const getAgrupadorCode = product => {
+export const getAgrupadorCode = (product?: Product | null): string | null => {
 	const code = getProductProperty(product, 'Codigo Agrupador')
 	if (!code) return null
 	const trimmed = String(code).trim()
@@ -27,15 +39,15 @@ const METAL_COLORS = [
 	{ match: /prata/i, color: DEFAULT_METAL_COLOR }
 ]
 
-export const getMetalColor = material => {
+export const getMetalColor = (material?: string | null): string => {
 	if (!material) return DEFAULT_METAL_COLOR
 	const found = METAL_COLORS.find(m => m.match.test(material))
 	return found ? found.color : DEFAULT_METAL_COLOR
 }
 
-export const groupSiblingsByCode = products => {
+export const groupSiblingsByCode = <T extends Product>(products?: T[] | null): Record<string, T[]> => {
 	if (!Array.isArray(products)) return {}
-	return products.reduce((acc, product) => {
+	return products.reduce<Record<string, T[]>>((acc, product) => {
 		const code = getAgrupadorCode(product)
 		if (!code) return acc
 		if (!acc[code]) acc[code] = []

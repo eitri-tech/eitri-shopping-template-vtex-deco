@@ -4,7 +4,15 @@ import { useTranslation } from 'eitri-i18n'
 import { RemoteConfig } from 'eitri-shopping-vtex-shared'
 import { CircularArrowIcon, SupportIcon, PaymentIcon } from 'eitri-shopping-template-vtex-deco-shared'
 
-const SERVICE_LINKS = [
+interface ServiceLinkItem {
+	id: string
+	labelKey: string
+	remoteConfigKey: string
+	fallbackUrl: string
+	inApp: boolean
+}
+
+const SERVICE_LINKS: ServiceLinkItem[] = [
 	{
 		id: 'returns',
 		labelKey: 'serviceLinks.returns',
@@ -50,7 +58,11 @@ function ArrowIcon() {
 	)
 }
 
-function ServiceIcon(props) {
+interface ServiceIconProps {
+	id: string
+}
+
+function ServiceIcon(props: ServiceIconProps) {
 	const { id } = props
 
 	if (id === 'returns') return <CircularArrowIcon size={24} />
@@ -61,7 +73,7 @@ function ServiceIcon(props) {
 export default function ServiceLinks() {
 	const { t } = useTranslation()
 
-	const openLink = item => {
+	const openLink = (item: ServiceLinkItem) => {
 		const url = RemoteConfig.getContent(item.remoteConfigKey) || item.fallbackUrl
 
 		Eitri.openBrowser({

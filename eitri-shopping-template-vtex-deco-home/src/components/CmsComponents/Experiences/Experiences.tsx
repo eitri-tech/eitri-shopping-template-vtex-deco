@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react'
 import { View, Text, Image } from 'eitri-luminus'
 import { processActions } from '../../../services/ResolveCmsActions'
 import {
@@ -16,7 +17,7 @@ import {
     Divisor
 } from 'eitri-shopping-template-vtex-deco-shared'
 
-const ICON_MAP = {
+const ICON_MAP: Record<string, ComponentType<{ size?: number | string; className?: string }>> = {
     LuBadgePercent: BadgePercentIcon,
     LuShoppingBag: ShoppingBagIcon,
     LuGift: GiftIcon,
@@ -33,18 +34,41 @@ const ICON_MAP = {
     pix: PixIcon
 }
 
-export default function Experiences(props) {
+interface ExperienceAction {
+    type?: string
+    [key: string]: unknown
+}
+
+interface ExperienceItem {
+    iconName?: string
+    icon?: string
+    title?: string
+    description?: string
+    action?: ExperienceAction
+    [key: string]: unknown
+}
+
+interface ExperiencesData {
+    title?: string
+    items?: ExperienceItem[]
+}
+
+interface ExperiencesProps {
+    data?: ExperiencesData
+}
+
+export default function Experiences(props: ExperiencesProps) {
     const { data } = props
     const title = data?.title
     const items = data?.items || []
 
-    const rows = []
+    const rows: ExperienceItem[][] = []
     for (let i = 0; i < items.length; i += 2) {
         rows.push(items.slice(i, i + 2))
     }
 
-    const renderItem = (item, index) => {
-        const hasAction = item.action?.type && item.action.type !== 'none'
+    const renderItem = (item: ExperienceItem, index: number) => {
+        const hasAction = Boolean(item.action?.type && item.action.type !== 'none')
 
         return (
             <View

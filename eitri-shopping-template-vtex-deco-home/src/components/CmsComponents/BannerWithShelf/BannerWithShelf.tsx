@@ -7,9 +7,26 @@ import ShelfOfProductsSlider from '../../ShelfOfProducts/components/ShelfOfProdu
 import { ProductImageShelf } from './ProductImageShelf'
 import SectionTitle from '../../SectionTitle/SectionTitle'
 
-export default function BannerWithShelf(props) {
+interface BannerWithShelfData {
+	title?: string
+	imageUrl?: string
+	externalImageUrl?: string
+	aspectRatio?: string
+	numberOfItems?: number
+	mode?: string
+	facets?: any[]
+	term?: string
+	sort?: string
+	[key: string]: unknown
+}
+
+interface BannerWithShelfProps {
+	data?: BannerWithShelfData
+}
+
+export default function BannerWithShelf(props: BannerWithShelfProps) {
 	const { data } = props
-	const [products, setProducts] = useState([])
+	const [products, setProducts] = useState<any[]>([])
 	const [isLoading, setIsLoading] = useState(false)
 
 	useEffect(() => {
@@ -25,7 +42,7 @@ export default function BannerWithShelf(props) {
 			sort: data.sort ?? '',
 			to: data.numberOfItems || 8
 		}
-		const result = await getProductsService(params)
+		const result = await getProductsService(params as any)
 		if (result) {
 			setProducts(result.products)
 		}
@@ -37,21 +54,21 @@ export default function BannerWithShelf(props) {
 			path: 'ProductCatalog',
 			state: {
 				params: {
-					facets: data.facets || [],
-					query: data.term ?? '',
-					sort: data.sort ?? ''
+					facets: data?.facets || [],
+					query: data?.term ?? '',
+					sort: data?.sort ?? ''
 				},
-				title: data.title
+				title: data?.title
 			}
 		})
 	}
 
 	const imageUrl = data?.imageUrl || data?.externalImageUrl
 
-	let proportionalHeight = 'auto'
+	let proportionalHeight: number | string = 'auto'
 	if (data?.aspectRatio) {
 		try {
-			const [aspectWidth, aspectHeight] = data?.aspectRatio?.split(':')?.map(Number)
+			const [aspectWidth, aspectHeight] = data.aspectRatio.split(':').map(Number)
 			const screenWidth = window.innerWidth
 			proportionalHeight = screenWidth * (aspectHeight / aspectWidth)
 		} catch (e) {}

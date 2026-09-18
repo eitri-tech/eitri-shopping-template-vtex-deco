@@ -1,3 +1,4 @@
+import { View, Text } from 'eitri-luminus'
 import Eitri from 'eitri-bifrost'
 import { Divisor, WhatsappIcon, InfoCircleIcon, ArrowRightIcon } from 'eitri-shopping-template-vtex-deco-shared'
 import { RemoteConfig } from 'eitri-shopping-vtex-shared'
@@ -7,11 +8,18 @@ const WHATSAPP_FALLBACK_URL =
 	'https://api.whatsapp.com/send/?phone=%2B5521995714886&text=Ol%C3%A1%21+Gostaria+da+ajuda+de+uma+consultora+digital%21&type=phone_number&app_absent=0'
 const FAQ_FALLBACK_URL = 'https://montecarlojoias.zendesk.com/hc/pt-br'
 
-export default function HelpSection(props) {
+interface HelpSectionProps {
+	className?: string
+	hideTopDivisor?: boolean
+	showItemDivisors?: boolean
+	[key: string]: unknown
+}
+
+export default function HelpSection(props: HelpSectionProps) {
 	const { t } = useTranslation()
 	const { className } = props
 
-	const openLink = (url, inApp) => {
+	const openLink = (url: string, inApp: boolean) => {
 		Eitri.openBrowser({ url, inApp })
 	}
 

@@ -1,29 +1,53 @@
-import { Image, Text, View } from 'eitri-luminus'
 import { useEffect, useMemo, useState } from 'react'
+import { Image, Text, View } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
 import { TrackingService } from 'eitri-shopping-template-vtex-deco-shared'
-import { showTogether } from '../../services/productService'
 import { useLocalShoppingCart } from '../../providers/LocalCart'
 import { useSnackBar } from '../../providers/SnackBar'
+import { showTogether } from '../../services/productService'
 import { formatAmount } from '../../utils/utils'
+import type { VtexProduct, VtexSku, VtexSeller, VtexInstallment } from '../../types/vtex'
 
-function getAvailableSku(product) {
+interface Recommendation {
+	product: VtexProduct
+	sku: VtexSku
+}
+
+function getAvailableSku(product?: VtexProduct): VtexSku | null {
+	const items = product?.items || []
 	return (
-		product?.items?.find(item => item?.sellers?.some(seller => seller?.commertialOffer?.AvailableQuantity > 0)) ||
+		items.find(item =>
+			item.sellers?.some(
+				seller =>
+					seller.sellerDefault &&
+					(seller.commertialOffer?.AvailableQuantity ?? 0) > 0
+			)
+		) ||
+		items.find(item =>
+			item.sellers?.some(
+				seller => (seller.commertialOffer?.AvailableQuantity ?? 0) > 0
+			)
+		) ||
 		null
 	)
 }
 
-function getAvailableSeller(sku) {
+function getAvailableSeller(sku?: VtexSku): VtexSeller | null {
 	const sellers = sku?.sellers || []
 	return (
-		sellers.find(seller => seller?.sellerDefault && seller?.commertialOffer?.AvailableQuantity > 0) ||
-		sellers.find(seller => seller?.commertialOffer?.AvailableQuantity > 0) ||
+		sellers.find(
+			seller =>
+				seller?.sellerDefault &&
+				(seller?.commertialOffer?.AvailableQuantity ?? 0) > 0
+		) ||
+		sellers.find(
+			seller => (seller?.commertialOffer?.AvailableQuantity ?? 0) > 0
+		) ||
 		null
 	)
 }
 
-function getMainSeller(sku) {
+function getMainSeller(sku?: VtexSku): VtexSeller | undefined {
 	const sellers = sku?.sellers || []
 	return (
 		getAvailableSeller(sku) ||
@@ -32,29 +56,39 @@ function getMainSeller(sku) {
 	)
 }
 
-function getPrice(sku) {
+function getPrice(sku?: VtexSku): number {
 	return getMainSeller(sku)?.commertialOffer?.Price || 0
 }
 
-function getInstallment(sku) {
+function getInstallment(sku?: VtexSku): VtexInstallment | null {
 	const installments = getMainSeller(sku)?.commertialOffer?.Installments || []
-	const interestFreeInstallments = installments.filter(installment => installment.InterestRate === 0)
+	const interestFreeInstallments = installments.filter(
+		installment => installment.InterestRate === 0
+	)
 
-	return interestFreeInstallments.reduce((best, installment) => {
-		if (!best || installment.NumberOfInstallments > best.NumberOfInstallments) {
+	return interestFreeInstallments.reduce<VtexInstallment | null>((best, installment) => {
+		if (
+			!best ||
+			(installment.NumberOfInstallments ?? 0) > (best.NumberOfInstallments ?? 0)
+		) {
 			return installment
 		}
 		return best
 	}, null)
 }
 
-export default function BuyTogether(props) {
+interface BuyTogetherProps {
+	product?: VtexProduct
+	currentSku?: VtexSku
+}
+
+export default function BuyTogether(props: BuyTogetherProps) {
 	const { product, currentSku } = props
 	const { t } = useTranslation()
 	const { addItems } = useLocalShoppingCart()
 	const { showSnackBar } = useSnackBar()
-	const [recommendations, setRecommendations] = useState([])
-	const [selectedProductIds, setSelectedProductIds] = useState([])
+	const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+	const [selectedProductIds, setSelectedProductIds] = useState<string[]>([])
 	const [isLoading, setIsLoading] = useState(false)
 	const [isBuying, setIsBuying] = useState(false)
 
@@ -71,16 +105,16 @@ export default function BuyTogether(props) {
 
 		try {
 			const products = await showTogether(product.productId)
-			const availableProducts = (products || [])
+			const availableProducts: Recommendation[] = (products || [])
 				.filter(
 					recommendedProduct =>
 						String(recommendedProduct?.productId) !== String(product.productId)
 				)
 				.map(recommendedProduct => ({
 					product: recommendedProduct,
-					sku: getAvailableSku(recommendedProduct)
+					sku: getAvailableSku(recommendedProduct)!
 				}))
-				.filter(recommendation => recommendation.sku)
+				.filter(recommendation => Boolean(recommendation.sku))
 				.slice(0, 1)
 
 			setRecommendations(availableProducts)
@@ -107,7 +141,7 @@ export default function BuyTogether(props) {
 	}, [currentSku, recommendations])
 
 	const selectedPrice = useMemo(() => {
-		const currentProductPrice = selectedProductIds.includes(String(product.productId))
+		const currentProductPrice = selectedProductIds.includes(String(product?.productId))
 			? getPrice(currentSku)
 			: 0
 
@@ -115,9 +149,10 @@ export default function BuyTogether(props) {
 			(total, recommendation) => total + getPrice(recommendation.sku),
 			currentProductPrice
 		)
-	}, [currentSku, product.productId, selectedProductIds, selectedRecommendations])
+	}, [currentSku, product?.productId, selectedProductIds, selectedRecommendations])
 
-	const toggleProduct = productId => {
+	const toggleProduct = (productId?: string) => {
+		if (!productId) return
 		const normalizedProductId = String(productId)
 		setSelectedProductIds(currentIds => {
 			if (currentIds.includes(normalizedProductId)) {
@@ -127,7 +162,7 @@ export default function BuyTogether(props) {
 		})
 	}
 
-	const getCartItemPayload = sku => {
+	const getCartItemPayload = (sku: VtexSku) => {
 		return {
 			id: sku.itemId,
 			quantity: 1,
@@ -136,9 +171,9 @@ export default function BuyTogether(props) {
 	}
 
 	const allProductsSelected =
-		!!getAvailableSeller(currentSku) &&
+		Boolean(getAvailableSeller(currentSku)) &&
 		recommendations.length > 0 &&
-		selectedProductIds.includes(String(product.productId)) &&
+		selectedProductIds.includes(String(product?.productId)) &&
 		recommendations.every(recommendation =>
 			selectedProductIds.includes(String(recommendation.product.productId))
 		)
@@ -154,7 +189,9 @@ export default function BuyTogether(props) {
 				getCartItemPayload(recommendation.sku)
 			])
 
-			TrackingService.addToCartEvent(product)
+			if (product) {
+				TrackingService.addToCartEvent(product)
+			}
 			TrackingService.addToCartEvent(recommendation.product)
 
 			showSnackBar('success', t('buyTogether.snackAdded'))
@@ -189,8 +226,8 @@ export default function BuyTogether(props) {
 					<BuyTogetherCard
 						product={product}
 						sku={currentSku}
-						isSelected={selectedProductIds.includes(String(product.productId))}
-						onToggle={() => toggleProduct(product.productId)}
+						isSelected={selectedProductIds.includes(String(product?.productId))}
+						onToggle={() => toggleProduct(product?.productId)}
 					/>
 
 					{recommendations.map(recommendation => (
@@ -232,11 +269,18 @@ export default function BuyTogether(props) {
 	)
 }
 
-function BuyTogetherCard(props) {
+interface BuyTogetherCardProps {
+	product?: VtexProduct
+	sku?: VtexSku
+	isSelected?: boolean
+	onToggle?: () => void
+}
+
+function BuyTogetherCard(props: BuyTogetherCardProps) {
 	const { product, sku, isSelected, onToggle } = props
 	const { t } = useTranslation()
 	const seller = getMainSeller(sku)
-	const price = seller?.commertialOffer?.Price
+	const price = seller?.commertialOffer?.Price ?? 0
 	const installment = getInstallment(sku)
 	const imageUrl = sku?.images?.[0]?.imageUrl
 
@@ -244,7 +288,7 @@ function BuyTogetherCard(props) {
 		<View className='w-[198px] flex flex-col'>
 			<View className='h-[154px] w-full bg-gray-50 flex items-center justify-center'>
 				<Image
-					src={imageUrl}
+					src={imageUrl || ''}
 					className='h-full w-full object-contain'
 				/>
 			</View>
@@ -259,11 +303,11 @@ function BuyTogetherCard(props) {
 
 			<Text className='mt-2 text-xs leading-4 min-h-[32px]'>{sku?.nameComplete || product?.productName}</Text>
 			<Text className='mt-2 text-sm font-bold'>{formatAmount(price)}</Text>
-			{installment && installment.NumberOfInstallments > 1 && (
+			{installment && (installment.NumberOfInstallments ?? 0) > 1 && (
 				<Text className='text-[10px] text-gray-700'>
 					{t('buyTogether.installment', {
 						count: installment.NumberOfInstallments,
-						value: formatAmount(installment.Value)
+						value: formatAmount(installment.Value ?? 0)
 					})}
 				</Text>
 			)}

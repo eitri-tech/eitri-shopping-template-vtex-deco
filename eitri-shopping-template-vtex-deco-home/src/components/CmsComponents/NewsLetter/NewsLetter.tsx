@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import type { ComponentProps } from 'react'
 import { View, Text, TextInput } from 'eitri-luminus'
 import { TrackingService, NewsletterService } from 'eitri-shopping-template-vtex-deco-shared'
 import { useSnackBar } from '../../../providers/SnackBar'
@@ -5,7 +7,28 @@ import { processActions } from '../../../services/ResolveCmsActions'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-export default function NewsLetter(props) {
+// TextInputProps deliberately omits `type` from its InputHTMLAttributes — same override already
+// applied in SearchInput.tsx and CustomInput.tsx to preserve this input's real `type` usage.
+type TextInputWithType = ComponentProps<typeof TextInput> & { type?: string }
+const TextInputAny = TextInput as unknown as (props: TextInputWithType) => JSX.Element
+
+interface NewsLetterData {
+	title?: string
+	subtitle?: string
+	emailPlaceholder?: string
+	namePlaceholder?: string
+	buttonLabel?: string
+	page?: string
+	termsAction?: any
+	privacyAction?: any
+	[key: string]: unknown
+}
+
+interface NewsLetterProps {
+	data?: NewsLetterData
+}
+
+export default function NewsLetter(props: NewsLetterProps) {
 	const { data } = props
 	const { showSnackBar } = useSnackBar()
 
@@ -39,7 +62,7 @@ export default function NewsLetter(props) {
 
 			TrackingService.sendRecommendedGaEvent('newsletter_subscribe', { email, name })
 
-			showSnackBar(
+			showSnackBar?.(
 				'success',
 				alreadySubscribed ? 'E-mail já cadastrado.' : 'Cadastro realizado com sucesso!'
 			)
@@ -48,7 +71,7 @@ export default function NewsLetter(props) {
 			setAccepted(false)
 		} catch (e) {
 			console.error('Erro ao cadastrar na newsletter', e)
-			showSnackBar('trash', 'Não foi possível concluir o cadastro. Tente novamente.')
+			showSnackBar?.('trash', 'Não foi possível concluir o cadastro. Tente novamente.')
 		} finally {
 			setIsLoading(false)
 		}
@@ -61,18 +84,18 @@ export default function NewsLetter(props) {
 				<Text className='text-lg text-gray-800'>{subtitle}</Text>
 			</View>
 
-			<TextInput
+			<TextInputAny
 				type='email'
 				value={email}
-				onChange={e => setEmail(e.target.value)}
+				onChange={(e: any) => setEmail(e?.target?.value ?? '')}
 				placeholder={emailPlaceholder}
 				className='w-full h-12 px-4 border border-gray-300 border-solid bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0'
 			/>
 
-			<TextInput
+			<TextInputAny
 				type='text'
 				value={name}
-				onChange={e => setName(e.target.value)}
+				onChange={(e: any) => setName(e?.target?.value ?? '')}
 				placeholder={namePlaceholder}
 				className='w-full h-12 px-4 border border-gray-300 border-solid bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0'
 			/>
@@ -89,13 +112,13 @@ export default function NewsLetter(props) {
 				<Text className='text-sm text-gray-600'>
 					Li e concordo com os{' '}
 					<Text
-						onClick={termsAction ? () => processActions({ action: termsAction }) : undefined}
+						onClick={termsAction ? () => processActions({ action: termsAction } as any) : undefined}
 						className='underline text-gray-600'>
 						Termos e Condições
 					</Text>
 					, e com a{' '}
 					<Text
-						onClick={privacyAction ? () => processActions({ action: privacyAction }) : undefined}
+						onClick={privacyAction ? () => processActions({ action: privacyAction } as any) : undefined}
 						className='underline text-gray-600'>
 						Política de Privacidade
 					</Text>{' '}

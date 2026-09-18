@@ -4,17 +4,43 @@ import { processActions } from '../../../services/ResolveCmsActions'
 import { getTimeRemaining, formatCountdown } from '../../../utils/countdownUtils'
 import { resolveVideoProps } from '../../../utils/videoUtils'
 
-const safeParse = (s) => {
+const safeParse = (s?: string | null) => {
 	if (!s) return null
 	const d = new Date(s)
 	return isNaN(d.getTime()) ? null : d
 }
 
-export default function VideoHero(props) {
+interface VideoHeroAction {
+	type?: string
+	[key: string]: unknown
+}
+
+interface VideoHeroData {
+	backgroundImage?: string
+	externalBackgroundImage?: string
+	backgroundVideo?: string
+	externalBackgroundVideo?: string
+	contentMode?: string
+	logoImage?: string
+	externalLogoImage?: string
+	title?: string
+	description?: string
+	ctaText?: string
+	startDate?: string
+	endDate?: string
+	action?: VideoHeroAction
+	[key: string]: unknown
+}
+
+interface VideoHeroProps {
+	data?: VideoHeroData
+}
+
+export default function VideoHero(props: VideoHeroProps) {
 	const { data } = props
 
-	const intervalRef = useRef(null)
-	const videoRef = useRef(null)
+	const intervalRef = useRef<any>(null)
+	const videoRef = useRef<any>(null)
 
 	const backgroundImage = data?.backgroundImage || data?.externalBackgroundImage
 	const backgroundVideo = data?.backgroundVideo || data?.externalBackgroundVideo
@@ -29,16 +55,16 @@ export default function VideoHero(props) {
 
 	const now = new Date()
 	const isInDateRange = !(startDate && now < startDate) && !(endDate && now >= endDate)
-	const showCountdown = contentMode === 'countdown' && endDate && isInDateRange
+	const showCountdown = contentMode === 'countdown' && Boolean(endDate) && isInDateRange
 
 	const [expired, setExpired] = useState(false)
-	const [countdown, setCountdown] = useState(() => {
-		if (showCountdown) return formatCountdown(getTimeRemaining(endDate))
+	const [countdown, setCountdown] = useState<string | null>(() => {
+		if (showCountdown && endDate) return formatCountdown(getTimeRemaining(endDate))
 		return null
 	})
 
 	useEffect(() => {
-		if (!showCountdown) return
+		if (!showCountdown || !endDate) return
 
 		intervalRef.current = setInterval(() => {
 			const rem = getTimeRemaining(endDate)
@@ -96,7 +122,7 @@ export default function VideoHero(props) {
 				/>
 			) : (
 				<Image
-					src={backgroundImage}
+					src={backgroundImage || ''}
 					className='absolute inset-0 w-full h-full object-cover'
 					width='100%'
 					height='100%'
