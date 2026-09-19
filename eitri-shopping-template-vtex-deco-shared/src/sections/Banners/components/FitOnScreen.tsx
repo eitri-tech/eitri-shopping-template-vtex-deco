@@ -19,7 +19,7 @@ export default function FitOnScreen({ data, onClick }: Props) {
 						key={image.imageUrl}
 						onClick={() => onClick(image)}>
 						<Image
-							src={image.imageUrl}
+							src={image.imageUrl ?? ''}
 							className='rounded'
 						/>
 						{image.action?.title && <Text className='text-center mt-2'>{image.action.title}</Text>}

@@ -44,7 +44,7 @@ function BlogCard({ postImg, post, handleClick, textWidth }: BlogCardProps) {
 				<View className='relative'>
 					<View className=''>
 						<Image
-							src={postImg}
+							src={postImg ?? ''}
 							className={`w-full h-[168px] rounded object-cover object-top`}
 							alt={post.title.rendered}
 						/>

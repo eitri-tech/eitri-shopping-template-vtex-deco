@@ -19,7 +19,7 @@ export default function GridList({ data, onClick }: Props) {
 						key={image.imageUrl || image.externalImageUrl}
 						onClick={() => onClick(image)}>
 						<Image
-							src={image.imageUrl || image.externalImageUrl}
+							src={image.imageUrl || image.externalImageUrl || ''}
 							className='w-full h-auto rounded'
 						/>
 						{image.subLabel && (

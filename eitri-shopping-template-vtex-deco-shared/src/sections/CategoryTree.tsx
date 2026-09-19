@@ -1,9 +1,15 @@
 import { Text, View, Image } from 'eitri-luminus'
 import { useState, useEffect } from 'react'
+import type { ReactNode } from 'react'
 import Eitri from 'eitri-bifrost'
 import { Vtex } from 'eitri-shopping-vtex-shared'
 import { resolveNavigation } from '../services/NavigationService'
 import type { ImageWidget } from '../types/widgets'
+
+// View/Text have no `backgroundColor`/`borderColor`/`borderBottomWidth`/`fontFamily` props in
+// their .d.ts — kept as-is (pre-existing, legacy props from an older API version).
+const ViewAny = View as unknown as (props: Record<string, unknown> & { children?: ReactNode }) => JSX.Element
+const TextAny = Text as unknown as (props: Record<string, unknown> & { children?: ReactNode }) => JSX.Element
 
 export interface CategoryTreeItem {
 	/**
@@ -46,7 +52,7 @@ function ListWithImages({ currentShelf, chooseCategory }: ListProps) {
 	return (
 		<View className='px-8 flex flex-col'>
 			{currentShelf?.content?.map(category => (
-				<View
+				<ViewAny
 					key={category.title}
 					onClick={() => chooseCategory(category)}
 					height='71px'
@@ -54,11 +60,11 @@ function ListWithImages({ currentShelf, chooseCategory }: ListProps) {
 					<View
 						width='100%'
 						className='px-8 justify-between items-center flex'>
-						<Text
+						<TextAny
 							fontFamily='Baloo 2'
 							className='text-base text-base-100 font-bold'>
 							{category?.title}
-						</Text>
+						</TextAny>
 						{category.thumbnail && (
 							<View
 								width='71px'
@@ -72,7 +78,7 @@ function ListWithImages({ currentShelf, chooseCategory }: ListProps) {
 							</View>
 						)}
 					</View>
-				</View>
+				</ViewAny>
 			))}
 		</View>
 	)
@@ -85,26 +91,26 @@ function SimpleList({ currentShelf, chooseCategory }: ListProps) {
 		<View className='px-8 flex'>
 			<View width='50%'>
 				{currentShelf?.content?.slice(0, half).map(category => (
-					<View
+					<ViewAny
 						key={category.title}
 						onClick={() => chooseCategory(category)}
 						borderBottomWidth='hairline'
 						width='100%'
 						className='py-1 border-neutral'>
-						<Text fontFamily='Baloo 2'>{category?.title}</Text>
-					</View>
+						<TextAny fontFamily='Baloo 2'>{category?.title}</TextAny>
+					</ViewAny>
 				))}
 			</View>
 			<View width='50%'>
 				{currentShelf?.content?.slice(half, totalLength).map(category => (
-					<View
+					<ViewAny
 						key={category.title}
 						onClick={() => chooseCategory(category)}
 						borderBottomWidth='hairline'
 						width='100%'
 						className='py-1 border-neutral'>
-						<Text fontFamily='Baloo 2'>{category?.title}</Text>
-					</View>
+						<TextAny fontFamily='Baloo 2'>{category?.title}</TextAny>
+					</ViewAny>
 				))}
 			</View>
 		</View>
@@ -113,7 +119,8 @@ function SimpleList({ currentShelf, chooseCategory }: ListProps) {
 
 export default function CategoryTree({ shelves = [] }: Props) {
 	const [currentShelf, setCurrentShelf] = useState<CategoryTreeShelf | null>(null)
-	const legacySearch = Vtex?.configs?.searchOptions?.legacySearch
+	const legacySearch = (Vtex?.configs as { searchOptions?: { legacySearch?: boolean } } | undefined)?.searchOptions
+		?.legacySearch
 
 	useEffect(() => {
 		if (shelves.length) {
@@ -147,7 +154,7 @@ export default function CategoryTree({ shelves = [] }: Props) {
 				<View className='overflow-x-auto flex px-8'>
 					{shelves.map(shelf =>
 						shelf.title ? (
-							<View
+							<ViewAny
 								minWidth='fit-content'
 								key={shelf.title}
 								onClick={() => onChooseShelf(shelf)}
@@ -157,7 +164,7 @@ export default function CategoryTree({ shelves = [] }: Props) {
 								<Text color={shelf.title === currentShelf?.title ? 'secondary-500' : 'neutral-300'}>
 									{shelf.title}
 								</Text>
-							</View>
+							</ViewAny>
 						) : null
 					)}
 				</View>

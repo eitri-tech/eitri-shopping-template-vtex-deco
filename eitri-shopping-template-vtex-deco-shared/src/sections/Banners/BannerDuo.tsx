@@ -122,7 +122,7 @@ export default function BannerDuo({ title, showCta = true, ctaText = 'ver todos'
 						return (
 							<View key={index} className='flex flex-col w-[45vw] shrink-0'>
 								<Image
-									src={imageUrl}
+									src={imageUrl ?? ''}
 									alt={item.alt || title || ''}
 									onClick={() => handleBannerClick(item)}
 									className='w-full aspect-[199/301] object-cover'

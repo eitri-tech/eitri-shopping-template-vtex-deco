@@ -43,8 +43,9 @@ export const getSponsoredBanner = async ({
 		channel: 'app'
 	}
 
+	// HttpConfig expects headers nested under `headers` — passing them flat silently drops them (see AGENTS.md).
 	const res = await Eitri.http.post(`${BASE_URL}/${PUBLISHER_ID}`, body, {
-		'Content-Type': 'application/json'
+		headers: { 'Content-Type': 'application/json' }
 	})
 
 	const ads = res?.data?.[sponsoredPlacement]

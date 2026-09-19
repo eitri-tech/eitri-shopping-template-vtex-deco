@@ -196,7 +196,7 @@ function CategoryPageItem({ item, goToItem }: CategoryPageItemProps) {
 						showSubItems ? 'left-0' : '!left-[100vw] !shadow-none'
 					} transition-left !duration-300 !backdrop-blur-none !bg-white`}>
 					<HeaderReturn onClick={handleBack} />
-					<HeaderText text={currentItem?.title || item.title}>{currentItem?.title || item.title}</HeaderText>
+					<HeaderText text={currentItem?.title || item.title} />
 				</HeaderContentWrapper>
 				<View
 					bottomInset={'auto'}

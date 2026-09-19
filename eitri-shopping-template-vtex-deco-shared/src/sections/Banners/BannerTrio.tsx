@@ -1,9 +1,13 @@
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Image, Text, View } from 'eitri-luminus'
 import { processActions } from '../../services/ResolveCmsActions'
 import Slider from '../../Slider/Slider'
 import type { CmsAction } from '../types'
 import type { ImageWidget } from '../../types/widgets'
+
+// Text has no `fontFamily` prop in its .d.ts — kept as-is (pre-existing, likely a no-op at runtime).
+const TextAny = Text as unknown as (props: Record<string, unknown> & { children?: ReactNode }) => JSX.Element
 
 // Figma 413-427: viewport 440, card 298x424, gap 22, peek de 49 de cada lado
 // -> perView = 440 / (298 + 22) = 1.375. Trilho 177 / thumb 66 (~0.37).
@@ -61,18 +65,18 @@ export default function BannerTrio({ title, subtitle, items = [] }: Props) {
 			{(title || subtitle) && (
 				<View className='flex flex-col px-4 mb-4'>
 					{title ? (
-						<Text
+						<TextAny
 							fontFamily='Inter'
 							className='font-medium text-2xl leading-[29px] text-black'>
 							{title}
-						</Text>
+						</TextAny>
 					) : null}
 					{subtitle ? (
-						<Text
+						<TextAny
 							fontFamily='Inter'
 							className='font-medium text-2xl leading-[29px] text-black opacity-60'>
 							{subtitle}
-						</Text>
+						</TextAny>
 					) : null}
 				</View>
 			)}

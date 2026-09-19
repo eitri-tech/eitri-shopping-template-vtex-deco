@@ -1,0 +1,84 @@
+import { useEffect } from 'react'
+import Eitri from 'eitri-bifrost'
+import { View, Text, Page } from 'eitri-luminus'
+import { useTranslation } from 'eitri-i18n'
+import {
+	HeaderContentWrapper,
+	HeaderReturn,
+	HeaderText,
+	CustomButton,
+	BottomInset,
+	TrackingService,
+	ShoppingBagIcon
+} from 'eitri-shopping-template-vtex-deco-shared'
+import { useLocalShoppingCart } from '../providers/LocalCart'
+import type { RouteProps } from '../types/route'
+
+interface EmptyCartState {
+	openWithBottomBar?: boolean
+}
+
+export default function EmptyCart(props: RouteProps<EmptyCartState>) {
+	const openWithBottomBar = props?.location?.state?.openWithBottomBar
+
+	const { t } = useTranslation()
+	const { startCart } = useLocalShoppingCart()
+
+	useEffect(() => {
+		TrackingService.sendScreenView('Carrinho vazio', 'EmptyCart')
+	}, [])
+
+	useEffect(() => {
+		Eitri.navigation.setOnResumeListener(async () => {
+			const cart = await startCart?.()
+			if (cart && (cart.items?.length ?? 0) > 0) {
+				Eitri.navigation.navigate({ path: 'Home', replace: true })
+			}
+		})
+	}, [])
+
+	const goToHome = async () => {
+		await Eitri.bottomBar.changeTab({ index: 0 })
+		await Eitri.navigation.close({ resetStack: true })
+	}
+
+	const handleContinueShopping = () => {
+		if (openWithBottomBar) {
+			goToHome()
+			return
+		}
+
+		Eitri.navigation.close()
+	}
+
+	return (
+		<Page title='Carrinho vazio'>
+			<View className={'min-h-[100vh] flex flex-col'}>
+				<HeaderContentWrapper>
+					{!openWithBottomBar && <HeaderReturn />}
+					<HeaderText text={t('home.title')} />
+				</HeaderContentWrapper>
+
+				<View className='flex flex-1 flex-col justify-center items-center'>
+					<View className='flex flex-col items-center gap-4 w-full max-w-xs'>
+						<View className='text-primary'>
+							<ShoppingBagIcon size={50} />
+						</View>
+						<Text className='font-bold text-gray-800 text-xl text-center'>
+							{t('emptyCart.txtEmptyCart')}
+						</Text>
+						<Text className='text-gray-600 text-center'>{t('emptyCart.txtMessageList')}</Text>
+						<View className='w-full mt-2'>
+							<CustomButton
+								label={t('emptyCart.labelButton')}
+								onPress={handleContinueShopping}
+								className='btn-primary w-full'
+							/>
+						</View>
+					</View>
+					<BottomInset />
+				</View>
+			</View>
+		</Page>
+	)
+}
