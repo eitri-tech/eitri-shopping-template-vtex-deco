@@ -6,10 +6,6 @@
   "manifest": {
     "blocks": {
       "sections": {
-        "site/sections/AppPages/Bonus.tsx": {
-          "$ref": "#/definitions/c2l0ZS9zZWN0aW9ucy9BcHBQYWdlcy9Cb251cy50c3g=",
-          "namespace": "site"
-        },
         "site/sections/AppPages/FavoritosHeader.tsx": {
           "$ref": "#/definitions/c2l0ZS9zZWN0aW9ucy9BcHBQYWdlcy9GYXZvcml0b3NIZWFkZXIudHN4",
           "namespace": "site"
@@ -20,10 +16,6 @@
         },
         "site/sections/AppPages/SignUp.tsx": {
           "$ref": "#/definitions/c2l0ZS9zZWN0aW9ucy9BcHBQYWdlcy9TaWduVXAudHN4",
-          "namespace": "site"
-        },
-        "site/sections/AppPages/WelcomeBonusCallout.tsx": {
-          "$ref": "#/definitions/c2l0ZS9zZWN0aW9ucy9BcHBQYWdlcy9XZWxjb21lQm9udXNDYWxsb3V0LnRzeA==",
           "namespace": "site"
         },
         "site/sections/AppPages/WelcomeHeader.tsx": {
@@ -84,10 +76,6 @@
         },
         "site/sections/BlogPostShelf.tsx": {
           "$ref": "#/definitions/c2l0ZS9zZWN0aW9ucy9CbG9nUG9zdFNoZWxmLnRzeA==",
-          "namespace": "site"
-        },
-        "site/sections/BonusBar.tsx": {
-          "$ref": "#/definitions/c2l0ZS9zZWN0aW9ucy9Cb251c0Jhci50c3g=",
           "namespace": "site"
         },
         "site/sections/BrandCarousel.tsx": {
@@ -2254,27 +2242,6 @@
           }
         }
       },
-      "c2l0ZS9zZWN0aW9ucy9BcHBQYWdlcy9Cb251cy50c3g=": {
-        "title": "site/sections/AppPages/Bonus.tsx",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/c3JjL3NlY3Rpb25zL0FwcFBhZ2VzL0JvbnVzLnRzeA==@Props"
-          }
-        ],
-        "required": [
-          "__resolveType"
-        ],
-        "properties": {
-          "__resolveType": {
-            "type": "string",
-            "enum": [
-              "site/sections/AppPages/Bonus.tsx"
-            ],
-            "default": "site/sections/AppPages/Bonus.tsx"
-          }
-        }
-      },
       "c3JjL3NlY3Rpb25zL0FwcFBhZ2VzL0Zhdm9yaXRvc0hlYWRlci50c3g=@Props": {
         "type": "object",
         "properties": {
@@ -2469,27 +2436,6 @@
           "description": {
             "type": "string",
             "title": "Descrição do card"
-          }
-        }
-      },
-      "c2l0ZS9zZWN0aW9ucy9BcHBQYWdlcy9XZWxjb21lQm9udXNDYWxsb3V0LnRzeA==": {
-        "title": "site/sections/AppPages/WelcomeBonusCallout.tsx",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/c3JjL3NlY3Rpb25zL0FwcFBhZ2VzL1dlbGNvbWVCb251c0NhbGxvdXQudHN4@Props"
-          }
-        ],
-        "required": [
-          "__resolveType"
-        ],
-        "properties": {
-          "__resolveType": {
-            "type": "string",
-            "enum": [
-              "site/sections/AppPages/WelcomeBonusCallout.tsx"
-            ],
-            "default": "site/sections/AppPages/WelcomeBonusCallout.tsx"
           }
         }
       },
@@ -4650,44 +4596,11 @@
             "title": "Rótulo do CTA (saldo zerado)",
             "default": "Saiba como ganhar"
           },
-          "authenticatedHref": {
-            "type": "string",
-            "title": "Rota de saldo (autenticado)",
-            "description": "Rota nativa da conta para a tela de saldo, ex.: \"Bonus\".",
-            "default": "Bonus"
-          },
-          "educationHref": {
-            "type": "string",
-            "title": "Rota educativa (saldo zerado)",
-            "description": "Rota nativa OU URL externa (http/https) sobre o programa de bônus.",
-            "default": "https://www.montecarlo.com.br/meu-bonus"
-          },
           "loginHref": {
             "type": "string",
             "title": "Rota de login",
             "description": "Rota nativa do app account usada para autenticação, ex.: \"SignInVariant\".",
             "default": "SignInVariant"
-          }
-        }
-      },
-      "c2l0ZS9zZWN0aW9ucy9Cb251c0Jhci50c3g=": {
-        "title": "site/sections/BonusBar.tsx",
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/definitions/c3JjL3NlY3Rpb25zL0JvbnVzQmFyLnRzeA==@Props"
-          }
-        ],
-        "required": [
-          "__resolveType"
-        ],
-        "properties": {
-          "__resolveType": {
-            "type": "string",
-            "enum": [
-              "site/sections/BonusBar.tsx"
-            ],
-            "default": "site/sections/BonusBar.tsx"
           }
         }
       },
@@ -5622,7 +5535,7 @@
                     "iconName": {
                       "type": "string",
                       "title": "Nome do ícone.",
-                      "description": "Um dos nomes mapeados: LuBadgePercent, LuShoppingBag, LuGift, LuTag, LuStar, LuPercent, LuCircleDollarSign, LuShoppingCart, LuTicket, FaHandHoldingUsd, FiShoppingBag, FiGift, bonus, storebag, pix."
+                      "description": "Um dos nomes mapeados: LuBadgePercent, LuShoppingBag, LuGift, LuTag, LuStar, LuPercent, LuCircleDollarSign, LuShoppingCart, LuTicket, FaHandHoldingUsd, FiShoppingBag, FiGift, storebag, pix."
                     },
                     "icon": {
                       "type": "string",

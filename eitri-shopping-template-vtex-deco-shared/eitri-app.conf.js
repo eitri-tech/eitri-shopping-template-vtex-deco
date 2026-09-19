@@ -12,7 +12,7 @@ module.exports = {
   "eitri-app-dependencies": {
     "eitri-shopping-vtex-shared": {
       "isEitriAppShared": true,
-      "version": "1.18.0"
+      "version": "1.18.1"
     },
     "i18n": {
       "version": "14.1.2"
