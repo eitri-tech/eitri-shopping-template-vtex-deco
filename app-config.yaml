@@ -52,11 +52,10 @@ bottom-tab-view-simulation:
       type: string
       value: tabIndex=3
 
-
 #Monte Carlo
 application-id: 1701f922-8738-4143-97c6-a7af1d90b81b
 
-#App2
+#App
 # application-id:
 
 #App3

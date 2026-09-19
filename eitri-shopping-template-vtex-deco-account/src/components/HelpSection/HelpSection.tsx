@@ -4,9 +4,8 @@ import { Divisor, WhatsappIcon, InfoCircleIcon, ArrowRightIcon } from 'eitri-sho
 import { RemoteConfig } from 'eitri-shopping-vtex-shared'
 import { useTranslation } from 'eitri-i18n'
 
-const WHATSAPP_FALLBACK_URL =
-	'https://api.whatsapp.com/send/?phone=%2B5521995714886&text=Ol%C3%A1%21+Gostaria+da+ajuda+de+uma+consultora+digital%21&type=phone_number&app_absent=0'
-const FAQ_FALLBACK_URL = 'https://montecarlojoias.zendesk.com/hc/pt-br'
+const WHATSAPP_FALLBACK_URL = ''
+const FAQ_FALLBACK_URL = ''
 
 interface HelpSectionProps {
 	className?: string

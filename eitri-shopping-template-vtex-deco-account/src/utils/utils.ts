@@ -10,7 +10,7 @@ export const formatPrice = (price?: number, _locale?: string, _currency?: string
 }
 
 /**
- * Currency prefixed with an explicit +/- sign, used by the bonus statement
+ * Currency prefixed with an explicit +/- sign, used by the feature statement
  * ("+R$ 7.702,83" for credits, "-R$ 5.000,00" for redemptions).
  */
 export const formatSignedPrice = (value?: number, _locale?: string, _currency?: string): string => {

@@ -361,25 +361,12 @@ Alternativa ao `sizeTable` que suporta dois formatos de conteúdo: imagem estát
     "whatsappUrl": "https://api.whatsapp.com/send/?phone=...",
     "faqUrl": "https://www.example.com/faq"
   },
-  "bonusConsultation": {
-    "url": "https://www.example.com/bonus-consultation",
-    "label": "Consulte seu Bônus"
+  "legalLinks": {
+    "termsUrl": "https://www.example.com/termos-de-uso",
+    "privacyUrl": "https://www.example.com/politica-de-privacidade"
   }
 }
-```
 
-**bonusConsultation** — Quando presente, exibe um botão na Home da conta que abre um link externo em in-app browser. Útil para integrações com serviços de bônus/cashback que possuem portal próprio. Quando ausente/`null`, o botão não é exibido.
-
-| Campo                   | Tipo         | Descrição                                                                       |
-| ----------------------- | ------------ | ------------------------------------------------------------------------------- |
-| helpLinks               | object       | URLs da seção de ajuda da Account.                                               |
-| helpLinks.whatsappUrl   | string (URL) | Abre externamente o atendimento pelo WhatsApp; usa o fallback quando ausente.    |
-| helpLinks.faqUrl        | string (URL) | Abre as perguntas frequentes no navegador interno; usa o fallback quando ausente. |
-| bonusConsultation       | object       | Quando presente, exibe o botão de consulta de bônus na Home da conta.            |
-| bonusConsultation.url   | string (URL) | URL externa aberta em in-app browser ao clicar no botão.                         |
-| bonusConsultation.label | string       | Texto exibido no botão (ex.: `"Consulte seu Bônus"`).                            |
-
----
 
 ### 🔗 externalPayments
 

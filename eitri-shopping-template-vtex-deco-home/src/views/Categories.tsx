@@ -50,7 +50,7 @@ export default function Categories(props: RouteProps<CategoriesState>) {
 		<Page title='Categorias'>
 			<HeaderContentWrapper className='flex justify-between'>
 				<TextInput
-					placeholder='Encontre sua Joia'
+					placeholder='Encontre seu produto'
 					insideLeft={<HeaderSearchIcon />}
 					className='flex-auto !bg-[#F6F4F7]'
 					onClick={goToSearch}

@@ -4,8 +4,8 @@
   "path": "/",
   "sections": [
     {
-      "promotionalText": "WELCOME_PROMO_TEXT",
-      "couponCode": "COUPON10",
+      "promotionalText": "CODIGO_PROMO",
+      "couponCode": "NEW10",
       "__resolveType": "site/sections/OverHeader.tsx"
     },
     {
@@ -40,6 +40,26 @@
       "numberOfItems": 8,
       "title": "Featured Products",
       "__resolveType": "site/sections/ProductShelf.tsx"
+    },
+    {
+      "images": [
+        {
+          "action": {
+            "type": "category",
+            "sort": "score:desc",
+            "value": "",
+            "title": "Shop Now",
+            "facets": []
+          },
+          "imageUrl": "https://placehold.co/750x1200/222/fff?text=Banner+2"
+        }
+      ],
+      "autoPlay": true,
+      "aspectRatio": "750:1200",
+      "mode": "FullScreen",
+      "size": {},
+      "__resolveType": "site/sections/Banners/MultipleImageBanner.tsx",
+      "autoPlayTimeout": 6
     }
   ]
 }
