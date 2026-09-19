@@ -1,4 +1,5 @@
 import { View, Text, Image } from 'eitri-luminus'
+import type { MouseEvent } from 'react'
 import { getProductProperty } from '../../utils/metalSwatches'
 import { getMaterialImage } from '../../utils/variationImages'
 import type { Product } from '../../types/product'
@@ -54,8 +55,8 @@ export default function MetalSwatches({ currentProductId, siblings, onSwatchPres
 				return (
 					<View
 						key={sibling.productId}
-						onClick={(e: any) => {
-							e.stopPropagation()
+						onClick={(e?: MouseEvent<HTMLElement>) => {
+							e?.stopPropagation()
 							if (!isCurrent && onSwatchPress) onSwatchPress(sibling)
 						}}
 						className='w-4 h-4 rounded-sm overflow-hidden border border-neutral-300'>

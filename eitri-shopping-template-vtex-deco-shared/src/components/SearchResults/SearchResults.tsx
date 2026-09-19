@@ -39,7 +39,7 @@ export default function SearchResults({ searchResults, isLoading, siblingsByCode
 						className='w-full'>
 						<ProductCard
 							product={product}
-							siblings={siblingsByCode?.[getAgrupadorCode(product)]}
+							siblings={siblingsByCode?.[getAgrupadorCode(product) ?? '']}
 						/>
 					</View>
 				))}

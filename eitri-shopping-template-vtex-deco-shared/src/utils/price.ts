@@ -7,8 +7,9 @@ import { App } from 'eitri-shopping-vtex-shared'
 export const formatPrice = (price?: number, _locale?: string, _currency?: string): string => {
 	if (!price) return ''
 
-	const locale = _locale || App?.configs?.storePreferences?.locale || 'pt-BR'
-	const currency = _currency || App?.configs?.storePreferences?.currencyCode || 'BRL'
+	// App.configs is typed as { verbose, gaVerbose } in the generated stub — cast narrowly.
+	const locale = _locale || (App as any)?.configs?.storePreferences?.locale || 'pt-BR'
+	const currency = _currency || (App as any)?.configs?.storePreferences?.currencyCode || 'BRL'
 
 	return price.toLocaleString(locale, { style: 'currency', currency: currency })
 }

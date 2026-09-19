@@ -1,0 +1,93 @@
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { addToWishlist, productOnWishlist, removeItemFromWishlist } from '../../services/CustomerService'
+import type { VtexCart, VtexCartItem } from '../../types/vtex'
+
+export const useCartItem = (cart?: VtexCart | null, itemId?: string): (VtexCartItem & { index: number }) | null => {
+	return useMemo(() => {
+		if (!cart?.items || !itemId) return null
+
+		const index = cart.items.findIndex(cartItem => cartItem.id === itemId)
+		if (index === -1) return null
+
+		return { ...cart.items[index], index }
+	}, [cart, itemId])
+}
+
+export const useWishlist = (productId?: string) => {
+	const [isOnWishlist, setIsOnWishlist] = useState(false)
+	// -1 is used elsewhere (ProductCard.tsx) as a sentinel for "just removed" — not a real list id.
+	const [wishListId, setWishListId] = useState<string | number | null>(null)
+	const [loading, setLoading] = useState(true)
+
+	useEffect(() => {
+		if (!productId) {
+			setLoading(false)
+			return
+		}
+
+		const checkWishlist = async () => {
+			try {
+				const { inList, listId } = await productOnWishlist(productId)
+				setIsOnWishlist(!!inList)
+				if (inList) setWishListId(listId ?? null)
+			} catch (error) {
+				console.error('Error checking wishlist:', error)
+			} finally {
+				setLoading(false)
+			}
+		}
+
+		checkWishlist()
+	}, [productId])
+
+	const addToList = useCallback(
+		async (itemName?: string, itemId?: string) => {
+			if (!productId) return
+
+			try {
+				setLoading(true)
+				setIsOnWishlist(true)
+				const response = (await addToWishlist(productId, itemName ?? '', itemId)) as {
+					data?: { addToList?: string }
+				}
+				setWishListId(response?.data?.addToList ?? null)
+			} catch (error) {
+				console.error('Error adding to wishlist:', error)
+				setIsOnWishlist(false)
+			} finally {
+				setLoading(false)
+			}
+		},
+		[productId]
+	)
+
+	const removeFromList = useCallback(async () => {
+		if (!wishListId) return
+
+		try {
+			setLoading(true)
+			setIsOnWishlist(false)
+			await removeItemFromWishlist(String(wishListId))
+		} catch (error) {
+			console.error('Error removing from wishlist:', error)
+			setIsOnWishlist(true)
+		} finally {
+			setLoading(false)
+		}
+	}, [wishListId])
+
+	const toggle = useCallback(
+		async (itemName?: string, itemId?: string) => {
+			if (loading) return
+
+			if (isOnWishlist) {
+				await removeFromList()
+			} else {
+				await addToList(itemName, itemId)
+			}
+		},
+		[loading, isOnWishlist, removeFromList, addToList]
+	)
+
+	return { isOnWishlist, loading, wishListId, setIsOnWishlist, toggle, setWishListId }
+}

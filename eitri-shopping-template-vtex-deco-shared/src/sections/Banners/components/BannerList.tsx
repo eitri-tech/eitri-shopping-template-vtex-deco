@@ -83,7 +83,7 @@ export default function BannerList({ data, onClick }: Props) {
 								key={imageUrl}
 								className='flex flex-col'>
 								<Image
-									src={imageUrl}
+									src={imageUrl ?? ''}
 									width={dimensions.width}
 									height={dimensions.height}
 									className='rounded object-cover'

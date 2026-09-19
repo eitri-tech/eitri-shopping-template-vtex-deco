@@ -1,0 +1,77 @@
+import type { ComponentType } from 'react'
+import Banner from '../components/CmsComponents/Banner/Banner'
+import ProductShelf from '../components/CmsComponents/ProductShelf/ProductShelf'
+import ProductTiles from '../components/CmsComponents/ProductTiles/ProductTiles'
+import CategoryTree from '../components/CmsComponents/CategoryTree/CategoryTree'
+import LastSeenProducts from '../components/CmsComponents/LastSeenProducts/LastSeenProducts'
+import CategoryListSwipe from '../components/CmsComponents/CategoryListSwipe/CategoryListSwipe'
+import ProductInfiniteScroll from '../components/CmsComponents/ProductInfiniteScroll/ProductInfiniteScroll'
+import BlogPostShelf from '../components/CmsComponents/Blog/BlogPostShelf'
+import HighlightedProductShelf from '../components/CmsComponents/HighlightedProductShelf/HighlightedProductShelf'
+import CategoryListVtex from '../components/CmsComponents/CategoryListVtex/CategoryListVtex'
+import CategoryAccordion from '../components/CmsComponents/CategoryAccordion/CategoryAccordion'
+import RichText from '../components/CmsComponents/RichText/RichText'
+import VtexAdsBanner from '../components/CmsComponents/VtexAdsBanner/VtexAdsBanner'
+import Experiences from '../components/CmsComponents/Experiences/Experiences'
+import CategoryGallery from '../components/CmsComponents/CategoryGallery/CategoryGallery'
+import OverHeader from '../components/CmsComponents/OverHeader/OverHeader'
+import NewsLetter from '../components/CmsComponents/NewsLetter/NewsLetter'
+import NavigateByCategories from '../components/CmsComponents/NavigateByCategories/NavigateByCategories'
+import BannerWithShelf from '../components/CmsComponents/BannerWithShelf/BannerWithShelf'
+import VideoHero from '../components/CmsComponents/VideoHero/VideoHero'
+import WelcomeModal from '../components/CmsComponents/WelcomeModal/WelcomeModal'
+
+const componentMap: Record<string, ComponentType<any>> = {
+	MultipleImageBanner: Banner,
+	ProductTiles: ProductTiles,
+	ProductShelf: ProductShelf,
+	CategoryTree: CategoryTree,
+	LastSeenProducts: LastSeenProducts,
+	CategoryListSwipe: CategoryListSwipe,
+	ProductInfiniteScroll: ProductInfiniteScroll,
+	WordPressCardList: BlogPostShelf,
+	HighlightedProductShelf: HighlightedProductShelf,
+	CategoryListVtex: CategoryListVtex,
+	CategoryAccordion: CategoryAccordion,
+	RichText: RichText,
+	VtexAdsBanner: VtexAdsBanner,
+	Experiences: Experiences,
+	CategoryGallery: CategoryGallery,
+	OverHeader: OverHeader,
+	NewsLetter: NewsLetter,
+	NavigateByCategories: NavigateByCategories,
+	BannerWithShelf: BannerWithShelf,
+	VideoHero: VideoHero,
+	WelcomeModal: WelcomeModal
+}
+
+interface CmsContent {
+	name?: string
+	id?: string | number
+	data?: unknown
+	[key: string]: unknown
+}
+
+export const getMappedComponent = (content: CmsContent, reloadKey?: unknown, rest?: Record<string, unknown>) => {
+	const Component = content.name ? componentMap[content.name] : undefined
+	if (!Component) {
+		console.error(`Component ${content.name} does not exist in the component map.`)
+		return null
+	}
+
+	const key = content.id
+
+	try {
+		return (
+			<Component
+				key={key}
+				data={content.data}
+				reloadKey={reloadKey}
+				{...rest}
+			/>
+		)
+	} catch (error) {
+		console.error(`Error rendering component ${content.name}:`, error)
+		return null
+	}
+}

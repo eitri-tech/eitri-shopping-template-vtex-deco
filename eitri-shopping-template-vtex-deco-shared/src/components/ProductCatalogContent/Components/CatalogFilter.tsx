@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { MouseEvent } from 'react'
 import { View, Text } from 'eitri-luminus'
 import { useTranslation } from 'eitri-i18n'
 import { RemoteConfig } from 'eitri-shopping-vtex-shared'
@@ -132,8 +133,8 @@ export default function CatalogFilter({
 		}
 	}
 
-	const handleFilterToggle = (filterValue: any, e: any) => {
-		e.stopPropagation()
+	const handleFilterToggle = (filterValue: any, e?: MouseEvent<HTMLElement>) => {
+		e?.stopPropagation()
 		const existingIndex = tempFilters?.facets?.findIndex(
 			(f: any) => f.key === filterValue.key && f.value === filterValue.value
 		)
@@ -195,7 +196,7 @@ export default function CatalogFilter({
 					open={showModal}
 					onClose={() => setShowModal(false)}>
 					<View
-						onClick={(e: any) => e.stopPropagation()}
+						onClick={(e?: MouseEvent<HTMLElement>) => e?.stopPropagation()}
 						className='bg-white rounded-t w-full max-h-[70vh] overflow-y-auto pointer-events-auto p-4'>
 						<View className='flex flex-row items-center justify-between border-b border-gray-300'>
 							<Text className='text-xl font-semibold'>{t('categoryPageModal.title')}</Text>
@@ -219,10 +220,13 @@ export default function CatalogFilter({
 										{facet.values.map((value: any, index: number) => (
 											<View
 												key={`${facet.key}-${index}`}
-												onClick={(e: any) => handleFilterToggle(value, e)}>
+												onClick={(e?: MouseEvent<HTMLElement>) => handleFilterToggle(value, e)}>
 												<CustomCheckbox
 													checked={value.selected}
 													label={`${value.name} (${value.quantity})`}
+													// Toggling actually happens via the wrapping View's onClick above (handleFilterToggle) —
+													// this checkbox is presentational only, so onChange is a required-but-unused no-op.
+													onChange={() => {}}
 												/>
 											</View>
 										))}

@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { Image, Text, View } from 'eitri-luminus'
 import { processActions } from '../../services/ResolveCmsActions'
 import type { CmsAction } from '../types'
 import type { Color, ImageWidget } from '../../types/widgets'
+
+// View has no `backgroundColor` prop in its .d.ts — kept as-is (pre-existing, likely a no-op at runtime).
+const ViewAny = View as unknown as (props: Record<string, unknown> & { children?: ReactNode }) => JSX.Element
 
 export interface SpotlightCarouselImage {
 	/** @title Imagem (APP) */
@@ -202,7 +206,7 @@ export default function SpotlightCarousel({
 				{backgroundImage ? (
 					<Image src={backgroundImage} alt='' className='w-full h-full object-cover' />
 				) : (
-					<View className='w-full h-full' backgroundColor={backgroundColor} />
+					<ViewAny className='w-full h-full' backgroundColor={backgroundColor} />
 				)}
 			</View>
 

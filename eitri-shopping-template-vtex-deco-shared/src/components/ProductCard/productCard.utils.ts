@@ -3,7 +3,8 @@ import { App } from 'eitri-shopping-vtex-shared'
 import type { Product, Seller } from '../../types/product'
 
 export const getProductVideo = (product: Product): string => {
-	const videoTag = App?.configs?.appConfigs?.productCard?.productVideoTag
+	// App.configs is typed as { verbose, gaVerbose } in the generated stub — cast narrowly.
+	const videoTag = (App as any)?.configs?.appConfigs?.productCard?.productVideoTag
 	if (!videoTag) return ''
 
 	const property = product?.properties?.find(prop => prop.name === videoTag)

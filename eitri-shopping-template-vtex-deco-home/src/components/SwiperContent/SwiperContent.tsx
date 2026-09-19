@@ -1,0 +1,23 @@
+import type { ReactNode } from 'react'
+import { Text, View } from 'eitri-luminus'
+
+interface SwiperContentProps {
+	title?: string
+	children?: ReactNode
+}
+
+export default function SwiperContent(props: SwiperContentProps) {
+	const { title, children } = props
+	return (
+		<View className='flex flex-col gap-2'>
+			{title && (
+				<View className='px-4'>
+					<Text className='font-bold text-lg'>{title}</Text>
+				</View>
+			)}
+			<View className='flex flex-row overflow-x-scroll'>
+				<View className={`flex flex-row gap-4 px-4`}>{children}</View>
+			</View>
+		</View>
+	)
+}
