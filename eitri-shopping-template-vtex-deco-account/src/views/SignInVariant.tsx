@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Page, View, Text, Image } from 'eitri-luminus'
 import iconGoogle from '../assets/images/social_google.svg'
 import lockIcon from '../assets/icons/lock.svg'
-import bonusIcon from '../assets/images/bonus.png'
+import { MdOutlineFeaturedVideo } from "react-icons/md";
 import Eitri from 'eitri-bifrost'
 import {
 	Loading,
@@ -27,7 +27,7 @@ import HelpSection from '../components/HelpSection/HelpSection'
 import type { RouteProps } from '../types/route'
 
 interface LoginProviders {
-	oAuthProviders?: Array<{ providerName?: string; [key: string]: unknown }>
+	oAuthProviders?: Array<{ providerName?: string;[key: string]: unknown }>
 	passwordAuthentication?: boolean
 	[key: string]: unknown
 }
@@ -49,7 +49,7 @@ export default function SignInVariant(props: SignInVariantProps) {
 	const redirectTo = props?.location?.state?.redirectTo
 	const redirectState = props?.location?.state?.redirectState
 	const closeAppAfterLogin = props?.location?.state?.closeAppAfterLogin
-	const defaultAfterLogin = props?.defaultAfterLogin || 'bonus'
+	const defaultAfterLogin = props?.defaultAfterLogin || 'feature'
 	const isWelcomeFlow = defaultAfterLogin !== 'back'
 	const openedFromBottomTab = redirectState?.tabIndex !== undefined && redirectState?.tabIndex !== null
 
@@ -87,12 +87,11 @@ export default function SignInVariant(props: SignInVariantProps) {
 	const redirectLoggedUser = async () => {
 		try {
 			if (!(await isLoggedIn())) return false
-
 			setLoading(true)
 			await onLoggedIn()
 			return true
 		} catch (error) {
-			console.error('Erro ao verificar sessão antes de exibir o login do bônus', error)
+			console.error('Erro ao verificar sessão antes de redirecionar o usuário', error)
 			return false
 		}
 	}
@@ -138,7 +137,7 @@ export default function SignInVariant(props: SignInVariantProps) {
 		if (defaultAfterLogin === 'back') {
 			return Eitri.navigation.back()
 		}
-		return navigate(PAGES.BONUS, {}, true)
+		return navigate(PAGES.FEATURE, {}, true)
 	}
 
 	const handleSocialLogin = async (executor: () => Promise<any>, method: string) => {
@@ -160,7 +159,7 @@ export default function SignInVariant(props: SignInVariantProps) {
 	}
 
 	const goToEmailLogin = (loginMode: string) => {
-		const emailRedirectTo = redirectTo || (defaultAfterLogin === 'bonus' ? PAGES.BONUS : undefined)
+		const emailRedirectTo = redirectTo || (defaultAfterLogin === 'feature' ? PAGES.FEATURE : undefined)
 		navigate(PAGES.SIGNIN, {
 			redirectTo: emailRedirectTo,
 			redirectState,
@@ -200,20 +199,18 @@ export default function SignInVariant(props: SignInVariantProps) {
 
 			<View className='px-4 mt-4'>
 				<View className='border border-gray-200 rounded-lg p-4 flex flex-row gap-3 items-start'>
-					<Image
-						src={bonusIcon}
-						width='28px'
-						height='28px'
-						className='object-contain mt-1'
+					<MdOutlineFeaturedVideo
+						className='text-primary-content'
+						size={20}
 					/>
 					<View className='flex flex-col flex-1'>
-						<Text className='font-bold text-base text-black'>{t('signInVariant.bonusTitle')}</Text>
-						<Text className='text-sm text-gray-600 mt-1 leading-5'>{t('signInVariant.bonusDescription')}</Text>
+						<Text className='font-bold text-base text-black'>{t('signInVariant.featureTitle')}</Text>
+						<Text className='text-sm text-gray-600 mt-1 leading-5'>{t('signInVariant.featureDescription')}</Text>
 					</View>
 				</View>
 
-				<View className='mt-6 mb-6'>
-					<Text className='text-center text-sm text-gray-600 leading-5 px-2'>
+				<View className='mt-6 mb-6 flex flex-col items-center'>
+					<Text className="text-gray-600 text-center text-sm leading-relaxed px-2" >
 						{t('signInVariant.subtitle')}
 					</Text>
 				</View>

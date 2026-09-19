@@ -21,17 +21,23 @@ import {
 import { doLogout, getCustomerData, isLoggedIn, removeClientData } from '../services/CustomerService'
 import { navigate, PAGES } from '../services/NavigationService'
 import { sendScreenView } from '../services/TrackingService'
-import { loadBonusScreenData, invalidateBonusCache } from '../services/BonusService'
+
 import { useTranslation } from 'eitri-i18n'
 import ProfileCardButton from '../components/ProfileCardButton/ProfileCardButton'
+import { RemoteConfig } from 'eitri-shopping-vtex-shared'
 import { startConfigure } from '../services/AppService'
 import HelpSection from '../components/HelpSection/HelpSection'
-import bonusIcon from '../assets/images/bonus.png'
+import { MdOutlineFeaturedVideo } from "react-icons/md";
 import type { VtexCustomerProfile } from '../types/vtex'
 
-// TODO: configurar URLs via Remote Config ou AppService
-const TERMS_URL = 'https://montecarlojoias.zendesk.com/hc/pt-br/articles/360043776251-Termos-de-uso'
-const PRIVACY_URL = 'https://montecarlojoias.zendesk.com/hc/pt-br/articles/360043337712-Politica-de-Privacidade'
+const TERMS_FALLBACK_URL = ''
+const PRIVACY_FALLBACK_URL = ''
+
+const getTermsUrl = (): string =>
+	(RemoteConfig.getContent('appConfigs.account.legalLinks.termsUrl') as string) || TERMS_FALLBACK_URL
+
+const getPrivacyUrl = (): string =>
+	(RemoteConfig.getContent('appConfigs.account.legalLinks.privacyUrl') as string) || PRIVACY_FALLBACK_URL
 
 interface InitializationInfos {
 	action?: string
@@ -51,20 +57,15 @@ export default function Home() {
 	const [isLoading, setIsLoading] = useState(true)
 	const [customerData, setCustomerData] = useState<VtexCustomerProfile>({})
 	const [isLogged, setIsLogged] = useState<boolean | null>(null)
-	const [bonusBalance, setBonusBalance] = useState<number | null>(null)
 	const [notificationsEnabled, setNotificationsEnabled] = useState(false)
 	const [locationEnabled, setLocationEnabled] = useState(false)
 
 	useEffect(() => {
-		// Only this first, direct call is a genuine app open — the resume
-		// listener below re-fires `init()` on every tab switch back into this
-		// app, which must NOT re-invalidate an otherwise-still-fresh bonus cache.
 		init({ isAppOpen: true })
 		sendScreenView('Perfil', 'HomeAccount')
 		Eitri.navigation.setOnResumeListener(() => {
 			init({ isAppOpen: false })
 		})
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const init = async (options: InitOptions = {}) => {
@@ -90,7 +91,6 @@ export default function Home() {
 		const logged = await isLoggedIn()
 
 		if (logged) {
-			if (isAppOpen) await invalidateBonusCache()
 			await loadMe()
 		} else {
 			doLogout()
@@ -108,21 +108,6 @@ export default function Home() {
 			return
 		}
 		setCustomerData(data)
-		loadBonusBalance(data)
-	}
-
-	// Also warms the Bonus screen's cache (statement + expiration, not just this
-	// balance) as a side effect — so a subsequent visit to the Bonus screen can
-	// render instantly instead of re-running the whole auth+profile+extract
-	// pipeline. See BonusService.loadBonusScreenData/peekCachedBonusScreenData.
-	const loadBonusBalance = async (customer: VtexCustomerProfile) => {
-		try {
-			// BonusService is still untyped JS — cast the shape this screen actually reads.
-			const result = (await loadBonusScreenData(customer)) as { balance?: number } | undefined
-			setBonusBalance(result?.balance ?? null)
-		} catch (e) {
-			setBonusBalance(null)
-		}
 	}
 
 	const _doLogout = async () => {
@@ -271,17 +256,17 @@ export default function Home() {
 					</View>
 
 					<View className='flex flex-col'>
+						{/* Use the CardButton Below as a model to integrate with external features
 						<ProfileCardButton
-							label={t('home.labelBonus')}
+							label={t('home.labelFeature')}
 							icon={
-								<Image
-									src={bonusIcon}
-									width='24px'
-									height='24px'
+								<MdOutlineFeaturedVideo
+									className='text-primary-content'
+									size={20}
 								/>
 							}
-							onClick={() => navigate(PAGES.BONUS)}
-						/>
+							onClick={() => navigate(PAGES.FEATURE)}
+						/> */}
 						<View className='px-4'>
 							<Divisor />
 						</View>
@@ -395,30 +380,23 @@ export default function Home() {
 						<View className='px-4'>
 							<Divisor />
 						</View>
-						<View
+						{/* <View
 							className='flex flex-col px-4 py-4 w-full'
-							onClick={() => navigate(PAGES.BONUS)}>
+							onClick={() => navigate(PAGES.FEATURE)}>
 							<View className='flex flex-row justify-between items-center w-full'>
 								<View className='flex flex-row items-center gap-2'>
-									<Image
-										src={bonusIcon}
-										width='24px'
-										height='24px'
+									<MdOutlineFeaturedVideo
+										className='text-primary-content'
+										size={20}
 									/>
-									<Text className='text-gray-700 font-medium'>{t('home.labelMyBonus')}</Text>
+									<Text className='text-gray-700 font-medium'>{t('home.labelMyBenefit')}</Text>
 								</View>
 								<ArrowRightIcon
 									size={16}
 									className='text-gray-700'
 								/>
 							</View>
-							{bonusBalance !== null && (
-								<View className='ml-8 mt-2 bg-gray-100 px-3 py-2 flex flex-col items-start'>
-									<Text className='text-xs text-gray-500'>{t('home.labelAvailableBalance')}:</Text>
-									<Text className='text-sm font-bold text-gray-900'>{formatCurrency(bonusBalance)}</Text>
-								</View>
-							)}
-						</View>
+						</View> */}
 					</View>
 
 					<View className='px-4 py-2'>
@@ -441,10 +419,10 @@ export default function Home() {
 					<HelpSection />
 
 					<View className='px-4 py-6 flex flex-col items-start gap-2'>
-						<View onClick={() => openExternalLink(TERMS_URL)}>
+						<View onClick={() => openExternalLink(getTermsUrl())}>
 							<Text className='text-gray-500 text-sm underline'>{t('home.labelTermsConditions')}</Text>
 						</View>
-						<View onClick={() => openExternalLink(PRIVACY_URL)}>
+						<View onClick={() => openExternalLink(getPrivacyUrl())}>
 							<Text className='text-gray-500 text-sm underline'>{t('home.labelPrivacyPolicy')}</Text>
 						</View>
 					</View>

@@ -20,7 +20,7 @@ export const PAGES = {
 	ADD_CARD_FORM: '/AddCardForm',
 	AUTH_SELECT: '/AuthSelect',
 	SIGNIN_VARIANT: '/SignInVariant',
-	BONUS: '/Bonus'
+	FEATURE: '/Feature'
 }
 
 export const openProduct = async (product: VtexProduct): Promise<void> => {
