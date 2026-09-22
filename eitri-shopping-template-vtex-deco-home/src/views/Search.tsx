@@ -70,7 +70,7 @@ export default function Search(props: RouteProps<SearchState>) {
 		if (returnTo) {
 			Eitri.navigation.navigate({ path: `/${returnTo}`, replace: true })
 		} else {
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		}
 	}
 

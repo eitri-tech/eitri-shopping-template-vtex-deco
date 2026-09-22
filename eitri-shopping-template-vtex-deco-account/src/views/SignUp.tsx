@@ -130,7 +130,7 @@ export default function SignUp(props: RouteProps<SignUpState>) {
 								content_id: 'back_from_sign_up'
 							})
 						}
-						Eitri.navigation.back(1)
+						Eitri.navigation.back()
 					}}
 				/>
 				<HeaderText text={t('signUp.lbRegister')} />

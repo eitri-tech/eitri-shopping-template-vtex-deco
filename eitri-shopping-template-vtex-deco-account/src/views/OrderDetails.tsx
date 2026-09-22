@@ -77,7 +77,7 @@ export default function OrderDetails(props: RouteProps<OrderDetailsState>) {
 		} else if (orderId) {
 			handleOrder(orderId)
 		} else {
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 			return
 		}
 
@@ -93,7 +93,7 @@ export default function OrderDetails(props: RouteProps<OrderDetailsState>) {
 			setOrder(orderData)
 		} catch (error) {
 			console.error('Erro ao pegar detalhes do pedido:', error)
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		} finally {
 			setIsLoading(false)
 		}
@@ -104,7 +104,7 @@ export default function OrderDetails(props: RouteProps<OrderDetailsState>) {
 		setIsLoading(true)
 		try {
 			await Vtex.customer.cancelOrder(order.orderId, { reason: cancelReason })
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		} catch (e) {
 			console.error('Erro ao cancelar pedido', e)
 			setIsLoading(false) // Garante que o loading para em caso de erro

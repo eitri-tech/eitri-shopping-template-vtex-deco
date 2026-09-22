@@ -88,7 +88,7 @@ export default function PixOrder(props: RouteProps<PixOrderState>) {
 
 	useEffect(() => {
 		if (timeOut <= 0) {
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		}
 	}, [timeOut])
 

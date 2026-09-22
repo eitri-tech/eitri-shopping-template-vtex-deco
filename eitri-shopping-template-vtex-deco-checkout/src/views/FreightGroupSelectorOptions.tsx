@@ -43,7 +43,7 @@ export default function FreightGroupSelectorOptions(props: RouteProps<{ group?: 
 
 			await setFreight?.(payload)
 
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		} catch (error) {
 			console.error('Error on select freight option', error)
 		} finally {

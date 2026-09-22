@@ -40,7 +40,7 @@ export default function ExternalProviderOrderFinished() {
 						<CustomButton
 							outlined
 							label={'Tentar novamente'}
-							onPress={() => Eitri.navigation.back(1)}
+							onPress={() => Eitri.navigation.back()}
 						/>
 					</View>
 				</View>

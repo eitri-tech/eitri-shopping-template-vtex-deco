@@ -15,10 +15,11 @@ export default function HeaderReturn(props: HeaderReturnProps) {
 	const onBack = () => {
 		if (typeof onClick === 'function') {
 			return onClick()
+		} else if (backPage) {
+			Eitri.navigation.back(backPage)
 		} else {
-			// The .d.ts declares `steps` as required even though the JSDoc/examples treat it as
-			// optional — 1 matches the documented single-screen-back example.
-			Eitri.navigation.back(backPage ?? 1)
+			// Only the no-arg call closes the Eitri-App at its root screen; back(1) there is a silent no-op.
+			Eitri.navigation.back()
 		}
 	}
 

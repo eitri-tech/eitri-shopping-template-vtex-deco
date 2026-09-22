@@ -283,7 +283,7 @@ export default function AddressForm(props: RouteProps<{ addressId?: string }>) {
 			}
 		} catch (e) {
 			console.error('Error loading address', e)
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		}
 	}
 
