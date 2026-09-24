@@ -58,5 +58,5 @@ export const navigate = (path: string, state: Record<string, unknown> = {}, repl
 
 export const navigateBack = (): void => {
 	// .d.ts declares `steps` as required despite the JSDoc/example showing a zero-arg call.
-	Eitri.navigation.back(1)
+	Eitri.navigation.back()
 }

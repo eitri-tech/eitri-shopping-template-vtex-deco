@@ -269,7 +269,7 @@ export default function AddressForm(props: RouteProps<AddressFormState>) {
 			} else {
 				await createAddress(address)
 			}
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		} catch (e) {
 			console.error('Error on submit', e)
 			return

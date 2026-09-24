@@ -192,7 +192,7 @@ export default function AddCardForm() {
 			const captchaToken = recaptchaSiteKey ? await recaptchaRef?.current?.getRecaptchaToken() : null
 
 			await addNewCard({ ...card, address }, captchaToken ?? '')
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		} catch (e) {
 			console.error('AddCardForm error', e)
 			setErrorMessage(t('savedCards.errorAddCard'))

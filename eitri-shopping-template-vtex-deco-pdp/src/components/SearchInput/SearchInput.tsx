@@ -132,7 +132,7 @@ export default function SearchInput(props: SearchInputProps) {
 		} else if (showSearchInsights) {
 			setShowSearchInsights(false)
 		} else {
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		}
 	}
 

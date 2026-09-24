@@ -146,7 +146,7 @@ export default function SearchInput(props: SearchInputProps) {
 		if (typeof onBack === 'function') {
 			onBack()
 		} else {
-			Eitri.navigation.back(1)
+			Eitri.navigation.back()
 		}
 	}
 
