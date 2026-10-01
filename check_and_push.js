@@ -4,8 +4,9 @@ const path = require('path')
 
 const MANAGER_URL = 'https://api.eitri.tech/eitri-manager-api/v2/revisions?eitriAppId='
 const BLIND_GUARDIAN_URL = 'https://api.eitri.tech/blind-guardian-api/v2/o/auth'
-const DEV_ENV_ID = ''
-const PROD_ENV_ID = ''
+// ID do ambiente vem do env (EITRI_DEV_ENV_ID), definido no workflow. Não pode ser o
+// código do ambiente, deve ser o ID.
+const DEV_ENV_ID = process.env.EITRI_DEV_ENV_ID
 
 const credentials = {
 	client_id: process.env.EITRI_CLI_CLIENT_ID,
@@ -128,12 +129,6 @@ async function publishProject(project, directoryPath, sharedVersion = false, mes
 
 	if (DEV_ENV_ID) {
 		await spawnAsync(`eitri publish -e ${DEV_ENV_ID}`, {
-			cwd: projectPath,
-			label: project
-		})
-	}
-	if (PROD_ENV_ID) {
-		await spawnAsync(`eitri publish -e ${PROD_ENV_ID}`, {
 			cwd: projectPath,
 			label: project
 		})
