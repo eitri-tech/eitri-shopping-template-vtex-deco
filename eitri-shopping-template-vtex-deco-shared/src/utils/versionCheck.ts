@@ -1,6 +1,7 @@
 import Eitri from 'eitri-bifrost'
 import Datadog from '../services/Datadog'
 
+// Use this to change the item quantity dots position on bottomBar if a version is already in production and for some reason the tabs position is changed
 export function isAppVersionBelow(currentVersion?: string | null, minimumVersion?: string | null): boolean {
 	if (!currentVersion || !minimumVersion) return false
 	const current = currentVersion.split('.').map(Number)
@@ -19,12 +20,13 @@ let tabIndex: number | null = null
 
 export async function getCartTabBadgeIndex(): Promise<number> {
 	try {
+		return 2
 		const config = await Eitri.getConfigs()
 		const currentVersion = config?.superAppData?.version
 		tabIndex = isAppVersionBelow(currentVersion, TAB_BADGE_MIN_VERSION) ? 1 : 3
 		Datadog.sendDatadogWarningLog({ currentVersion, tabIndex })
 	} catch (e) {
-		tabIndex = 3
+		tabIndex = 2
 	}
-	return tabIndex ?? 3
+	return tabIndex ?? 2
 }
