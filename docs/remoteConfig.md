@@ -421,40 +421,75 @@ Usa `appConfigs.pdp.sizeTable`. Para lojas sem integração Sizebay.
 
 ## 📱 eitriConfig
 
-Configuração de navegação entre apps Eitri. Define tabs, rotas e permite deep navigation via `initParams`.
+Configuração de navegação entre apps Eitri. `mainApp` é o app inicial e `dynamicBottomBar` define a bottom bar: as abas, o app e os `initParams` de cada uma (deep navigation) e a aparência.
 
 ```json
 "eitriConfig": {
-  "mainApp": "eitri-shopping-demo-home",
-  "bottomNavItems": [
-    {
-      "slug": "eitri-shopping-demo-home",
-      "initParams": { "tabIndex": 0 }
-    },
-    {
-      "slug": "eitri-shopping-demo-home",
-      "initParams": {
-        "tabIndex": 3,
-        "route": "LandingPage",
-        "landingPageName": "cupons"
+  "mainApp": "eitri-shopping-template-vtex-deco-home",
+  "dynamicBottomBar": {
+    "layout": {
+      "theme": "classic",
+      "backgroundColor": "#FFFFFF",
+      "selectedColor": "#373737",
+      "unselectedColor": "#8B8D98",
+      "badgeBackground": "#E5484D",
+      "badgeTextColor": "#FFFFFF",
+      "themeCustomizations": {
+        "classic": {
+          "labels": "shown",
+          "topBorder": {
+            "thickness": 1,
+            "color": "#DBDDE0"
+          }
+        }
       }
     },
-    {
-      "slug": "eitri-shopping-demo-home",
-      "initParams": {
-        "tabIndex": 1,
-        "route": "Search",
-        "searchTerm": "deals",
-        "title": "Deals"
+    "eitriApps": [
+      {
+        "slug": "eitri-shopping-template-vtex-deco-home",
+        "title": "Inicio",
+        "icon": "https://media-eitri-content.eitri.tech/default/icon_home_v1.png",
+        "initParams": {
+          "tabIndex": 0
+        }
+      },
+      {
+        "slug": "eitri-shopping-template-vtex-deco-home",
+        "title": "Categorias",
+        "icon": "https://media-eitri-content.eitri.tech/default/icon_menu_v1.png",
+        "initParams": {
+          "tabIndex": 1,
+          "route": "Categories"
+        }
+      },
+      {
+        "slug": "eitri-shopping-template-vtex-deco-cart",
+        "title": "Sacola",
+        "icon": "https://media-eitri-content.eitri.tech/default/icon_cart_v1.png",
+        "initParams": {
+          "tabIndex": 2
+        }
+      },
+      {
+        "slug": "eitri-shopping-template-vtex-deco-account",
+        "title": "Perfil",
+        "icon": "https://media-eitri-content.eitri.tech/default/icon_user_v1.png",
+        "initParams": {
+          "tabIndex": 3
+        }
       }
-    },
-    {
-      "slug": "eitri-shopping-demo-account",
-      "initParams": { "tabIndex": 3 }
-    }
-  ]
+    ]
+  }
 }
 ```
+
+| Campo                         | Descrição                                                                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `dynamicBottomBar.layout`     | Aparência: cores, badge, fontes e `themeCustomizations.classic` (rótulos, borda superior, tamanhos).                         |
+| `dynamicBottomBar.eitriApps`  | Abas, na ordem de exibição: `slug`, `title`, `icon` (PNG `https` com fundo transparente, ~96×96), `initParams` e `badge`.    |
+
+- A ordem das abas importa: o badge do carrinho é desenhado na aba de índice 2 (`getCartTabBadgeIndex`) e "Categorias" volta para a aba 0 com `changeTab`. Ao mudar a ordem, ajuste o código.
+- Para a simulação no `eitri app start`, o mesmo visual está em `bottom-tab-view-simulation.layout` do `app-config.yaml`.
 
 ---
 
